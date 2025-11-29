@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -8,7 +9,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettier from 'eslint-plugin-prettier/recommended';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: ['dist', 'node_modules', '.storybook', 'storybook-static'],
   },
@@ -17,10 +18,13 @@ export default tseslint.config(
     extends: [js.configs.recommended, ...tseslint.configs.recommended, prettier],
     languageOptions: {
       ecmaVersion: 2020,
-      sourceType: 'module',
       globals: globals.browser,
-      parser: tseslint.parser,
-      parserOptions: { project: true },
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
     },
     plugins: {
       react,
@@ -30,10 +34,10 @@ export default tseslint.config(
       'simple-import-sort': simpleImportSort,
     },
     rules: {
-      'react/jsx-key': 'warn',
-      'react/no-unknown-property': 'error',
+      ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'react/display-name': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
