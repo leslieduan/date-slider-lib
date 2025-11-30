@@ -30,7 +30,7 @@ export function useFocusManagement() {
 
   // Handle focus management after renders
   useEffect(() => {
-    if (pendingFocus && lastInteractionType === 'mouse') {
+    if (pendingFocus) {
       const focusTarget =
         pendingFocus === 'start'
           ? startHandleRef.current
@@ -41,9 +41,12 @@ export function useFocusManagement() {
               : null;
 
       if (focusTarget && document.activeElement !== focusTarget) {
+        // Use delay for mouse interactions to ensure DOM updates complete
+        // For keyboard/programmatic focus, apply immediately
+        const delay = lastInteractionType === 'mouse' ? TIMING.FOCUS_DELAY : 0;
         setTimeout(() => {
           focusTarget.focus();
-        }, TIMING.FOCUS_DELAY);
+        }, delay);
       }
       setPendingFocus(null);
     }

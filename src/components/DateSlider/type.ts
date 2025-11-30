@@ -2,15 +2,38 @@ import type { ReactNode, RefObject } from 'react';
 
 import type { DateGranularity } from './utils';
 
+/**
+ * Selection mode for the DateSlider component
+ * - `'point'`: Single date selection
+ * - `'range'`: Date range selection with start and end dates
+ * - `'combined'`: Both point and range selection simultaneously
+ */
 export type ViewMode = 'range' | 'point' | 'combined';
+
+/**
+ * Time unit granularity for date navigation and display
+ * - `'day'`: Daily granularity
+ * - `'month'`: Monthly granularity
+ * - `'year'`: Yearly granularity
+ */
 export type TimeUnit = 'day' | 'month' | 'year';
+
+/**
+ * Handle type identifier for drag operations
+ * - `'start'`: Range start handle
+ * - `'end'`: Range end handle
+ * - `'point'`: Point handle
+ * - `null`: No handle
+ */
 export type DragHandle = 'start' | 'end' | 'point' | null;
 
 // Re-export for convenience
 export type { DateGranularity };
 
 /**
- * Time label for scale marks
+ * Time label for scale marks on the slider track
+ * @property {Date} date - The date/time value for this label
+ * @property {number} position - Horizontal position in pixels from track start
  */
 export type TimeLabel = {
   date: Date;
@@ -22,22 +45,72 @@ export type TimeLabel = {
  */
 export type SelectionResult = SliderValue;
 
+/**
+ * Configuration for scale unit sizing and spacing
+ * Controls the visual appearance of tick marks on the slider track
+ *
+ * @example
+ * ```tsx
+ * <DateSlider
+ *   layout={{
+ *     scaleUnitConfig: {
+ *       gap: 60,
+ *       width: { short: 1, medium: 1, long: 1 },
+ *       height: { short: 10, medium: 20, long: 40 }
+ *     }
+ *   }}
+ * />
+ * ```
+ */
 export type ScaleUnitConfig = {
+  /** Gap between scale units in pixels */
   gap?: number;
+  /** Width of scale marks in pixels for each size variant */
   width: {
+    /** Width for short (minor) tick marks */
     short: number;
+    /** Width for medium tick marks */
     medium: number;
+    /** Width for long (major) tick marks */
     long: number;
   };
+  /** Height of scale marks in pixels for each size variant */
   height: {
+    /** Height for short (minor) tick marks */
     short: number;
+    /** Height for medium tick marks */
     medium: number;
+    /** Height for long (major) tick marks */
     long: number;
   };
 };
 
+/**
+ * Imperative API for programmatically controlling the DateSlider
+ *
+ * @example
+ * ```tsx
+ * const sliderRef = useRef<SliderExposedMethod>(null);
+ *
+ * // Set a specific date
+ * sliderRef.current?.setDateTime(new Date('2024-06-15'), 'point');
+ *
+ * // Focus a handle
+ * sliderRef.current?.focusHandle('point');
+ * ```
+ */
 export type SliderExposedMethod = {
+  /**
+   * Programmatically set the date/time for a specific handle
+   * @param date - UTC Date to set
+   * @param target - Which handle to update ('start', 'end', 'point'). Defaults to the current active handle.
+   */
   setDateTime: (date: Date, target?: DragHandle) => void;
+
+  /**
+   * Programmatically focus a specific handle
+   * @param handleType - Which handle to focus ('start', 'end', 'point')
+   */
   focusHandle: (handleType: DragHandle) => void;
 };
 
@@ -205,22 +278,64 @@ export type HandleRenderProps = {
   viewMode?: ViewMode;
 };
 
-/** Props passed to custom date label renderer */
+/**
+ * Props passed to custom date label renderer
+ * Used for rendering floating date labels above handles
+ */
 export type DateLabelRenderProps = {
+  /** Formatted date string to display */
   label?: string;
 };
 
+/**
+ * Props passed to custom time display renderer
+ * Used for rendering the current date/time display with navigation controls
+ *
+ * @example
+ * ```tsx
+ * renderTimeDisplay={({ dateLabel, toNextDate, toPrevDate }) => (
+ *   <div>
+ *     <button onClick={toPrevDate}>←</button>
+ *     <span>{dateLabel}</span>
+ *     <button onClick={toNextDate}>→</button>
+ *   </div>
+ * )}
+ * ```
+ */
 export type TimeDisplayRenderProps = {
+  /** Navigate to the next date based on current time unit */
   toNextDate: () => void;
+  /** Navigate to the previous date based on current time unit */
   toPrevDate: () => void;
+  /** Formatted date label for current selection */
   dateLabel: string;
 };
 
+/**
+ * Props passed to custom time unit selection renderer
+ * Used for rendering the time unit selector (day/month/year)
+ *
+ * @example
+ * ```tsx
+ * renderTimeUnitSelection={({ timeUnit, handleTimeUnitNextSelect, handleTimeUnitPreviousSelect }) => (
+ *   <div>
+ *     <button onClick={handleTimeUnitPreviousSelect}>↑</button>
+ *     <span>{timeUnit}</span>
+ *     <button onClick={handleTimeUnitNextSelect}>↓</button>
+ *   </div>
+ * )}
+ * ```
+ */
 export type TimeUnitSelectionRenderProps = {
+  /** Current time unit (day/month/year) */
   timeUnit: TimeUnit;
+  /** Select the next time unit (day → month → year) */
   handleTimeUnitNextSelect: () => void;
+  /** Select the previous time unit (year → month → day) */
   handleTimeUnitPreviousSelect: () => void;
+  /** Check if next button should be disabled */
   isNextBtnDisabled: () => boolean;
+  /** Check if previous button should be disabled */
   isPrevBtnDisabled: () => boolean;
 };
 /**
