@@ -30,7 +30,7 @@
     "build-storybook": "storybook build",
     "prepublishOnly": "pnpm run build",
     "prepare": "husky",
-    "lint": "eslint . || echo '\nNote: DateSlider component has expected ESLint warnings for DOM layout calculations. See .eslintrc-dateslider.md'",
+    "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:strict": "eslint . --max-warnings 0",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
