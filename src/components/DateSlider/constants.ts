@@ -22,7 +22,7 @@ export const DEFAULT_SCALE_CONFIG = {
  */
 export const LAYOUT = {
   /** Default horizontal padding for the track in pixels */
-  TRACK_PADDING_X: 36,
+  TRACK_PADDING_X: 0,
   /** Default slider height in pixels */
   DEFAULT_SLIDER_HEIGHT: 64,
   /** Minimum slider width in pixels (min-w-40 = 160px) */

@@ -88,22 +88,6 @@ export type DateSliderClassNames = {
   scaleMarkMinor?: string;
   /** Medium scale tick marks */
   scaleMarkMedium?: string;
-
-  // Time Unit Selection
-  /** Time unit selector container */
-  timeUnitSelector?: string;
-  /** Time unit selection buttons */
-  timeUnitButton?: string;
-  /** Active time unit button */
-  timeUnitButtonActive?: string;
-  /** Time unit text labels */
-  timeUnitText?: string;
-
-  // Time Display
-  /** Time display container */
-  timeDisplay?: string;
-  /** Text inside time display */
-  timeDisplayText?: string;
 };
 
 /**
