@@ -1,8 +1,8 @@
 // Import Tailwind CSS
-import '@/index.css';
+import './index.css';
 
 // Export components
-export { DateSlider } from '@/components';
+export { DateSlider } from './components';
 
 // Export types - Public API only
 export type {
