@@ -439,7 +439,7 @@ export const CombinedMode: Story = {
   },
 };
 
-export const FixedTrackWidth: Story = {
+export const FixedTrackUnscrollabel: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
     mode: 'range',
@@ -452,12 +452,14 @@ export const FixedTrackWidth: Story = {
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 'fill',
-      fixedTrackWidth: true,
       height: 100,
     },
     classNames: {
       trackActive: 'bg-orange-400/20',
       track: 'bg-gray-400',
+    },
+    behavior: {
+      scrollable: false,
     },
   },
 };

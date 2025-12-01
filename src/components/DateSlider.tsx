@@ -83,7 +83,8 @@ export const DateSlider = memo(
     const sliderWidth = layout?.width;
     const sliderHeight = layout?.height;
     const trackPaddingX = layout?.trackPaddingX ?? LAYOUT.TRACK_PADDING_X;
-    const isTrackFixedWidth = layout?.fixedTrackWidth ?? false;
+    // if not scrollable, track is fixed with, which is 100% of slider container width.
+    const isTrackFixedWidth = !scrollable;
     const withEndLabel = layout?.showEndLabel ?? true;
     const minGapScaleUnits = layout?.minGapScaleUnits ?? DEFAULTS.MIN_GAP_SCALE_UNITS;
     const scaleUnitConfig = layout?.scaleUnitConfig ?? DEFAULT_SCALE_CONFIG;
@@ -438,20 +439,33 @@ export const DateSlider = memo(
     }, [debouncedOnChange, endDate, pointPosition, rangeEnd, rangeStart, startDate, viewMode]);
     return (
       <div
-        className={cn('flex min-w-40', classNames?.wrapper, {
-          'w-full': sliderWidth === 'fill',
-        })}
+        className={cn('flex', classNames?.wrapper)}
         style={
-          sliderWidth !== 'fill'
+          sliderWidth === 'fill'
             ? {
                 height: sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
-                width: sliderWidth,
+                width: '100%',
+                minWidth: LAYOUT.MIN_SLIDER_WIDTH,
               }
-            : { height: sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT }
+            : {
+                height: sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
+                width: sliderWidth,
+                minWidth: LAYOUT.MIN_SLIDER_WIDTH,
+              }
         }
         role="group"
         aria-label={ACCESSIBILITY.SLIDER_ARIA_LABEL}
       >
+        {/* 
+                  date slider width mode: 1. fill parent div. 2. specified width.
+                  date slider width = TimeDisplay + SliderContainer + TimeUnitSelection
+                  SliderContainer is the visible area of DateSlider Track.
+                      Track can be fixed width, 100% of SliderContainer width.
+                      Track can be dynamic width, calculation result from each scale unit width, gap and number of sacales.
+                  
+               NOTICE!!!!!!   So layout.width(sliderWidth) cannot be undefined, must be either fill or a specified width number.
+                      
+
         {/* Time display and date selection operation */}
         {renderProps?.renderTimeDisplay && (
           <TimeDisplay
@@ -468,6 +482,7 @@ export const DateSlider = memo(
         <div ref={sliderContainerRef} className="overflow-hidden h-full flex-1 rounded-2xl">
           <div
             className="h-full"
+            // if track width is fixed, it will fill the width of slider container, it cannot be scrolled.
             style={isTrackFixedWidth ? { width: '100%' } : { width: trackWidth }}
             ref={sliderRef}
             {...dragHandlers}

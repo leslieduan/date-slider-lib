@@ -194,13 +194,11 @@ export type BehaviorConfig = {
  */
 export type LayoutConfig = {
   /** Slider width - 'fill' to fill parent, or specific number in pixels */
-  width?: 'fill' | number;
+  width: 'fill' | number;
   /** Slider height in pixels */
   height?: number;
   /** Horizontal padding for track in pixels */
   trackPaddingX?: number;
-  /** Use fixed track width (disable responsive width) */
-  fixedTrackWidth?: boolean;
   /** Show end label on scale */
   showEndLabel?: boolean;
   /** Minimum gap between scale units in pixels */
