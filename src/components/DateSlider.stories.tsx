@@ -541,10 +541,15 @@ export const ScrollableSlider: Story = {
     },
     behavior: {
       scrollable: true,
+      handleLabelDisabled: true,
     },
     classNames: {
       trackActive: 'bg-teal-400/20',
       track: 'bg-gray-300',
+    },
+    renderProps: {
+      renderDateLabel: customDateLabelRenderer,
+      renderTimeDisplay: customTimeDisplayRenderer,
     },
   },
 };
@@ -657,7 +662,7 @@ export const FrostSlider: Story = {
     behavior: {
       scrollable: true,
       handleLabelPersistent: false,
-      handleLabelDisabled: false,
+      handleLabelDisabled: true,
     },
     classNames: {
       slider: 'frosted',

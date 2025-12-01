@@ -64,13 +64,13 @@
   ],
   "author": "Your Name <your.email@example.com>",
   "license": "MIT",
-  "homepage": "https://github.com/leslieduan/date-slider#readme",
+  "homepage": "https://github.com/aodn/imos-live-date-slider#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leslieduan/date-slider.git"
+    "url": "git+https://github.com/aodn/imos-live-date-slider.git"
   },
   "bugs": {
-    "url": "https://github.com/leslieduan/date-slider/issues"
+    "url": "https://github.com/aodn/imos-live-date-slider/issues"
   },
   "packageManager": "pnpm@10.24.0",
   "peerDependencies": {

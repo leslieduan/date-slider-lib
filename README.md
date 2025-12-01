@@ -3,10 +3,10 @@
 A powerful, fully customizable React date slider component with range, point, and combined selection modes. Built with TypeScript, styled with Tailwind CSS.
 
 [![npm version](https://img.shields.io/npm/v/date-slider-lib.svg)](https://www.npmjs.com/package/date-slider-lib)
-[![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://leslieduan.github.io/date-slider/)
+[![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://aodn.github.io/imos-live-date-slider)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📚 [View Live Demo & Documentation](https://leslieduan.github.io/date-slider/)
+## 📚 [View Live Demo & Documentation](https://aodn.github.io/imos-live-date-slider)
 
 ## Features
 
