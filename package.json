@@ -65,15 +65,15 @@
     "tailwind",
     "tailwindcss"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "leslied41@gmail.com",
   "license": "MIT",
-  "homepage": "https://github.com/aodn/imos-live-date-slider#readme",
+  "homepage": "https://github.com/leslieduan/date-slider-lib#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aodn/imos-live-date-slider.git"
+    "url": "git+ttps://github.com/leslieduan/date-slider-lib.git"
   },
   "bugs": {
-    "url": "https://github.com/aodn/imos-live-date-slider/issues"
+    "url": "https://github.com/leslieduan/date-slider-lib/issues"
   },
   "packageManager": "pnpm@10.24.0",
   "peerDependencies": {
