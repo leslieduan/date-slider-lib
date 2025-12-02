@@ -8,3 +8,4 @@ export * from './useFocusManagement';
 export * from './useInitialAutoScrollPosition';
 export * from './usePositionState';
 export * from './useDateLabelPersist';
+export * from './useHandleVisible';

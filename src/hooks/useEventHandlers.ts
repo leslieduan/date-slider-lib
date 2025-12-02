@@ -40,6 +40,7 @@ import { useCallback, useEffect } from 'react';
  * @param isContainerDragging - Whether the container is being dragged
  * @param totalScaleUnits - Total number of scale units
  * @param freeSelectionOnTrackClick - Whether to allow free selection or snap to scales
+ * @param autoScrollToVisibleAreaEnabled - Ref to enable auto-scroll to bring handle into view
  * @returns Event handler functions for mouse, touch, and keyboard events
  */
 export function useEventHandlers(
@@ -62,7 +63,8 @@ export function useEventHandlers(
   handleDragStarted: boolean,
   isContainerDragging: boolean,
   totalScaleUnits: number,
-  freeSelectionOnTrackClick: boolean
+  freeSelectionOnTrackClick: boolean,
+  autoScrollToVisibleAreaEnabled: React.MutableRefObject<boolean>
 ) {
   const findClosestHandle = useCallback(
     (percentage: number): DragHandle => {
@@ -245,6 +247,7 @@ export function useEventHandlers(
       if (newPercentage !== undefined) {
         setLastInteractionType('keyboard');
         updateHandlePosition(handle, newPercentage);
+        autoScrollToVisibleAreaEnabled.current = true;
       }
     },
     [
@@ -258,6 +261,7 @@ export function useEventHandlers(
       freeSelectionOnTrackClick,
       setLastInteractionType,
       updateHandlePosition,
+      autoScrollToVisibleAreaEnabled,
     ]
   );
 

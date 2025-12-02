@@ -259,6 +259,97 @@ const customTimeUnitSelectionRenderer = ({
   );
 };
 
+// Getting Started template component
+const GettingStartedTemplate = () => {
+  const [selection, setSelection] = useState<SelectionResult>();
+
+  const value = { point: toUTCDate('2024-06-15') };
+
+  return (
+    <div className="p-8 bg-linear-to-br from-gray-50 to-gray-100 min-h-[400px] rounded-lg">
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h2 className="text-2xl font-bold mb-4 text-gray-900">Getting Started with DateSlider</h2>
+        <p className="text-gray-700 mb-6">
+          This is the simplest possible DateSlider configuration. Try dragging the handle or using
+          keyboard arrows!
+        </p>
+
+        <DateSlider
+          mode="point"
+          value={value}
+          min={toUTCDate('2024-01-01')}
+          max={toUTCDate('2024-12-31')}
+          initialTimeUnit="day"
+          onChange={setSelection}
+          icons={{ point: <Circle /> }}
+          layout={{ width: 600, height: 80 }}
+        />
+
+        {selection && (
+          <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
+            <strong className="text-blue-900">Selected Date:</strong>
+            <pre className="mt-2 text-sm text-blue-800">
+              {'point' in selection && selection.point.toISOString()}
+            </pre>
+          </div>
+        )}
+
+        <div className="mt-6 p-4 bg-gray-50 rounded border border-gray-200">
+          <h3 className="font-semibold text-gray-900 mb-2">Quick Tips:</h3>
+          <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+            <li>Drag the handle to select a date</li>
+            <li>Click on the track to jump to a date</li>
+            <li>Use arrow keys for precise navigation</li>
+            <li>Change time unit (day/month/year) with the selector</li>
+            <li>Navigate with the date display arrows</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Getting Started
+ *
+ * This story demonstrates the absolute minimum code needed to use DateSlider.
+ * Perfect for beginners who want to quickly integrate the component.
+ *
+ * ## Basic Usage:
+ * ```tsx
+ * import { DateSlider } from 'date-slider-lib';
+ * import { Circle } from 'lucide-react';
+ *
+ * function App() {
+ *   const [value, setValue] = useState({ point: new Date() });
+ *
+ *   return (
+ *     <DateSlider
+ *       mode="point"
+ *       value={value}
+ *       onChange={setValue}
+ *       min={new Date('2024-01-01')}
+ *       max={new Date('2024-12-31')}
+ *       initialTimeUnit="day"
+ *       icons={{ point: <Circle /> }}
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * ## Key Props:
+ * - `mode`: Selection type ('point', 'range', or 'combined')
+ * - `value`: Current selection (UTC dates)
+ * - `onChange`: Callback when selection changes
+ * - `min` / `max`: Date range boundaries
+ * - `initialTimeUnit`: Starting granularity ('day', 'month', 'year')
+ * - `icons`: Custom icons for handles
+ */
+export const GettingStarted: Story = {
+  render: () => <GettingStartedTemplate />,
+  args: {},
+};
+
 // Enhanced template with better performance and accessibility
 const DateSliderTemplate = (args: Partial<SliderProps>) => {
   const [selection, setSelection] = useState<SelectionResult>();
@@ -677,247 +768,4 @@ export const FrostSlider: Story = {
       renderTimeUnitSelection: customTimeUnitSelectionRenderer,
     },
   },
-};
-
-// ===== DOCUMENTATION STORIES =====
-
-// Getting Started template component
-const GettingStartedTemplate = () => {
-  const [selection, setSelection] = useState<SelectionResult>();
-
-  const value = { point: toUTCDate('2024-06-15') };
-
-  return (
-    <div className="p-8 bg-linear-to-br from-gray-50 to-gray-100 min-h-[400px] rounded-lg">
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">Getting Started with DateSlider</h2>
-        <p className="text-gray-700 mb-6">
-          This is the simplest possible DateSlider configuration. Try dragging the handle or using
-          keyboard arrows!
-        </p>
-
-        <DateSlider
-          mode="point"
-          value={value}
-          min={toUTCDate('2024-01-01')}
-          max={toUTCDate('2024-12-31')}
-          initialTimeUnit="day"
-          onChange={setSelection}
-          icons={{ point: <Circle /> }}
-          layout={{ width: 600, height: 80 }}
-        />
-
-        {selection && (
-          <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
-            <strong className="text-blue-900">Selected Date:</strong>
-            <pre className="mt-2 text-sm text-blue-800">
-              {'point' in selection && selection.point.toISOString()}
-            </pre>
-          </div>
-        )}
-
-        <div className="mt-6 p-4 bg-gray-50 rounded border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-2">Quick Tips:</h3>
-          <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-            <li>Drag the handle to select a date</li>
-            <li>Click on the track to jump to a date</li>
-            <li>Use arrow keys for precise navigation</li>
-            <li>Change time unit (day/month/year) with the selector</li>
-            <li>Navigate with the date display arrows</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Getting Started
- *
- * This story demonstrates the absolute minimum code needed to use DateSlider.
- * Perfect for beginners who want to quickly integrate the component.
- *
- * ## Basic Usage:
- * ```tsx
- * import { DateSlider } from 'date-slider-lib';
- * import { Circle } from 'lucide-react';
- *
- * function App() {
- *   const [value, setValue] = useState({ point: new Date() });
- *
- *   return (
- *     <DateSlider
- *       mode="point"
- *       value={value}
- *       onChange={setValue}
- *       min={new Date('2024-01-01')}
- *       max={new Date('2024-12-31')}
- *       initialTimeUnit="day"
- *       icons={{ point: <Circle /> }}
- *     />
- *   );
- * }
- * ```
- *
- * ## Key Props:
- * - `mode`: Selection type ('point', 'range', or 'combined')
- * - `value`: Current selection (UTC dates)
- * - `onChange`: Callback when selection changes
- * - `min` / `max`: Date range boundaries
- * - `initialTimeUnit`: Starting granularity ('day', 'month', 'year')
- * - `icons`: Custom icons for handles
- */
-export const GettingStarted: Story = {
-  render: () => <GettingStartedTemplate />,
-  args: {},
-};
-
-// Accessibility template component
-const AccessibilityTemplate = () => {
-  const [selection, setSelection] = useState<SelectionResult>();
-  const sliderRef = useRef<SliderExposedMethod>(null);
-
-  const value = {
-    start: toUTCDate('2024-03-01'),
-    end: toUTCDate('2024-09-01'),
-  };
-
-  const handleFocusStart = () => sliderRef.current?.focusHandle('start');
-  const handleFocusEnd = () => sliderRef.current?.focusHandle('end');
-
-  return (
-    <div className="p-8 bg-linear-to-br from-gray-50 to-gray-100 min-h-[600px] rounded-lg">
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">Accessibility Features</h2>
-
-        <div className="mb-6 p-4 bg-blue-50 rounded border border-blue-200">
-          <h3 className="font-semibold text-blue-900 mb-2">WCAG AAA Compliant</h3>
-          <p className="text-sm text-blue-800">
-            All colors meet WCAG AAA contrast requirements (minimum 7:1 ratio for text, 4.5:1 for UI
-            components)
-          </p>
-        </div>
-
-        <DateSlider
-          mode="range"
-          value={value}
-          min={toUTCDate('2024-01-01')}
-          max={toUTCDate('2024-12-31')}
-          initialTimeUnit="month"
-          onChange={setSelection}
-          imperativeRef={sliderRef}
-          icons={{
-            rangeStart: <MoveHorizontal />,
-            rangeEnd: <MoveHorizontal />,
-          }}
-          layout={{ width: 700, height: 100 }}
-          classNames={{
-            // High contrast colors for accessibility
-            trackActive: 'bg-blue-500/20',
-            track: 'bg-gray-400',
-            handle: 'bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300',
-          }}
-        />
-
-        {selection && (
-          <div className="mt-6 p-4 bg-green-50 rounded border border-green-200">
-            <strong className="text-green-900">Current Selection:</strong>
-            <pre className="mt-2 text-sm text-green-800">{JSON.stringify(selection, null, 2)}</pre>
-          </div>
-        )}
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-gray-50 rounded border border-gray-200">
-            <h3 className="font-semibold text-gray-900 mb-3">Keyboard Navigation</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">← →</kbd>
-                <span className="text-gray-700">Move by 1 unit</span>
-              </div>
-              <div className="flex justify-between">
-                <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">PgUp/Dn</kbd>
-                <span className="text-gray-700">Move by 10 units</span>
-              </div>
-              <div className="flex justify-between">
-                <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">Home</kbd>
-                <span className="text-gray-700">Go to minimum</span>
-              </div>
-              <div className="flex justify-between">
-                <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">End</kbd>
-                <span className="text-gray-700">Go to maximum</span>
-              </div>
-              <div className="flex justify-between">
-                <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">Tab</kbd>
-                <span className="text-gray-700">Next handle</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 bg-gray-50 rounded border border-gray-200">
-            <h3 className="font-semibold text-gray-900 mb-3">Programmatic Control</h3>
-            <div className="space-y-2">
-              <button
-                onClick={handleFocusStart}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
-              >
-                Focus Start Handle
-              </button>
-              <button
-                onClick={handleFocusEnd}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
-              >
-                Focus End Handle
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 p-4 bg-purple-50 rounded border border-purple-200">
-          <h3 className="font-semibold text-purple-900 mb-2">Accessibility Checklist</h3>
-          <ul className="space-y-1 text-sm text-purple-800">
-            <li>✓ Keyboard navigable</li>
-            <li>✓ Screen reader compatible</li>
-            <li>✓ WCAG AAA color contrast</li>
-            <li>✓ Focus indicators visible</li>
-            <li>✓ Touch-friendly (44x44px targets)</li>
-            <li>✓ No color-only information</li>
-            <li>✓ Descriptive ARIA labels</li>
-            <li>✓ Works without JavaScript (graceful degradation)</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Accessibility Features
- *
- * DateSlider is built with accessibility in mind, meeting WCAG AAA standards.
- *
- * ## Keyboard Navigation:
- * - **Arrow Left/Right**: Move handle by one time unit
- * - **Page Up/Down**: Move handle by 10 units
- * - **Home**: Move to minimum date
- * - **End**: Move to maximum date
- * - **Tab**: Navigate between handles (in range/combined mode)
- *
- * ## Screen Reader Support:
- * - Proper ARIA labels for all interactive elements
- * - Descriptive role attributes
- * - Value announcements on change
- *
- * ## Color Contrast:
- * - All text meets WCAG AAA standard (7:1 contrast)
- * - Focus indicators are clearly visible
- * - Color is not the only means of conveying information
- *
- * ## Touch Support:
- * - Large touch targets (minimum 44x44px)
- * - Drag and drop on touch devices
- * - No hover-only interactions
- */
-export const Accessibility: Story = {
-  render: () => <AccessibilityTemplate />,
-  args: {},
 };

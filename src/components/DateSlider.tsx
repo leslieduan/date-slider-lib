@@ -14,6 +14,7 @@ import {
   useEventHandlers,
   useFocusManagement,
   useHandleDragState,
+  useHandleVisible,
   useInitialAutoScrollPosition,
   usePositionState,
   useRAFDFn,
@@ -228,42 +229,21 @@ export const DateSlider = memo(
       },
     });
 
-    //TODO: 1. when scroll handle outside of view, then click on left/right button, it should scroll to make handle fully visible.
-    //TODO: 2. currently, the auto scroll only works when left/right button clicked. keyboard arrow navigation does not trigger auto scroll. Should fix this.
-    //TODO: 3. date label and time unit lablel format should be customizable.
-    //TODO: 4. update docs, there are two readme files now.
-    //TODO: 5. add more tests.
-    //TODO: 6. improve performance, avoid too many re-renders when dragging.
-    //TODO: 7. remove Button component and its dependencies if not used.
-    //TODO: 8. refactor files structure under components/DateSlider for better clarity.
-    //TODO: 9. add more comments and documentation in the code.
+    //TODO: 2. date label and time unit label format should be customizable.
+    //TODO: 4. add tests.
+    //TODO: 5. improve performance, avoid too many re-renders when dragging.
 
-    // auto scroll slider to keep point handle in view when point date changes by moving point handle
-    if (
-      !isSliderDragging &&
-      !isHandleDragging &&
-      pointHandleRef.current &&
-      sliderContainerRef.current &&
-      autoScrollToVisibleAreaEnabled.current
-    ) {
-      const pointHandleRect = pointHandleRef.current.getBoundingClientRect();
-      const containerRect = sliderContainerRef.current.getBoundingClientRect();
-
-      const distanceFromRightEdge = containerRect.right - pointHandleRect.right;
-      const distanceFromLeftEdge = pointHandleRect.left - containerRect.left;
-
-      if (distanceFromRightEdge < 0) {
-        const newX = sliderPosition.x - dimensions.sliderContainerWidth / 2;
-        const clampedX = Math.max(newX, dragBounds.left);
-        resetPosition({ x: clampedX, y: 0 });
-        autoScrollToVisibleAreaEnabled.current = false;
-      } else if (distanceFromLeftEdge < 0) {
-        const newX = sliderPosition.x + dimensions.sliderContainerWidth / 2;
-        const clampedX = Math.min(newX, dragBounds.right);
-        resetPosition({ x: clampedX, y: 0 });
-        autoScrollToVisibleAreaEnabled.current = false;
-      }
-    }
+    useHandleVisible({
+      pointHandleRef,
+      isHandleDragging,
+      sliderContainerRef,
+      dragBounds,
+      sliderPosition,
+      resetPosition,
+      pointPosition,
+      isSliderDragging,
+      autoScrollToVisibleAreaEnabled,
+    });
 
     useInitialAutoScrollPosition({
       scrollable,
@@ -412,7 +392,8 @@ export const DateSlider = memo(
       handleDragStarted,
       isSliderDragging,
       totalScaleUnits,
-      freeSelectionOnTrackClick
+      freeSelectionOnTrackClick,
+      autoScrollToVisibleAreaEnabled
     );
 
     const onChangeRef = useRef(onChange);

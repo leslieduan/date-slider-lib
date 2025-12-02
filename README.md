@@ -3,10 +3,10 @@
 A powerful, fully customizable React date slider component with range, point, and combined selection modes. Built with TypeScript, styled with Tailwind CSS.
 
 [![npm version](https://img.shields.io/npm/v/date-slider-lib.svg)](https://www.npmjs.com/package/date-slider-lib)
-[![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://aodn.github.io/imos-live-date-slider)
+[![Storybook](https://img.shields.io/badge/Storybook-FF4785?style=flat&logo=storybook&logoColor=white)](https://leslieduan.github.io/date-slider-lib)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📚 [View Live Demo & Documentation](https://aodn.github.io/imos-live-date-slider)
+## 📚 [View Live Demo & Documentation](https://leslieduan.github.io/date-slider-lib)
 
 ## Features
 
@@ -56,7 +56,6 @@ export default {
 }
 ```
 
-> **Note**: The library uses inline styles for critical layout properties, so it works even without Tailwind configuration. However, configuring Tailwind ensures all styling classes are available for customization.
 
 ### Basic Usage
 
@@ -389,7 +388,6 @@ type LayoutConfig = {
   width?: 'fill' | number;        // Slider width (px or fill parent)
   height?: number;                // Slider height in pixels
   trackPaddingX?: number;         // Horizontal track padding
-  fixedTrackWidth?: boolean;      // Disable responsive width
   showEndLabel?: boolean;         // Show end date label
   minGapScaleUnits?: number;      // Minimum gap between handles
   scaleUnitConfig?: {             // Custom scale configuration
@@ -497,27 +495,6 @@ Mobile-friendly responsive slider:
 />
 ```
 
-### Fixed Track Width
-
-Maintain consistent track appearance:
-
-```tsx
-<DateSlider
-  mode="range"
-  value={{
-    start: new Date('2024-11-05'),
-    end: new Date('2024-01-05')
-  }}
-  min={new Date('2024-10-05')}
-  max={new Date('2025-11-11')}
-  initialTimeUnit="month"
-  layout={{
-    width: 'fill',
-    fixedTrackWidth: true,
-    height: 100,
-  }}
-/>
-```
 
 ## Architecture
 
