@@ -682,6 +682,7 @@ export const WithCustomRenderProps: Story = {
       width: 800,
       height: 100,
     },
+    behavior: { handleLabelPersistent: true },
     classNames: {
       trackActive: 'bg-purple-400/20',
       track: 'bg-gray-300',
