@@ -580,6 +580,7 @@ export type SliderHandleProps = {
   handleLabelPersistent?: boolean;
   handleLabelDisabled?: boolean;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
+  sliderContainerRef: RefObject<HTMLDivElement | null>;
 };
 
 export type RenderSliderHandleProps = {
@@ -605,6 +606,7 @@ export type RenderSliderHandleProps = {
   handleLabelDisabled?: boolean;
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
+  sliderContainerRef: RefObject<HTMLDivElement | null>;
 };
 
 export type TimeUnitSelectionProps = {
@@ -640,6 +642,7 @@ export type DateLabelProps = {
   handleLabelPersistent?: boolean;
   handleLabelDisabled?: boolean;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
+  className?: string;
 };
 
 export type Dimension = {

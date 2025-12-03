@@ -639,3 +639,28 @@ export function toISODateString(date: Date): string {
 
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * Detect if handle is outside visible area in slider
+ *
+ * @param sliderContainerRef
+ * @returns handleRef
+ */
+export const handleOutsideVisibleArea = ({
+  sliderContainerRef,
+  handleRef,
+}: {
+  sliderContainerRef: RefObject<HTMLDivElement | null>;
+  handleRef: RefObject<HTMLButtonElement | null>;
+}) => {
+  const handleRect = handleRef.current?.getBoundingClientRect();
+  const containerRect = sliderContainerRef.current?.getBoundingClientRect();
+
+  const distanceFromRightEdge = (containerRect?.right || 0) - (handleRect?.right || 0);
+  const distanceFromLeftEdge = (handleRect?.left || 0) - (containerRect?.left || 0);
+
+  return {
+    left: distanceFromLeftEdge < 0,
+    right: distanceFromRightEdge < 0,
+  };
+};
