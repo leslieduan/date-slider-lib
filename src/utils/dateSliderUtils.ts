@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 
 import type {
+  DateFormat,
   NumOfScales,
   Scale,
   ScaleType,
@@ -162,6 +163,7 @@ export const generateTrackWidth = (
  * Generate scale marks with position and type information.
  *
  * Creates an array of scale objects representing tick marks on the slider.
+ * Each scale tick points to the corresponding unit.
  * Scale types (short/medium/long) are determined by date significance:
  * - Day mode: long=1st of month, medium=Monday, short=other days
  * - Month mode: long=January, medium=quarter start, short=other months
@@ -237,6 +239,13 @@ export const generateScalesWithInfo = (
   return { scales, numberOfScales: scaleCounts };
 };
 
+/**
+ * Each time label point to each sacle tick
+ * @param start - Start date of the range
+ * @param end - End date of the range
+ * @param unit - Time unit for scales
+ * @returns
+ */
 export const generateTimeLabelsWithPositions = (
   start: Date,
   end: Date,
@@ -259,8 +268,8 @@ export const generateTimeLabelsWithPositions = (
         current.setUTCDate(current.getUTCDate() + 1);
         break;
       case 'month':
-        labelDate = new Date(Date.UTC(current.getUTCFullYear(), 0, 1));
-        current.setUTCFullYear(current.getUTCFullYear() + 1);
+        labelDate = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 1));
+        current.setUTCMonth(current.getUTCMonth() + 1);
         break;
       case 'year': {
         const decade = Math.floor(current.getUTCFullYear() / 10) * 10;
@@ -432,13 +441,7 @@ export const getAllScalesPercentage = (
  * - All dates are stored and manipulated as UTC timestamps
  * - Only convert to local timezone for display purposes
  * - Date-only data is represented as UTC midnight
- * - Supports future hourly/minute granularity
  */
-
-/**
- * Date granularity supported by the slider
- */
-export type DateGranularity = 'day' | 'hour' | 'minute';
 
 /**
  * Convert an ISO date string (YYYY-MM-DD) to UTC midnight
@@ -509,83 +512,55 @@ export function addTime(
   return result;
 }
 
-/**
- * Format UTC date for display
- *
- * Uses the browser's Intl API to format dates according to locale.
- * Always displays in UTC timezone to avoid confusion.
- *
- * @param date - UTC date to format
- * @param granularity - Display granularity
- * @param locale - Locale string (default: en-AU)
- * @param fullDate - For day granularity, whether to show full date or abbreviated
- * @returns Formatted date string
- *
- * @example
- * // Daily granularity - show only date
- * formatForDisplay(new Date("2024-01-15T00:00:00Z"), 'day', 'en-AU', true)
- * // → "15 Jan 2024"
- *
- * // Hourly granularity - show date and time
- * formatForDisplay(new Date("2024-01-15T14:00:00Z"), 'hour')
- * // → "15 Jan 2024, 14:00"
- */
-export function formatForDisplay(
-  date: Date,
-  granularity: DateGranularity,
-  locale: string = 'en-AU',
-  fullDate: boolean = false
-): string {
-  switch (granularity) {
-    case 'day': {
-      if (fullDate) {
-        return date.toLocaleDateString(locale, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          timeZone: 'UTC',
-        });
-      }
+export const dateFormatFn: DateFormat = (date: Date) => {
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
 
-      // Abbreviated format for labels
-      const day = date.getUTCDate();
-      const month = date.getUTCMonth();
-
-      if (month === 0 && day === 1) {
-        // New Year - show year
-        return date.toLocaleDateString(locale, { year: 'numeric', timeZone: 'UTC' });
-      }
-
-      if (day === 1) {
-        // First of month - show month
-        return date.toLocaleDateString(locale, { month: 'short', timeZone: 'UTC' });
-      }
-
-      // Regular day - show day number
-      return date.toLocaleDateString(locale, { day: 'numeric', timeZone: 'UTC' });
-    }
-
-    case 'hour':
-      return date.toLocaleString(locale, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'UTC',
-      });
-
-    case 'minute':
-      return date.toLocaleString(locale, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        timeZone: 'UTC',
-      });
+  if (month === 0 && day === 1) {
+    return 'yyyy';
   }
+
+  if (day === 1) {
+    return 'MMM';
+  }
+
+  return 'dd';
+};
+
+export function formatDate(
+  date: Date,
+  format: DateFormat,
+  locale: string = 'en-AU',
+  variant: 'scale' | 'label' = 'scale'
+): string {
+  const year = date.getUTCFullYear();
+  const monthNum = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const hour = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  const monthShort = date.toLocaleString(locale, { month: 'short', timeZone: 'UTC' });
+  const monthLong = date.toLocaleString(locale, { month: 'long', timeZone: 'UTC' });
+
+  const map: Record<string, string> = {
+    yyyy: String(year),
+    mm: pad(monthNum),
+    dd: pad(day),
+    hh: pad(hour),
+    MM: pad(minutes),
+    MMM: monthShort,
+    MMMM: monthLong,
+  };
+
+  return (variant === 'scale' ? format(date) : 'dd-MMM-yyyy')
+    .split('-')
+    .map((token) => {
+      const v = map[token];
+      return v ?? token;
+    })
+    .join(' ');
 }
 
 /**

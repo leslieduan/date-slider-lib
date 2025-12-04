@@ -4,6 +4,9 @@ import './index.css';
 // Export components
 export { DateSlider } from './components';
 
+// Export utility functions
+export { dateFormatFn } from './utils';
+
 // Export types - Public API only
 export type {
   // Main component types
@@ -31,5 +34,5 @@ export type {
 
   // Utility types
   TimeUnit,
-  DateGranularity,
+  DateFormat,
 } from './type';

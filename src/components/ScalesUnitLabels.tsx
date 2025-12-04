@@ -1,5 +1,5 @@
 import type { ScalesUnitLabelsProps, TimeLabel } from '@/type';
-import { cn, formatForDisplay } from '@/utils';
+import { cn, formatDate } from '@/utils';
 import { memo, useCallback, useMemo } from 'react';
 
 export const ScalesUnitLabels = memo(
@@ -10,6 +10,7 @@ export const ScalesUnitLabels = memo(
     minDistance = 40,
     withEndLabel = true,
     classNames,
+    dateFormat,
   }: ScalesUnitLabelsProps) => {
     const getVisibleLabels = useCallback((): TimeLabel[] => {
       if (!timeLabels.length || !scales.length) return [];
@@ -48,7 +49,7 @@ export const ScalesUnitLabels = memo(
             style={{ left: `${position}%` }}
             aria-hidden="true"
           >
-            {formatForDisplay(date, 'day', 'en-AU', false).toUpperCase()}
+            {formatDate(date, dateFormat, 'en-AU').toUpperCase()}
           </span>
         ))}
       </>

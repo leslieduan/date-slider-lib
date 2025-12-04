@@ -1,5 +1,5 @@
 import type { SliderHandleProps, RenderSliderHandleProps } from '@/type';
-import { cn, formatForDisplay, getDateFromPercent, handleOutsideVisibleArea } from '@/utils';
+import { cn, formatDate, getDateFromPercent, handleOutsideVisibleArea } from '@/utils';
 import { memo } from 'react';
 import { DateLabel } from './DateLabel';
 
@@ -117,6 +117,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     renderDateLabel,
     sliderContainerRef,
     dateLabelDistanceOverHandle,
+    dateFormat,
   }) => {
     const commonProps = {
       onFocus: onHandleFocus,
@@ -136,11 +137,11 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               icon={rangeHandleIcon}
               onDragging={isDragging === 'start'}
               position={rangeStart}
-              label={formatForDisplay(
+              label={formatDate(
                 getDateFromPercent(rangeStart, startDate, endDate),
-                'day',
+                dateFormat,
                 'en-AU',
-                true
+                'label'
               )}
               onMouseDown={onMouseDown('start')}
               onTouchStart={onTouchStart('start')}
@@ -160,11 +161,11 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               icon={rangeHandleIcon}
               onDragging={isDragging === 'end'}
               position={rangeEnd}
-              label={formatForDisplay(
+              label={formatDate(
                 getDateFromPercent(rangeEnd, startDate, endDate),
-                'day',
+                dateFormat,
                 'en-AU',
-                true
+                'label'
               )}
               onMouseDown={onMouseDown('end')}
               onTouchStart={onTouchStart('end')}
@@ -188,11 +189,11 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             icon={pointHandleIcon}
             onDragging={isDragging === 'point'}
             position={pointPosition}
-            label={formatForDisplay(
+            label={formatDate(
               getDateFromPercent(pointPosition, startDate, endDate),
-              'day',
+              dateFormat,
               'en-AU',
-              true
+              'label'
             )}
             onMouseDown={onMouseDown('point')}
             onTouchStart={onTouchStart('point')}

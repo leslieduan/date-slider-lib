@@ -233,8 +233,7 @@ Enable horizontal scrolling for large date ranges:
 | `onChange` | `(value: SelectionResult) => void` | Yes | Selection change callback |
 | `min` | `Date` | No | Minimum selectable date (UTC) |
 | `max` | `Date` | No | Maximum selectable date (UTC) |
-| `initialTimeUnit` | `'day' \| 'month' \| 'year'` | No | Initial time unit granularity |
-| `granularity` | `'day' \| 'hour' \| 'minute'` | No | Selection granularity (default: 'day') |
+| `initialTimeUnit` | `'day' \| 'month' \| 'year'` | No | Initial time unit |
 
 ### Configuration Props
 
@@ -365,7 +364,6 @@ import type {
 
   // Utility types
   TimeUnit,              // 'day' | 'month' | 'year'
-  DateGranularity,       // 'day' | 'hour' | 'minute'
 } from 'date-slider-lib';
 ```
 
@@ -403,7 +401,6 @@ DateSlider follows a **"UTC Everywhere, Display Locally"** architecture:
 1. **Unambiguous**: No DST or timezone confusion
 2. **Consistent**: Same timestamp for all users globally
 3. **Scalable**: Works for days, hours, minutes
-4. **Future-proof**: Adding time granularity requires zero changes
 
 ## 💡 Best Practices
 

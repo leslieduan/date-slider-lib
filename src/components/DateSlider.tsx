@@ -27,6 +27,7 @@ import {
   clampPercent,
   cn,
   createSelectionResult,
+  dateFormatFn,
   debounce,
   generateScalesWithInfo,
   generateTimeLabelsWithPositions,
@@ -64,7 +65,7 @@ export const DateSlider = memo(
     behavior,
     layout,
     // Advanced
-    granularity = 'day',
+    dateFormat = dateFormatFn,
     imperativeRef: imperativeHandleRef,
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
@@ -184,9 +185,6 @@ export const DateSlider = memo(
       return generateTrackWidth(totalScaleUnits, numberOfScales, safeScaleUnitConfig);
     }, [numberOfScales, scaleUnitConfig, sliderContainerWidth, totalScaleUnits]);
 
-    //TODO: could refactor this to always generate full labels regardless of time unit. But later,
-    // in formatForDisplay to decide what to display and how display format.
-    //day unit, generate all labels per day. month unit, generate per month. year unit, per year.
     const timeLabels = useMemo(
       () => generateTimeLabelsWithPositions(startDate, endDate, timeUnit),
       [startDate, endDate, timeUnit]
@@ -469,9 +467,10 @@ export const DateSlider = memo(
             startDate={startDate}
             endDate={endDate}
             position={pointPosition}
-            granularity={granularity}
             setDateTime={setDateTime}
             renderTimeDisplay={renderProps?.renderTimeDisplay}
+            dateFormat={dateFormat}
+            timeUnit={timeUnit}
           />
         )}
 
@@ -527,6 +526,7 @@ export const DateSlider = memo(
                   timeLabels={timeLabels}
                   withEndLabel={withEndLabel}
                   dateLabelDistanceOverHandle={dateLabelDistance}
+                  dateFormat={dateFormat}
                 />
 
                 <RenderSliderHandle
@@ -554,6 +554,7 @@ export const DateSlider = memo(
                   renderDateLabel={renderProps?.renderDateLabel}
                   sliderContainerRef={sliderContainerRef}
                   dateLabelDistanceOverHandle={dateLabelDistance}
+                  dateFormat={dateFormat}
                 />
               </div>
             </div>

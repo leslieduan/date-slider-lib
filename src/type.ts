@@ -1,7 +1,5 @@
 import type { ReactNode, RefObject } from 'react';
 
-import type { DateGranularity } from './utils';
-
 /**
  * Selection mode for the DateSlider component
  * - `'point'`: Single date selection
@@ -27,8 +25,75 @@ export type TimeUnit = 'day' | 'month' | 'year';
  */
 export type DragHandle = 'start' | 'end' | 'point' | null;
 
-// Re-export for convenience
-export type { DateGranularity };
+/**
+ * Date format function type used with `formatDate()` utility
+ *
+ * A function that takes a Date and returns a format string template.
+ * The template uses tokens like 'yyyy', 'mm', 'dd' which are replaced with actual values.
+ *
+ * Format tokens:
+ * - `yyyy`: 4-digit year (e.g., "2024")
+ * - `mm`: 2-digit month number (e.g., "06")
+ * - `dd`: 2-digit day (e.g., "15")
+ * - `hh`: 2-digit hour (e.g., "14")
+ * - `MM`: 2-digit minutes (e.g., "30")
+ * - `MMM`: Short month name (e.g., "Jun")
+ * - `MMMM`: Full month name (e.g., "June")
+ *
+ * @example
+ * // Simple static format
+ * const simpleFormat: DateFormat = () => 'yyyy-mm-dd';
+ * formatDate(new Date('2024-06-15'), simpleFormat); // → "2024 06 15"
+ *
+ * @example
+ * // Dynamic format based on date
+ * const adaptiveFormat: DateFormat = (date) => {
+ *   return date.getUTCDate() === 1 ? 'mm-yyyy' : 'dd';
+ * };
+ * formatDate(new Date('2024-06-01'), adaptiveFormat); // → "06 2024"
+ * formatDate(new Date('2024-06-15'), adaptiveFormat); // → "15"
+ *
+ * @see {@link dateFormatFn} - Built-in format for scale and date labels
+ */
+export type DateFormat = (date: Date) => // Date only
+  | 'yyyy-mm-dd'
+  | 'dd-mm-yyyy'
+  | 'mm-dd-yyyy'
+  | 'yyyy-mm'
+  | 'mm-yyyy'
+  | 'dd-mm'
+  | 'mm-dd'
+  | 'yyyy'
+  | 'mm'
+  | 'dd'
+
+  // Time only
+  | 'hh'
+  | 'MM'
+  | 'hh-MM'
+
+  // Date + hour
+  | 'yyyy-mm-dd-hh'
+  | 'dd-mm-yyyy-hh'
+  | 'mm-dd-yyyy-hh'
+  | 'yyyy-mm-hh'
+  | 'mm-yyyy-hh'
+  | 'dd-mm-hh'
+  | 'mm-dd-hh'
+
+  // Date + hour + minutes
+  | 'yyyy-mm-dd-hh-MM'
+  | 'dd-mm-yyyy-hh-MM'
+  | 'mm-dd-yyyy-hh-MM'
+  | 'yyyy-mm-hh-MM'
+  | 'mm-yyyy-hh-MM'
+  | 'dd-mm-hh-MM'
+  | 'mm-dd-hh-MM'
+
+  // Month-name formats
+  | 'MMM'
+  | 'MMM-yyyy'
+  | 'dd-MMM-yyyy';
 
 /**
  * Time label for scale marks on the slider track
@@ -436,9 +501,8 @@ type CommonSliderProps = {
    */
   renderProps?: RenderPropsConfig;
 
-  // ===== Advanced Props (Optional) =====
-  /** Controls display granularity (day/hour/minute) */
-  granularity?: DateGranularity;
+  dateFormat?: DateFormat;
+
   /** Imperative API reference for external control */
   imperativeRef?: React.Ref<SliderExposedMethod>;
 };
@@ -549,6 +613,7 @@ type BaseSliderTrackProps = {
   minDistance?: number;
   withEndLabel?: boolean;
   dateLabelDistanceOverHandle: number;
+  dateFormat: DateFormat;
 };
 
 type PointModeProps = {
@@ -621,6 +686,7 @@ export type RenderSliderHandleProps = {
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   sliderContainerRef: RefObject<HTMLDivElement | null>;
   dateLabelDistanceOverHandle: number;
+  dateFormat: DateFormat;
 };
 
 export type TimeUnitSelectionProps = {
@@ -635,9 +701,10 @@ export type TimeDisplayProps = {
   position: number;
   startDate: Date;
   endDate: Date;
-  granularity: DateGranularity;
   setDateTime: (date: Date, target?: DragHandle) => void;
   renderTimeDisplay: (props: TimeDisplayRenderProps) => ReactNode;
+  dateFormat: DateFormat;
+  timeUnit: TimeUnit;
 };
 
 export type ScalesUnitLabelsProps = {
@@ -647,6 +714,7 @@ export type ScalesUnitLabelsProps = {
   minDistance?: number;
   withEndLabel?: boolean;
   classNames?: DateSliderClassNames;
+  dateFormat: DateFormat;
 };
 
 export type DateLabelProps = {

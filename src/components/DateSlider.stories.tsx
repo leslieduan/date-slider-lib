@@ -26,10 +26,6 @@ const meta: Meta<typeof DateSlider> = {
       control: { type: 'select' },
       options: ['day', 'month', 'year'],
     },
-    granularity: {
-      control: { type: 'select' },
-      options: ['day', 'hour', 'minute'],
-    },
   },
   parameters: {
     docs: {
@@ -347,7 +343,6 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             min={args.min ?? toUTCDate('2000-01-01')}
             max={args.max ?? toUTCDate('2030-12-31')}
             initialTimeUnit={args.initialTimeUnit ?? 'day'}
-            granularity={args.granularity ?? 'day'}
             onChange={handleSelectionChange}
             imperativeRef={sliderMethodRef}
             icons={{
@@ -377,7 +372,6 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             min={args.min ?? toUTCDate('2000-01-01')}
             max={args.max ?? toUTCDate('2030-12-31')}
             initialTimeUnit={args.initialTimeUnit ?? 'day'}
-            granularity={args.granularity ?? 'day'}
             onChange={handleSelectionChange}
             imperativeRef={sliderMethodRef}
             icons={{
@@ -412,7 +406,6 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             min={args.min ?? toUTCDate('2000-01-01')}
             max={args.max ?? toUTCDate('2030-12-31')}
             initialTimeUnit={args.initialTimeUnit ?? 'day'}
-            granularity={args.granularity ?? 'day'}
             onChange={handleSelectionChange}
             imperativeRef={sliderMethodRef}
             icons={{
@@ -820,7 +813,7 @@ export const WithCustomRenderProps: Story = {
       point: toUTCDate('2022-06-15'),
     },
     min: toUTCDate('2022-01-01'),
-    max: toUTCDate('2022-12-31'),
+    max: toUTCDate('2024-12-31'),
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 800,
@@ -920,7 +913,6 @@ const TimelineTemplate = (args: Partial<SliderProps>) => {
             min={args.min ?? toUTCDate('2024-12-03')}
             max={args.max ?? toUTCDate('2024-12-25')}
             initialTimeUnit={args.initialTimeUnit ?? 'day'}
-            granularity={args.granularity ?? 'minute'}
             onChange={setSelection}
             icons={{
               point: <CircleIcon className="fill-white text-white" />,
@@ -967,7 +959,6 @@ export const TimelineStyle: Story = {
     min: toUTCDate('2024-12-03'),
     max: toUTCDate('2024-12-25'),
     initialTimeUnit: 'day' as TimeUnit,
-    granularity: 'minute',
     layout: {
       width: 700,
       height: 80,
@@ -1018,7 +1009,6 @@ function TimelineSlider() {
         min={new Date('2024-12-03')}
         max={new Date('2024-12-25')}
         initialTimeUnit="day"
-        granularity="minute"
         onChange={setSelection}
         icons={{ point: <CircleIcon /> }}
         layout={{
