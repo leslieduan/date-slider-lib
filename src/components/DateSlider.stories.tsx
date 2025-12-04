@@ -665,6 +665,9 @@ export const ResponsiveWidth: Story = {
       trackActive: 'bg-indigo-400/20',
       track: 'bg-gray-300',
     },
+    renderProps: {
+      renderDateLabel: customDateLabelRenderer,
+    },
   },
 };
 
