@@ -580,52 +580,6 @@ function CombinedSlider() {
 };
 
 /**
- * Without Time Display - Hides the time navigation component
- */
-export const WithoutTimeDisplay: Story = {
-  render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
-  args: {
-    mode: 'point',
-    value: { point: toUTCDate('2024-06-15') },
-    min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'day' as TimeUnit,
-    layout: { width: 600, height: 80 },
-    renderProps: {
-      renderTimeDisplay: () => null,
-    },
-    classNames: {
-      trackActive: 'bg-blue-500/30',
-      track: 'bg-gray-300',
-    },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from 'lucide-react';
-
-function WithoutTimeDisplay() {
-  return (
-    <DateSlider
-      mode="point"
-      value={{ point: new Date('2024-06-15') }}
-      min={new Date('2024-01-01')}
-      max={new Date('2024-12-31')}
-      initialTimeUnit="day"
-      icons={{ point: <CircleIcon /> }}
-      renderProps={{
-        renderTimeDisplay: () => null // Hide time display
-      }}
-    />
-  );
-}`,
-      },
-    },
-  },
-};
-
-/**
  * Without Scale Marks - Hides all tick marks on the track
  */
 export const WithoutScaleMarks: Story = {
@@ -688,14 +642,13 @@ function WithoutScaleMarks() {
 export const PersistentHandleLabels: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
-    mode: 'range',
+    mode: 'point',
     value: {
-      start: toUTCDate('2024-04-01'),
-      end: toUTCDate('2024-08-01'),
+      point: toUTCDate('2024-08-01'),
     },
     min: toUTCDate('2024-01-01'),
     max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'month' as TimeUnit,
+    initialTimeUnit: 'day' as TimeUnit,
     layout: { width: 700, height: 100 },
     behavior: {
       handleLabelPersistent: true,
@@ -704,6 +657,7 @@ export const PersistentHandleLabels: Story = {
       trackActive: 'bg-blue-500/30',
       track: 'bg-gray-300',
     },
+    renderProps: { renderDateLabel: customDateLabelRenderer },
   },
   parameters: {
     docs: {
@@ -841,73 +795,6 @@ function YearSlider() {
 };
 
 /**
- * Scrollable Layout - Horizontal scrolling for large date ranges
- */
-export const ScrollableLayout: Story = {
-  render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
-  args: {
-    mode: 'point',
-    value: {
-      point: toUTCDate('2022-06-15'),
-    },
-    min: toUTCDate('2020-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'day' as TimeUnit,
-    layout: {
-      width: 600,
-      height: 80,
-      scaleUnitConfig: {
-        gap: 100,
-        width: { short: 1, medium: 2, long: 2 },
-        height: { short: 18, medium: 36, long: 60 },
-      },
-    },
-    behavior: {
-      scrollable: true,
-      handleLabelDisabled: true,
-    },
-    classNames: {
-      trackActive: 'bg-teal-400/20',
-      track: 'bg-gray-300',
-    },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from 'lucide-react';
-
-function ScrollableSlider() {
-  return (
-    <DateSlider
-      mode="point"
-      value={{ point: new Date('2022-06-15') }}
-      min={new Date('2020-01-01')}
-      max={new Date('2024-12-31')}
-      initialTimeUnit="day"
-      icons={{ point: <CircleIcon /> }}
-      layout={{
-        width: 600,
-        height: 80,
-        scaleUnitConfig: {
-          gap: 100,
-          width: { short: 1, medium: 2, long: 2 },
-          height: { short: 18, medium: 36, long: 60 },
-        },
-      }}
-      behavior={{
-        scrollable: true, // Enable horizontal scrolling
-        handleLabelDisabled: true
-      }}
-    />
-  );
-}`,
-      },
-    },
-  },
-};
-
-/**
  * With Custom Render Props - Custom UI components
  */
 export const WithCustomRenderProps: Story = {
@@ -924,7 +811,7 @@ export const WithCustomRenderProps: Story = {
       width: 800,
       height: 100,
     },
-    behavior: { handleLabelPersistent: true },
+    behavior: { handleLabelPersistent: false },
     classNames: {
       trackActive: 'bg-purple-400/20',
       track: 'bg-gray-300',
