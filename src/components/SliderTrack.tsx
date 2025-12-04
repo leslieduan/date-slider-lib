@@ -9,6 +9,7 @@ import {
 } from '@/utils';
 import { memo, useCallback, useState, useEffect, useMemo } from 'react';
 import { DateLabel } from './DateLabel';
+import { TimeUnitLabels } from './TimeUnitLabels';
 
 const CursorLine = memo(
   ({
@@ -118,11 +119,13 @@ export const SliderTrack = memo(
     pointHandleRef,
     classNames,
     renderDateLabel,
+    timeLabels,
+    trackWidth,
+    withEndLabel,
     ...props
   }: SliderTrackProps) => {
     const [isHoverTrack, setIsHoverTrack] = useState(false);
     const [isHandleHover, setIsHandleHover] = useState(false);
-
     const [mouseHoverPosition, setMouseHoverPosition] = useState<number>();
     const [labelPosition, setLabelPosition] = useState<{
       x: number;
@@ -130,103 +133,99 @@ export const SliderTrack = memo(
     }>();
     const [dateLabel, setDateLabel] = useState<string>();
 
+    const updateDateLabel = useCallback(
+      (percentage: number, clientX: number, isHover: boolean) => {
+        const label = formatForDisplay(
+          getDateFromPercent(percentage, startDate, endDate),
+          'day',
+          'en-AU',
+          true
+        );
+
+        setIsHoverTrack(isHover);
+        setDateLabel(label);
+        setMouseHoverPosition(percentage);
+        setLabelPosition(calculateLabelPosition(trackRef, clientX));
+      },
+      [trackRef, startDate, endDate]
+    );
+
     const handleMouseLeave = useCallback(() => {
       setIsHoverTrack(false);
       setMouseHoverPosition(undefined);
       setLabelPosition(undefined);
-    }, [setIsHoverTrack]);
+    }, []);
 
     const handleMouseMove = useCallback(
       (e: MouseEvent) => {
         if (!trackRef.current) return;
         const percentage = getPercentageFromMouseEvent(e, trackRef);
-        const label = formatForDisplay(
-          getDateFromPercent(percentage, startDate, endDate),
-          'day',
-          'en-AU',
-          true
-        );
-
-        setIsHoverTrack(true);
-        setDateLabel(label);
-        setMouseHoverPosition(percentage);
-        setLabelPosition(calculateLabelPosition(trackRef, e.clientX));
+        updateDateLabel(percentage, e.clientX, true);
       },
-      [trackRef, startDate, endDate, setIsHoverTrack]
+      [trackRef, updateDateLabel]
     );
 
     const handleTouchMove = useCallback(
       (e: TouchEvent) => {
         const percentage = getPercentageFromTouchEvent(e, trackRef);
-        const label = formatForDisplay(
-          getDateFromPercent(percentage, startDate, endDate),
-          'day',
-          'en-AU',
-          true
-        );
-
-        setIsHoverTrack(false);
-        setDateLabel(label);
-        setMouseHoverPosition(percentage);
-        // guard touches access to satisfy TypeScript
-        const touchX = e.touches && e.touches[0] ? e.touches[0].clientX : 0;
-        setLabelPosition(calculateLabelPosition(trackRef, touchX));
+        const touchX = e.touches?.[0]?.clientX ?? 0;
+        updateDateLabel(percentage, touchX, false);
       },
-      [trackRef, startDate, endDate, setIsHoverTrack]
+      [trackRef, updateDateLabel]
     );
 
     const handleTouchEnd = useCallback(() => {
       setIsHoverTrack(false);
       setMouseHoverPosition(undefined);
       setLabelPosition(undefined);
-    }, [setIsHoverTrack]);
+    }, []);
 
-    const handleHandlerMouseMove = () => {
+    const handleHandlerMouseMove = useCallback(() => {
       setIsHandleHover(true);
-    };
-    const handleHandlerMouseLeave = () => {
+    }, []);
+
+    const handleHandlerMouseLeave = useCallback(() => {
       setIsHandleHover(false);
-    };
+    }, []);
 
     useEffect(() => {
       const trackRefInstance = trackRef.current;
-      const startHandleRefInstance = startHandleRef.current;
-      const endHandleRefInstance = endHandleRef.current;
-      const pointHandleRefInstance = pointHandleRef.current;
       if (!trackRefInstance) return;
+
+      const handleRefs = [startHandleRef.current, endHandleRef.current, pointHandleRef.current];
+
       trackRefInstance.addEventListener('touchend', handleTouchEnd);
       trackRefInstance.addEventListener('touchmove', handleTouchMove);
       trackRefInstance.addEventListener('mousemove', handleMouseMove);
       trackRefInstance.addEventListener('mouseleave', handleMouseLeave);
-      startHandleRefInstance?.addEventListener('mousemove', handleHandlerMouseMove);
-      endHandleRefInstance?.addEventListener('mousemove', handleHandlerMouseMove);
-      pointHandleRefInstance?.addEventListener('mousemove', handleHandlerMouseMove);
-      startHandleRefInstance?.addEventListener('mouseleave', handleHandlerMouseLeave);
-      endHandleRefInstance?.addEventListener('mouseleave', handleHandlerMouseLeave);
-      pointHandleRefInstance?.addEventListener('mouseleave', handleHandlerMouseLeave);
+
+      handleRefs.forEach((handleRef) => {
+        handleRef?.addEventListener('mousemove', handleHandlerMouseMove);
+        handleRef?.addEventListener('mouseleave', handleHandlerMouseLeave);
+      });
 
       return () => {
-        if (!trackRefInstance) return;
         trackRefInstance.removeEventListener('touchend', handleTouchEnd);
         trackRefInstance.removeEventListener('touchmove', handleTouchMove);
         trackRefInstance.removeEventListener('mousemove', handleMouseMove);
         trackRefInstance.removeEventListener('mouseleave', handleMouseLeave);
-        startHandleRefInstance?.removeEventListener('mousemove', handleHandlerMouseMove);
-        endHandleRefInstance?.removeEventListener('mousemove', handleHandlerMouseMove);
-        pointHandleRefInstance?.removeEventListener('mousemove', handleHandlerMouseMove);
-        startHandleRefInstance?.removeEventListener('mouseleave', handleHandlerMouseLeave);
-        endHandleRefInstance?.removeEventListener('mouseleave', handleHandlerMouseLeave);
-        pointHandleRefInstance?.removeEventListener('mouseleave', handleHandlerMouseLeave);
+
+        handleRefs.forEach((handleRef) => {
+          handleRef?.removeEventListener('mousemove', handleHandlerMouseMove);
+          handleRef?.removeEventListener('mouseleave', handleHandlerMouseLeave);
+        });
       };
     }, [
+      trackRef,
+      startHandleRef,
       endHandleRef,
+      pointHandleRef,
       handleMouseLeave,
       handleMouseMove,
       handleTouchEnd,
       handleTouchMove,
-      pointHandleRef,
-      startHandleRef,
-      trackRef,
+      handleHandlerMouseMove,
+      handleHandlerMouseLeave,
     ]);
 
     const baseClassName = useMemo(
@@ -234,18 +233,13 @@ export const SliderTrack = memo(
         cn('h-full w-full relative overflow-visible cursor-pointer touch-none', classNames?.track),
       [classNames?.track]
     );
-    // Show cursor line when hovering and not dragging
+
     const showCursorLine = isHoverTrack && !onDragging && !isHandleHover;
     const showDateLabel = isHoverTrack;
 
-    if (props.mode === 'point') {
-      return (
-        <div
-          onClick={onTrackClick}
-          onTouchEnd={onTrackTouch}
-          className={baseClassName}
-          aria-hidden="true"
-        >
+    const commonElements = useMemo(
+      () => (
+        <>
           <Scales
             scales={scales}
             scaleUnitConfig={scaleUnitConfig}
@@ -254,17 +248,19 @@ export const SliderTrack = memo(
             scaleMarkMediumClassName={classNames?.scaleMarkMedium}
             scaleMarkMinorClassName={classNames?.scaleMarkMinor}
           />
-
-          {/* Cursor line */}
+          <TimeUnitLabels
+            timeLabels={timeLabels}
+            scales={scales}
+            trackWidth={trackWidth}
+            withEndLabel={withEndLabel}
+            classNames={classNames}
+          />
           <CursorLine
             position={mouseHoverPosition}
             isVisible={showCursorLine}
             className={classNames?.cursorLine}
           />
-
-          {/* Date label */}
           {showDateLabel && (
-            //hide slider track date label on mobile
             <DateLabel
               className="hidden md:block"
               label={dateLabel}
@@ -272,62 +268,65 @@ export const SliderTrack = memo(
               renderDateLabel={renderDateLabel}
             />
           )}
+        </>
+      ),
+      [
+        scales,
+        scaleUnitConfig,
+        classNames,
+        timeLabels,
+        trackWidth,
+        withEndLabel,
+        mouseHoverPosition,
+        showCursorLine,
+        showDateLabel,
+        dateLabel,
+        labelPosition,
+        renderDateLabel,
+      ]
+    );
 
-          {/* Active track */}
+    const activeTrack = useMemo(() => {
+      const baseActiveClasses = cn(
+        'absolute h-full transition-all duration-200 z-10',
+        'motion-reduce:transition-none',
+        classNames?.trackActive || 'bg-blue-500/30'
+      );
+
+      if (props.mode === 'point') {
+        return (
           <div
-            className={cn(
-              'absolute h-full rounded-full transition-all duration-200 z-10',
-              'motion-reduce:transition-none',
-              classNames?.trackActive || 'bg-blue-500/30'
-            )}
+            className={cn(baseActiveClasses, 'rounded-full')}
             style={{ width: `${props.pointPosition}%` }}
           />
-        </div>
-      );
-    }
+        );
+      }
 
-    if (props.mode === 'range' || props.mode === 'combined') {
-      return (
-        <div
-          className={baseClassName}
-          onClick={onTrackClick}
-          onTouchEnd={onTrackTouch}
-          aria-hidden="true"
-        >
-          <Scales
-            scales={scales}
-            scaleUnitConfig={scaleUnitConfig}
-            scaleMarkClassName={classNames?.scaleMark}
-            scaleMarkMajorClassName={classNames?.scaleMarkMajor}
-            scaleMarkMediumClassName={classNames?.scaleMarkMedium}
-            scaleMarkMinorClassName={classNames?.scaleMarkMinor}
-          />
-
-          {/* Cursor line */}
-          <CursorLine
-            position={mouseHoverPosition}
-            isVisible={showCursorLine}
-            className={classNames?.cursorLine}
-          />
-
-          {/* Date label */}
-          {showDateLabel && (
-            //hide slider track date label on mobile
-            <DateLabel label={dateLabel} position={labelPosition} className="hidden md:block" />
-          )}
-
-          {/* Active track */}
+      if (props.mode === 'range' || props.mode === 'combined') {
+        return (
           <div
-            className={cn(
-              'absolute h-full transition-all duration-200 z-10',
-              'motion-reduce:transition-none',
-              classNames?.trackActive || 'bg-blue-500/30'
-            )}
+            className={baseActiveClasses}
             style={{
               left: `${props.rangeStart}%`,
               width: `${(props.rangeEnd ?? 0) - (props.rangeStart ?? 0)}%`,
             }}
           />
+        );
+      }
+
+      return null;
+    }, [props, classNames?.trackActive]);
+
+    if (props.mode === 'point' || props.mode === 'range' || props.mode === 'combined') {
+      return (
+        <div
+          onClick={onTrackClick}
+          onTouchEnd={onTrackTouch}
+          className={baseClassName}
+          aria-hidden="true"
+        >
+          {commonElements}
+          {activeTrack}
         </div>
       );
     }

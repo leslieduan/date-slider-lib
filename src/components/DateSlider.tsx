@@ -46,7 +46,6 @@ import type { SliderProps, TimeUnit, DragHandle, SelectionResult, Dimension } fr
 import { RenderSliderHandle } from './SliderHandle';
 import { SliderTrack } from './SliderTrack';
 import { TimeDisplay } from './TimeDisplay';
-import { TimeUnitLabels } from './TimeUnitLabels';
 import { TimeUnitSelection } from './TimeUnitSelection';
 
 export const DateSlider = memo(
@@ -523,15 +522,11 @@ export const DateSlider = memo(
                   handleLabelDisabled={handleLabelDisabled}
                   classNames={classNames}
                   renderDateLabel={renderProps?.renderDateLabel}
-                />
-                {/* TODO: move TimeUnitLabels to SliderTrack?*/}
-                <TimeUnitLabels
-                  timeLabels={timeLabels}
-                  scales={scales}
                   trackWidth={trackWidth}
+                  timeLabels={timeLabels}
                   withEndLabel={withEndLabel}
-                  classNames={classNames}
                 />
+
                 <RenderSliderHandle
                   viewMode={viewMode}
                   rangeStart={rangeStart}

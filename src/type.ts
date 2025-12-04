@@ -537,6 +537,10 @@ type BaseSliderTrackProps = {
   handleLabelDisabled?: boolean;
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
+  timeLabels: TimeLabel[];
+  trackWidth: number;
+  minDistance?: number;
+  withEndLabel?: boolean;
 };
 
 type PointModeProps = {
