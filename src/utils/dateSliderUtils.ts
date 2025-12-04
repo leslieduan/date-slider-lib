@@ -328,13 +328,14 @@ export const getPercentageFromTouchEvent = (
 };
 
 export const calculateLabelPosition = (
-  trackRef: RefObject<HTMLDivElement | null>,
-  cursorPosition: number
+  handleRef: RefObject<HTMLButtonElement | null>,
+  cursorPosition: number,
+  distance: number
 ) => {
-  if (!trackRef.current) return;
-  const trackRect = trackRef.current.getBoundingClientRect();
+  if (!handleRef.current) return;
+  const handleRect = handleRef.current.getBoundingClientRect();
   const x = cursorPosition;
-  const y = trackRect.top - 32;
+  const y = handleRect.top - distance;
   return { x, y };
 };
 

@@ -27,6 +27,8 @@ export const LAYOUT = {
   DEFAULT_SLIDER_HEIGHT: 64,
   /** Minimum slider width in pixels (min-w-40 = 160px) */
   MIN_SLIDER_WIDTH: 160,
+  /** DEFAULT date label distance over handle and track in pixels */
+  DATE_LABEL_DISTANCE: 32,
 } as const;
 
 /**

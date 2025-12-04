@@ -124,6 +124,7 @@ export const SliderTrack = memo(
     timeLabels,
     trackWidth,
     withEndLabel,
+    dateLabelDistanceOverHandle,
     ...props
   }: SliderTrackProps) => {
     const [isHoverTrack, setIsHoverTrack] = useState(false);
@@ -134,6 +135,8 @@ export const SliderTrack = memo(
       y: number;
     }>();
     const [dateLabel, setDateLabel] = useState<string>();
+    //point handle and range handle should be in same height, and there must be at least existing one handle.
+    const handleRef = pointHandleRef || startHandleRef;
 
     const updateDateLabel = useCallback(
       (percentage: number, clientX: number, isHover: boolean) => {
@@ -147,9 +150,10 @@ export const SliderTrack = memo(
         setIsHoverTrack(isHover);
         setDateLabel(label);
         setMouseHoverPosition(percentage);
-        setLabelPosition(calculateLabelPosition(trackRef, clientX));
+        //get handle ref, make lable always above handle in a confiured height.
+        setLabelPosition(calculateLabelPosition(handleRef, clientX, dateLabelDistanceOverHandle));
       },
-      [trackRef, startDate, endDate]
+      [startDate, endDate, handleRef, dateLabelDistanceOverHandle]
     );
 
     const handleMouseLeave = useCallback(() => {
@@ -292,17 +296,12 @@ export const SliderTrack = memo(
     const activeTrack = useMemo(() => {
       const baseActiveClasses = cn(
         'absolute h-full transition-all duration-200 z-10',
-        'motion-reduce:transition-none',
+        'motion-reduce:transition-none rounded-full',
         classNames?.trackActive || 'bg-blue-500/30'
       );
 
       if (props.mode === 'point') {
-        return (
-          <div
-            className={cn(baseActiveClasses, 'rounded-full')}
-            style={{ width: `${props.pointPosition}%` }}
-          />
-        );
+        return <div className={baseActiveClasses} style={{ width: `${props.pointPosition}%` }} />;
       }
 
       if (props.mode === 'range' || props.mode === 'combined') {
@@ -328,7 +327,7 @@ export const SliderTrack = memo(
           className={baseClassName}
           aria-hidden="true"
         >
-          <div className={classNames?.trackInner}>
+          <div className={cn('relative w-full h-full', classNames?.trackInner)} ref={trackRef}>
             {commonElements}
             {activeTrack}
           </div>

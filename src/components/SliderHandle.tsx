@@ -23,6 +23,7 @@ export const SliderHandle = ({
   classNames,
   renderDateLabel,
   sliderContainerRef,
+  dateLabelDistanceOverHandle,
 }: SliderHandleProps) => {
   const { left, right } = handleOutsideVisibleArea({
     handleRef: ref,
@@ -35,7 +36,7 @@ export const SliderHandle = ({
     if (!ref.current || handleType !== 'point') return;
     return {
       x: ref.current.getBoundingClientRect().left + ref.current.getBoundingClientRect().width / 2,
-      y: ref.current.getBoundingClientRect().top - 32,
+      y: ref.current.getBoundingClientRect().top - dateLabelDistanceOverHandle,
     };
   };
 
@@ -55,8 +56,8 @@ export const SliderHandle = ({
       ref={ref}
       type="button"
       className={cn(
-        'group absolute cursor-pointer z-20 transform -translate-x-1/2 hover:scale-110 hover:bg-transparent active:bg-transparent touch-none top-0',
-        'w-9 h-9 inline-flex items-center justify-center rounded-md',
+        'group absolute cursor-pointer z-20 transform -translate-x-1/2 hover:scale-110 touch-none top-0 bg-transparent',
+        'w-fit h-fit inline-flex items-center justify-center',
         'focus-visible:outline focus-visible:outline-offset-2',
         handleBaseClass,
         handleSpecificClass,
@@ -115,6 +116,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     classNames,
     renderDateLabel,
     sliderContainerRef,
+    dateLabelDistanceOverHandle,
   }) => {
     const commonProps = {
       onFocus: onHandleFocus,
@@ -149,6 +151,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               handleLabelDisabled={handleLabelDisabled}
               renderDateLabel={renderDateLabel}
               sliderContainerRef={sliderContainerRef}
+              dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
             />
             <SliderHandle
               viewMode={viewMode}
@@ -172,6 +175,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               handleLabelDisabled={handleLabelDisabled}
               renderDateLabel={renderDateLabel}
               sliderContainerRef={sliderContainerRef}
+              dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
             />
           </>
         )}
@@ -200,6 +204,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             handleLabelDisabled={handleLabelDisabled}
             renderDateLabel={renderDateLabel}
             sliderContainerRef={sliderContainerRef}
+            dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
           />
         )}
       </>

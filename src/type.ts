@@ -210,6 +210,8 @@ export type LayoutConfig = {
   minGapScaleUnits?: number;
   /** Custom scale unit sizing configuration */
   scaleUnitConfig?: ScaleUnitConfig;
+  /** DateLabel distance over handle and track in pixels */
+  dateLabelDistanceOverHandle?: number;
 };
 
 /**
@@ -546,6 +548,7 @@ type BaseSliderTrackProps = {
   trackWidth: number;
   minDistance?: number;
   withEndLabel?: boolean;
+  dateLabelDistanceOverHandle: number;
 };
 
 type PointModeProps = {
@@ -590,6 +593,7 @@ export type SliderHandleProps = {
   handleLabelDisabled?: boolean;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   sliderContainerRef: RefObject<HTMLDivElement | null>;
+  dateLabelDistanceOverHandle: number;
 };
 
 export type RenderSliderHandleProps = {
@@ -616,6 +620,7 @@ export type RenderSliderHandleProps = {
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   sliderContainerRef: RefObject<HTMLDivElement | null>;
+  dateLabelDistanceOverHandle: number;
 };
 
 export type TimeUnitSelectionProps = {

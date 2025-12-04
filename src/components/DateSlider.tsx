@@ -91,6 +91,7 @@ export const DateSlider = memo(
     const withEndLabel = layout?.showEndLabel ?? true;
     const minGapScaleUnits = layout?.minGapScaleUnits ?? DEFAULTS.MIN_GAP_SCALE_UNITS;
     const scaleUnitConfig = layout?.scaleUnitConfig ?? DEFAULT_SCALE_CONFIG;
+    const dateLabelDistance = layout?.dateLabelDistanceOverHandle ?? LAYOUT.DATE_LABEL_DISTANCE;
     const [dimensions, setDimensions] = useState<Dimension>({
       sliderContainerWidth: 0,
       trackContainerWidth: 0,
@@ -500,7 +501,7 @@ export const DateSlider = memo(
               }}
               className={cn('pointer-events-auto', classNames?.slider)}
             >
-              <div className="relative" style={{ height: '100%', width: '100%' }} ref={trackRef}>
+              <div className="relative" style={{ height: '100%', width: '100%' }}>
                 <SliderTrack
                   mode={viewMode}
                   pointPosition={pointPosition}
@@ -525,6 +526,7 @@ export const DateSlider = memo(
                   trackWidth={trackWidth}
                   timeLabels={timeLabels}
                   withEndLabel={withEndLabel}
+                  dateLabelDistanceOverHandle={dateLabelDistance}
                 />
 
                 <RenderSliderHandle
@@ -551,6 +553,7 @@ export const DateSlider = memo(
                   classNames={classNames}
                   renderDateLabel={renderProps?.renderDateLabel}
                   sliderContainerRef={sliderContainerRef}
+                  dateLabelDistanceOverHandle={dateLabelDistance}
                 />
               </div>
             </div>

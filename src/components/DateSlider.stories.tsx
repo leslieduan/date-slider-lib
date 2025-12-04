@@ -664,7 +664,6 @@ export const ResponsiveWidth: Story = {
     classNames: {
       trackActive: 'bg-indigo-400/20',
       track: 'bg-gray-300',
-      trackInner: 'h-10 relative top-1/4',
     },
     renderProps: {
       renderDateLabel: customDateLabelRenderer,
@@ -759,8 +758,8 @@ export const FrostSlider: Story = {
     },
     behavior: {
       scrollable: true,
-      handleLabelPersistent: false,
-      handleLabelDisabled: true,
+      handleLabelPersistent: true,
+      // handleLabelDisabled: true,
     },
     classNames: {
       slider: 'frosted',
@@ -887,10 +886,10 @@ export const TimelineStyle: Story = {
     classNames: {
       trackActive: 'bg-white/30',
       track: 'bg-white/10',
-      trackInner: 'h-1 relative top-1/2',
+      trackInner: 'h-1  top-1/2 bg-red-700',
       scaleMark: 'bg-transparent',
       scaleMarkMajor: 'bg-white/60',
-      handle: 'bg-white shadow-xl border-4 border-white/50',
+      handle: 'shadow-xl top-1/2 -translate-y-1/2',
       handlePoint: 'hover:scale-125 transition-transform',
       scaleLabel: '-bottom-4',
     },
