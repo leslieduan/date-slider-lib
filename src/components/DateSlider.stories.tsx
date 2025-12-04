@@ -250,17 +250,6 @@ const GettingStartedTemplate = () => {
             </pre>
           </div>
         )}
-
-        <div className="mt-6 p-4 bg-gray-50 rounded border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-2">Quick Tips:</h3>
-          <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-            <li>Drag the handle to select a date</li>
-            <li>Click on the track to jump to a date</li>
-            <li>Use arrow keys for precise navigation</li>
-            <li>Change time unit (day/month/year) with the selector</li>
-            <li>Navigate with the date display arrows</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
@@ -275,7 +264,7 @@ const GettingStartedTemplate = () => {
  * ## Basic Usage:
  * ```tsx
  * import { DateSlider } from 'date-slider-lib';
- * import { CircleIcon } from 'lucide-react';
+ * import { CircleIcon } from '@/icons';
  *
  * function App() {
  *   const [value, setValue] = useState({ point: new Date() });
@@ -305,6 +294,32 @@ const GettingStartedTemplate = () => {
 export const GettingStarted: Story = {
   render: () => <GettingStartedTemplate />,
   args: {},
+  parameters: {
+    docs: {
+      source: {
+        code: `
+ import { DateSlider } from 'date-slider-lib';
+ import { CircleIcon } from '@/icons';
+ 
+ function App() {
+   const [value, setValue] = useState({ point: new Date() });
+ 
+   return (
+     <DateSlider
+       mode="point"
+       value={value}
+       onChange={setValue}
+       min={new Date('2024-01-01')}
+       max={new Date('2024-12-31')}
+       initialTimeUnit="day"
+       icons={{ point: <CircleIcon /> }}
+     />
+   );
+ }
+ `,
+      },
+    },
+  },
 };
 
 // Enhanced template with better performance and accessibility
@@ -447,7 +462,7 @@ export const RangeMode: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from 'lucide-react';
+import { MoveHorizontalIcon } from '@/icons';
 
 function RangeSlider() {
   const [selection, setSelection] = useState();
@@ -501,7 +516,7 @@ export const PointMode: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from 'lucide-react';
+import { CircleIcon } from '@/icons';
 
 function PointSlider() {
   const [selection, setSelection] = useState();
@@ -552,7 +567,7 @@ export const CombinedMode: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon, MoveHorizontalIcon } from 'lucide-react';
+import { CircleIcon, MoveHorizontalIcon } from '@/icons';
 
 function CombinedSlider() {
   return (
@@ -607,7 +622,7 @@ export const WithoutScaleMarks: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from 'lucide-react';
+import { MoveHorizontalIcon } from '@/icons';
 
 function WithoutScaleMarks() {
   return (
@@ -663,7 +678,7 @@ export const PersistentHandleLabels: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from 'lucide-react';
+import { MoveHorizontalIcon } from '@/icons';
 
 function PersistentLabels() {
   return (
@@ -715,7 +730,7 @@ export const NoHandleLabels: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from 'lucide-react';
+import { CircleIcon } from '@/icons';
 
 function NoLabels() {
   return (
@@ -769,7 +784,7 @@ export const YearTimeUnit: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from 'lucide-react';
+import { MoveHorizontalIcon } from '@/icons';
 
 function YearSlider() {
   return (
@@ -826,7 +841,7 @@ export const WithCustomRenderProps: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { CircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@/icons';
 
 // Custom date label renderer
 const customDateLabelRenderer = ({ label }) => (
@@ -962,6 +977,9 @@ export const TimelineStyle: Story = {
         height: { short: 0, medium: 0, long: 40 },
       },
     },
+    icons: {
+      point: <CircleIcon />,
+    },
     behavior: {
       scrollable: true,
       handleLabelPersistent: true,
@@ -973,7 +991,7 @@ export const TimelineStyle: Story = {
       trackInner: 'h-1 top-1/2 bg-red-500',
       scaleMark: 'bg-transparent',
       scaleMarkMajor: 'bg-white/60',
-      handle: 'bg-white shadow-2xl top-1/2 -translate-y-1/2 border-4 border-white/40',
+      handle: 'shadow-2xl top-1/2 -translate-y-1/2 ',
       handlePoint: 'hover:scale-125 transition-transform',
       scaleLabel: 'text-white/90 font-medium -bottom-4',
     },
@@ -982,7 +1000,7 @@ export const TimelineStyle: Story = {
     docs: {
       source: {
         code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from 'lucide-react';
+import { CircleIcon } from '@/icons';
 
 function TimelineSlider() {
   const [selection, setSelection] = useState();
