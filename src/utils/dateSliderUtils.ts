@@ -272,9 +272,8 @@ export const generateTimeLabelsWithPositions = (
         current.setUTCMonth(current.getUTCMonth() + 1);
         break;
       case 'year': {
-        const decade = Math.floor(current.getUTCFullYear() / 10) * 10;
-        labelDate = new Date(Date.UTC(decade, 0, 1));
-        current.setUTCFullYear(decade + 10);
+        labelDate = new Date(Date.UTC(current.getUTCFullYear(), 0, 1));
+        current.setUTCFullYear(current.getUTCFullYear() + 1);
         break;
       }
     }

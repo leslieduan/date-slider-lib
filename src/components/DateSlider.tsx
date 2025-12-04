@@ -230,7 +230,6 @@ export const DateSlider = memo(
       },
     });
 
-    //TODO: 2. date label and time unit label format should be customizable.
     //TODO: 4. add tests.
     //TODO: 5. improve performance, avoid too many re-renders when dragging.
 
