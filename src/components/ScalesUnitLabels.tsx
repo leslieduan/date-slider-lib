@@ -1,8 +1,8 @@
-import type { TimeUnitLabelsProps, TimeLabel } from '@/type';
-import { formatForDisplay } from '@/utils';
+import type { ScalesUnitLabelsProps, TimeLabel } from '@/type';
+import { cn, formatForDisplay } from '@/utils';
 import { memo, useCallback, useMemo } from 'react';
 
-export const TimeUnitLabels = memo(
+export const ScalesUnitLabels = memo(
   ({
     timeLabels,
     scales,
@@ -10,7 +10,7 @@ export const TimeUnitLabels = memo(
     minDistance = 40,
     withEndLabel = true,
     classNames,
-  }: TimeUnitLabelsProps) => {
+  }: ScalesUnitLabelsProps) => {
     const getVisibleLabels = useCallback((): TimeLabel[] => {
       if (!timeLabels.length || !scales.length) return [];
       const visible: TimeLabel[] = [];
@@ -41,10 +41,10 @@ export const TimeUnitLabels = memo(
         {visibleLabels.map(({ date, position }, index) => (
           <span
             key={`${date.getTime()}-${index}`}
-            className={
-              classNames?.scaleLabel ||
-              'bottom-0 whitespace-nowrap text-center text-xs font-medium text-slate-700 shadow-sm absolute'
-            }
+            className={cn(
+              'bottom-0 whitespace-nowrap text-center text-xs font-medium text-slate-700 shadow-sm absolute',
+              classNames?.scaleLabel
+            )}
             style={{ left: `${position}%` }}
             aria-hidden="true"
           >
@@ -56,4 +56,4 @@ export const TimeUnitLabels = memo(
   }
 );
 
-TimeUnitLabels.displayName = 'TimeUnitLabels';
+ScalesUnitLabels.displayName = 'TimeUnitLabels';

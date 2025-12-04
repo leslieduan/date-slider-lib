@@ -126,8 +126,10 @@ export type DateSliderClassNames = {
   slider?: string;
 
   // Track
-  /** Base track element */
+  /** Base track element wrapper*/
   track?: string;
+  /** The wrapper include all the track components */
+  trackInner?: string;
   /** Active portion of the track (point/range indicator) */
   trackActive?: string;
   /** Inactive/background portion of the track */
@@ -153,6 +155,9 @@ export type DateSliderClassNames = {
   // Visual Indicators
   /** Vertical cursor line on hover */
   cursorLine?: string;
+
+  /** scale wrapper */
+  scales?: string;
   /** Base styles for all scale marks */
   scaleMark?: string;
   /** Major scale tick marks */
@@ -630,7 +635,7 @@ export type TimeDisplayProps = {
   renderTimeDisplay: (props: TimeDisplayRenderProps) => ReactNode;
 };
 
-export type TimeUnitLabelsProps = {
+export type ScalesUnitLabelsProps = {
   timeLabels: TimeLabel[];
   scales: Scale[];
   trackWidth: number;

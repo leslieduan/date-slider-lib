@@ -9,7 +9,7 @@ import {
 } from '@/utils';
 import { memo, useCallback, useState, useEffect, useMemo } from 'react';
 import { DateLabel } from './DateLabel';
-import { TimeUnitLabels } from './TimeUnitLabels';
+import { ScalesUnitLabels } from './ScalesUnitLabels';
 
 const CursorLine = memo(
   ({
@@ -43,6 +43,7 @@ const Scales = memo(
   ({
     scales,
     scaleUnitConfig,
+    scalesClassName,
     scaleMarkClassName,
     scaleMarkMajorClassName,
     scaleMarkMediumClassName,
@@ -53,6 +54,7 @@ const Scales = memo(
       width: Record<ScaleType, number>;
       height: Record<ScaleType, number>;
     };
+    scalesClassName?: string;
     scaleMarkClassName?: string;
     scaleMarkMajorClassName?: string;
     scaleMarkMediumClassName?: string;
@@ -89,7 +91,7 @@ const Scales = memo(
     if (!scales?.length) return null;
 
     return (
-      <div className="absolute inset-0">
+      <div className={cn('absolute inset-0', scalesClassName)}>
         {scales.map((scale, index) => (
           <div
             key={index}
@@ -243,12 +245,13 @@ export const SliderTrack = memo(
           <Scales
             scales={scales}
             scaleUnitConfig={scaleUnitConfig}
+            scalesClassName={classNames?.scales}
             scaleMarkClassName={classNames?.scaleMark}
             scaleMarkMajorClassName={classNames?.scaleMarkMajor}
             scaleMarkMediumClassName={classNames?.scaleMarkMedium}
             scaleMarkMinorClassName={classNames?.scaleMarkMinor}
           />
-          <TimeUnitLabels
+          <ScalesUnitLabels
             timeLabels={timeLabels}
             scales={scales}
             trackWidth={trackWidth}
@@ -325,8 +328,10 @@ export const SliderTrack = memo(
           className={baseClassName}
           aria-hidden="true"
         >
-          {commonElements}
-          {activeTrack}
+          <div className={classNames?.trackInner}>
+            {commonElements}
+            {activeTrack}
+          </div>
         </div>
       );
     }

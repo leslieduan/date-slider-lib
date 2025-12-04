@@ -664,6 +664,7 @@ export const ResponsiveWidth: Story = {
     classNames: {
       trackActive: 'bg-indigo-400/20',
       track: 'bg-gray-300',
+      trackInner: 'h-10 relative top-1/4',
     },
     renderProps: {
       renderDateLabel: customDateLabelRenderer,
@@ -770,6 +771,128 @@ export const FrostSlider: Story = {
       renderDateLabel: customDateLabelRenderer,
       renderTimeDisplay: customTimeDisplayRenderer,
       renderTimeUnitSelection: customTimeUnitSelectionRenderer,
+    },
+  },
+};
+
+// Timeline-style template matching the user's image
+const TimelineTemplate = (args: Partial<SliderProps>) => {
+  const [selection, setSelection] = useState<SelectionResult>();
+  const sliderMethodRef = useRef<SliderExposedMethod>(null);
+
+  const handleSelectionChange = useCallback((newSelection: SelectionResult) => {
+    setSelection(newSelection);
+  }, []);
+
+  const value =
+    args.value && 'point' in args.value ? args.value : { point: toUTCDate('2024-12-05T10:52:00Z') };
+
+  // Custom date label for timeline style
+  const timelineDateLabel = ({ label }: DateLabelRenderProps) => {
+    return (
+      <div className="bg-white/95 backdrop-blur-sm text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg font-medium border border-gray-200">
+        {label}
+      </div>
+    );
+  };
+
+  return (
+    <div
+      className="p-8 min-h-[400px] rounded-lg relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}
+    >
+      {/* Decorative background pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 flex items-center justify-center min-h-[300px]">
+        <DateSlider
+          mode="point"
+          value={value}
+          min={args.min ?? toUTCDate('2024-12-03')}
+          max={args.max ?? toUTCDate('2024-12-07')}
+          initialTimeUnit={args.initialTimeUnit ?? 'day'}
+          granularity={args.granularity ?? 'minute'}
+          onChange={handleSelectionChange}
+          imperativeRef={sliderMethodRef}
+          icons={{
+            point: <Circle className="fill-white text-white" />,
+          }}
+          classNames={args.classNames}
+          behavior={args.behavior}
+          layout={args.layout}
+          renderProps={{
+            renderDateLabel: timelineDateLabel,
+          }}
+        />
+      </div>
+
+      {selection && (
+        <div className="mt-6 p-4 bg-white/10 backdrop-blur-md rounded-lg border border-white/20">
+          <strong className="text-white">Selected:</strong>
+          <pre className="mt-2 text-sm text-white/90">
+            {'point' in selection && selection.point.toISOString()}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Timeline Style
+ *
+ * A modern timeline-style date slider with:
+ * - Gradient background with decorative elements
+ * - Day labels positioned along the track
+ * - White circular handle
+ * - Compact date/time display
+ * - Minute-level granularity
+ *
+ * This design works great for:
+ * - Event timelines
+ * - Video scrubbers
+ * - Schedule visualization
+ * - Time-based navigation
+ */
+export const TimelineStyle: Story = {
+  render: (args: Partial<SliderProps>) => <TimelineTemplate {...args} />,
+  args: {
+    mode: 'point',
+    value: {
+      point: toUTCDate('2024-12-05T10:52:00Z'),
+    },
+    min: toUTCDate('2024-12-03'),
+    max: toUTCDate('2024-12-25'),
+    initialTimeUnit: 'day' as TimeUnit,
+    granularity: 'minute',
+    layout: {
+      width: 700,
+      height: 80,
+      scaleUnitConfig: {
+        gap: 150,
+        width: { short: 0, medium: 0, long: 2 },
+        height: { short: 0, medium: 0, long: 40 },
+      },
+    },
+    behavior: {
+      scrollable: true,
+      handleLabelPersistent: true,
+      handleLabelDisabled: false,
+    },
+    classNames: {
+      trackActive: 'bg-white/30',
+      track: 'bg-white/10',
+      trackInner: 'h-1 relative top-1/2',
+      scaleMark: 'bg-transparent',
+      scaleMarkMajor: 'bg-white/60',
+      handle: 'bg-white shadow-xl border-4 border-white/50',
+      handlePoint: 'hover:scale-125 transition-transform',
+      scaleLabel: '-bottom-4',
     },
   },
 };
