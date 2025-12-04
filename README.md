@@ -176,6 +176,47 @@ For complete UI control, use render props:
 />
 ```
 
+### Custom Date Formatting
+
+Control how dates are formatted on scale labels and handles using the `dateFormat` prop and `formatDate` utility.
+
+#### Default Format
+
+The library uses `dateFormatFn` by default for natural readability:
+- Regular days → "15"
+- First of month → "Jun"
+- First of year → "2024"
+
+#### Creating Custom Formats
+
+Create your own format function using the `DateFormat` type:
+
+```tsx
+import { DateSlider, dateFormatFn } from 'date-slider-lib';
+import type { DateFormat } from 'date-slider-lib';
+
+// Example: Custom format that shows full date on Mondays
+const mondayFormat: DateFormat = (date) => {
+  const isMonday = date.getUTCDay() === 1;
+  return isMonday ? 'dd-MMM-yyyy' : 'dd';
+};
+
+<DateSlider
+  mode="point"
+  value={{ point: new Date('2024-06-15') }}
+  dateFormat={mondayFormat}  // Use custom format
+/>
+```
+
+**Available format tokens:**
+- `yyyy` - 4-digit year (2024)
+- `mm` - 2-digit month (06)
+- `dd` - 2-digit day (15)
+- `hh` - 2-digit hour (14)
+- `MM` - 2-digit minutes (30)
+- `MMM` - Short month name (Jun)
+- `MMMM` - Full month name (June)
+
 ## 📐 Layout & Width Behavior
 
 ### Width Modes
@@ -336,9 +377,17 @@ sliderRef.current?.focusHandle('point');
 
 ## 📦 TypeScript Support
 
-DateSlider is written in TypeScript and exports all necessary types:
+DateSlider is written in TypeScript and exports all necessary types and utilities:
 
 ```tsx
+// Import components and utilities
+import {
+  DateSlider,
+  dateFormatFn,          // Built-in date format (default)
+  formatDate,            // Format utility function
+} from 'date-slider-lib';
+
+// Import types
 import type {
   // Main component types
   SliderProps,           // Main props type
@@ -364,6 +413,8 @@ import type {
 
   // Utility types
   TimeUnit,              // 'day' | 'month' | 'year'
+  DateGranularity,       // 'day' | 'hour' | 'minute'
+  DateFormat,            // Date format function type
 } from 'date-slider-lib';
 ```
 

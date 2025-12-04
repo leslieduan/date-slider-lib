@@ -352,6 +352,7 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             behavior={args.behavior}
             layout={args.layout}
             renderProps={args.renderProps}
+            dateFormat={args.dateFormat}
           />
           <SelectionDisplay selection={selection} />
           <ControlButtons sliderMethodRef={sliderMethodRef} viewMode="point" />
@@ -382,6 +383,7 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             behavior={args.behavior}
             layout={args.layout}
             renderProps={args.renderProps}
+            dateFormat={args.dateFormat}
           />
           <SelectionDisplay selection={selection} />
           <ControlButtons sliderMethodRef={sliderMethodRef} viewMode="range" />
@@ -417,6 +419,7 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             behavior={args.behavior}
             layout={args.layout}
             renderProps={args.renderProps}
+            dateFormat={args.dateFormat}
           />
           <SelectionDisplay selection={selection} />
           <ControlButtons sliderMethodRef={sliderMethodRef} viewMode="combined" />
@@ -485,6 +488,7 @@ function RangeSlider() {
 
 /**
  * Point Mode - Single date point selection
+ * Uses custom numeric date format for compact display
  */
 export const PointMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
@@ -503,6 +507,14 @@ export const PointMode: Story = {
     classNames: {
       trackActive: 'bg-green-400/20',
       track: 'bg-gray-400',
+    },
+    // Custom format: numeric dates
+    dateFormat: (date: Date) => {
+      const month = date.getUTCMonth();
+      const day = date.getUTCDate();
+      if (month === 0 && day === 1) return 'mm-yyyy'; // "01 2019"
+      if (day === 1) return 'mm'; // "02"
+      return 'dd'; // "15"
     },
   },
   parameters: {
@@ -700,61 +712,16 @@ function PersistentLabels() {
 };
 
 /**
- * No Handle Labels - Labels completely disabled
- */
-export const NoHandleLabels: Story = {
-  render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
-  args: {
-    mode: 'point',
-    value: { point: toUTCDate('2024-06-15') },
-    min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'day' as TimeUnit,
-    layout: { width: 600, height: 80 },
-    behavior: {
-      handleLabelDisabled: true,
-    },
-    classNames: {
-      trackActive: 'bg-green-500/30',
-      track: 'bg-gray-300',
-    },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from '@/icons';
-
-function NoLabels() {
-  return (
-    <DateSlider
-      mode="point"
-      value={{ point: new Date('2024-06-15') }}
-      min={new Date('2024-01-01')}
-      max={new Date('2024-12-31')}
-      initialTimeUnit="day"
-      icons={{ point: <CircleIcon /> }}
-      behavior={{
-        handleLabelDisabled: true // No labels
-      }}
-    />
-  );
-}`,
-      },
-    },
-  },
-};
-
-/**
  * Year Time Unit - Navigate by years
  */
 export const YearTimeUnit: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
-    mode: 'range',
+    mode: 'combined',
     value: {
       start: toUTCDate('2015-01-01'),
       end: toUTCDate('2023-01-01'),
+      point: toUTCDate('2018-01-01'),
     },
     min: toUTCDate('2000-01-01'),
     max: toUTCDate('2030-12-31'),
@@ -771,6 +738,11 @@ export const YearTimeUnit: Story = {
     classNames: {
       trackActive: 'bg-orange-500/30',
       track: 'bg-gray-300',
+    },
+    // Custom format: always show year for year-level navigation
+    dateFormat: () => 'yyyy', // Always show 4-digit year
+    renderProps: {
+      renderDateLabel: customDateLabelRenderer,
     },
   },
   parameters: {
@@ -923,6 +895,7 @@ const TimelineTemplate = (args: Partial<SliderProps>) => {
             renderProps={{
               renderDateLabel: timelineDateLabel,
             }}
+            dateFormat={args.dateFormat}
           />
         </div>
       </div>
@@ -985,6 +958,11 @@ export const TimelineStyle: Story = {
       handle: 'shadow-2xl top-1/2 -translate-y-1/2 ',
       handlePoint: 'hover:scale-125 transition-transform',
       scaleLabel: 'text-white/90 font-medium -bottom-4',
+    },
+    // Custom format: month abbreviation for timeline
+    dateFormat: (date: Date) => {
+      const day = date.getUTCDate();
+      return day === 1 ? 'MMM' : 'dd'; // "Dec" or "15"
     },
   },
   parameters: {
