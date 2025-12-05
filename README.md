@@ -11,49 +11,44 @@ A powerful, fully customizable React date slider component with range, point, an
 ## ✨ Features
 
 - **3 Selection Modes**: Point, Range, and Combined selection
-- **Fully Customizable**: Every element can be styled with Tailwind CSS
-- **Type-Safe**: Complete TypeScript support with discriminated unions
-- **Accessible**: WCAG compliant, keyboard navigation, ARIA labels
-- **Responsive**: Works seamlessly on mobile and desktop
+- **Fully Customizable**: Style with Tailwind CSS classes
+- **Type-Safe**: Complete TypeScript support
+- **Accessible**: WCAG compliant with keyboard navigation
+- **Responsive**: Works on mobile and desktop
 - **Flexible Time Units**: Day, month, and year navigation
-- **Custom Rendering**: Render props for complete UI customization
-- **UTC Architecture**: All dates are UTC Date objects for consistency
-- **Scrollable**: Support for large date ranges with horizontal scrolling
-- **Imperative API**: Programmatically control the slider
-- **Label Control**: Persistent, disabled, or hover-only handle labels
+- **Custom Rendering**: Full UI customization via render props
+- **Label Control**: Configurable handle and track hover labels
 
 ## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-npm install date-slider-lib 
+npm install date-slider-lib
 # or
-pnpm add date-slider-lib 
+pnpm add date-slider-lib
 # or
-yarn add date-slider-lib 
+yarn add date-slider-lib
 ```
 
 ### Setup
 
-**1. Import the CSS** (required for styling):
+**1. Import the CSS** (required):
 
 ```tsx
-// In your main file (e.g., App.tsx or main.tsx)
+// In your main file (e.g., App.tsx)
 import 'date-slider-lib/style.css';
 ```
 
-**2. Configure Tailwind CSS** (if using Tailwind in your project):
+**2. Configure Tailwind CSS** (if using Tailwind):
 
 ```js
 // tailwind.config.js
 export default {
   content: [
-    "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/date-slider-lib/dist/**/*.{js,mjs,cjs}", // Add this line
+    "./node_modules/date-slider-lib/dist/**/*.{js,mjs,cjs}", // Add this
   ],
-  // ...
 }
 ```
 
@@ -63,17 +58,14 @@ export default {
 import { DateSlider } from 'date-slider-lib';
 import type { SelectionResult } from 'date-slider-lib';
 import { Circle } from '@/icons';
-import { useState } from 'react';
 
 function App() {
-  const [selection, setSelection] = useState<SelectionResult>({
-    point: new Date('2024-06-15')
-  });
+  const [selection, setSelection] = useState<SelectionResult>();
 
   return (
     <DateSlider
       mode="point"
-      value={selection}
+      value={{ point: new Date('2024-06-15') }}
       onChange={setSelection}
       min={new Date('2024-01-01')}
       max={new Date('2024-12-31')}
@@ -85,8 +77,6 @@ function App() {
 ```
 
 ## 📖 Modes
-
-DateSlider supports three selection modes:
 
 ### Point Mode
 
@@ -150,61 +140,46 @@ Select both a point and a range simultaneously.
 />
 ```
 
+## 🎨 Customization
 
-### Custom Render Props
-
-For complete UI control, use render props:
+### Styling with Tailwind Classes
 
 ```tsx
 <DateSlider
-  mode="point"
-  value={{ point: new Date('2024-06-15') }}
-  renderProps={{
-    renderDateLabel: ({ label }) => (
-      <span className="bg-blue-700 text-white text-xs px-3 py-1.5 rounded shadow-md">
-        {label}
-      </span>
-    ),
-    renderTimeDisplay: ({ dateLabel, toNextDate, toPrevDate }) => (
-      <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2">
-        <button onClick={toPrevDate}>←</button>
-        <span>{dateLabel}</span>
-        <button onClick={toNextDate}>→</button>
-      </div>
-    ),
+  mode="range"
+  value={{ start: new Date('2024-03-01'), end: new Date('2024-09-01') }}
+  classNames={{
+    trackActive: 'bg-blue-500/30',
+    track: 'bg-gray-300',
+    handle: 'bg-blue-600 border-2 border-white shadow-lg',
+    handleDragging: 'scale-110',
+    scaleMarkMajor: 'bg-gray-600',
+    scaleLabel: 'text-gray-700',
   }}
 />
 ```
 
 ### Custom Date Formatting
 
-Control how dates are formatted on scale labels and handles using the `dateFormat` prop and `formatDate` utility.
-
-#### Default Format
-
-The library uses `dateFormatFn` by default for natural readability:
-- Regular days → "15"
-- First of month → "Jun"
-- First of year → "2024"
-
-#### Creating Custom Formats
-
-Create your own format function using the `DateFormat` type:
+Control how dates are formatted on labels and scales:
 
 ```tsx
-import { DateSlider, dateFormatFn } from 'date-slider-lib';
 import type { DateFormat } from 'date-slider-lib';
 
-// Example: Custom format that shows full date on Mondays
-const mondayFormat: DateFormat = (date) => {
-  const isMonday = date.getUTCDay() === 1;
-  return isMonday ? 'dd-MMM-yyyy' : 'dd';
+// Custom format function
+const customFormat: DateFormat = (date) => {
+  const day = date.getUTCDate();
+  const month = date.getUTCMonth();
+
+  if (month === 0 && day === 1) return 'yyyy';  // First of year: "2024"
+  if (day === 1) return 'MMM';                  // First of month: "Jun"
+  return 'dd';                                   // Regular day: "15"
 };
 
 <DateSlider
   mode="point"
   value={{ point: new Date('2024-06-15') }}
-  dateFormat={mondayFormat}  // Use custom format
+  dateFormat={customFormat}
 />
 ```
 
@@ -217,50 +192,125 @@ const mondayFormat: DateFormat = (date) => {
 - `MMM` - Short month name (Jun)
 - `MMMM` - Full month name (June)
 
-## 📐 Layout & Width Behavior
+### Custom Render Props
 
-### Width Modes
-
-**Fill Parent Container** (default):
-```tsx
-<DateSlider
-  layout={{ width: 'fill' }}  // Fills parent width
-  // ...
-/>
-```
-
-**Fixed Width**:
-```tsx
-<DateSlider
-  layout={{ width: 800 }}  // Fixed 800px width
-  // ...
-/>
-```
-
-### Scrollable Layout
-
-Enable horizontal scrolling for large date ranges:
+Full UI customization:
 
 ```tsx
 <DateSlider
   mode="point"
-  value={{ point: new Date('2022-06-15') }}
-  min={new Date('2020-01-01')}
-  max={new Date('2024-12-31')}
-  initialTimeUnit="day"
-  behavior={{
-    scrollable: true, // Enable horizontal scrolling
+  value={{ point: new Date('2024-06-15') }}
+  renderProps={{
+    renderDateLabel: ({ label }) => (
+      <span className="bg-blue-700 text-white px-3 py-1.5 rounded">
+        {label}
+      </span>
+    ),
+    renderTimeDisplay: ({ dateLabel, toNextDate, toPrevDate }) => (
+      <div className="flex items-center gap-2">
+        <button onClick={toPrevDate}>←</button>
+        <span>{dateLabel}</span>
+        <button onClick={toNextDate}>→</button>
+      </div>
+    ),
   }}
+/>
+```
+
+### Label Behavior
+
+Control when date labels appear:
+
+```tsx
+<DateSlider
+  mode="combined"
+  value={{
+    point: new Date('2024-06-15'),
+    start: new Date('2024-03-01'),
+    end: new Date('2024-09-01')
+  }}
+  behavior={{
+    // Handle labels
+    handleLabelPersistent: true,          // All handles: always visible
+    pointHandleLabelPersistent: true,     // Point handle only: always visible
+    rangeHandleLabelPersistent: false,    // Range handles only: hover to show
+    handleLabelDisabled: false,           // All handles: disable labels
+    pointHandleLabelDisabled: false,      // Point handle only: disable label
+    rangeHandleLabelDisabled: false,      // Range handles only: disable labels
+
+    // Track hover behavior
+    trackHoverDateLabelDisabled: false,   // Disable date label on track hover
+    trackHoverCursorLineDisabled: false,  // Disable cursor line on track hover
+  }}
+/>
+```
+
+### Layout Configuration
+
+```tsx
+<DateSlider
+  mode="point"
+  value={{ point: new Date('2024-06-15') }}
   layout={{
-    width: 600,
-    height: 80,
+    width: 800,                    // Fixed width in pixels (or 'fill' for parent width)
+    height: 100,                   // Height in pixels
+    trackPaddingX: 40,             // Horizontal padding
+    showEndLabel: true,            // Show end date label
+    minGapScaleUnits: 50,          // Minimum gap between scale units
+    dateLabelDistanceOverHandle: 35, // Distance of date label above handle
     scaleUnitConfig: {
-      gap: 100,
+      gap: 100,                    // Gap between scale units
       width: { short: 1, medium: 2, long: 2 },
       height: { short: 18, medium: 36, long: 60 },
     },
   }}
 />
+```
+
+### Behavior Options
+
+```tsx
+<DateSlider
+  mode="range"
+  value={{ start: new Date('2024-03-01'), end: new Date('2024-09-01') }}
+  behavior={{
+    scrollable: true,                   // Enable horizontal scrolling
+    freeSelectionOnTrackClick: false,   // Snap to scale units on click
+  }}
+/>
+```
+
+### Imperative API
+
+Control the slider programmatically:
+
+```tsx
+import { useRef } from 'react';
+import type { SliderExposedMethod } from 'date-slider-lib';
+
+function App() {
+  const sliderRef = useRef<SliderExposedMethod>(null);
+
+  const setToToday = () => {
+    sliderRef.current?.setDateTime(new Date(), 'point');
+  };
+
+  const focusHandle = () => {
+    sliderRef.current?.focusHandle('point');
+  };
+
+  return (
+    <>
+      <DateSlider
+        mode="point"
+        value={{ point: new Date('2024-06-15') }}
+        imperativeRef={sliderRef}
+      />
+      <button onClick={setToToday}>Set to Today</button>
+      <button onClick={focusHandle}>Focus Handle</button>
+    </>
+  );
+}
 ```
 
 ## 📘 API Reference
@@ -274,200 +324,132 @@ Enable horizontal scrolling for large date ranges:
 | `onChange` | `(value: SelectionResult) => void` | Yes | Selection change callback |
 | `min` | `Date` | No | Minimum selectable date (UTC) |
 | `max` | `Date` | No | Maximum selectable date (UTC) |
-| `initialTimeUnit` | `'day' \| 'month' \| 'year'` | No | Initial time unit |
+| `initialTimeUnit` | `'day' \| 'month' \| 'year'` | No | Initial time unit (default: 'day') |
+| `icons` | `IconsConfig` | No | Custom icons for handles |
+| `classNames` | `DateSliderClassNames` | No | Tailwind classes for styling |
+| `behavior` | `BehaviorConfig` | No | Interaction behavior |
+| `layout` | `LayoutConfig` | No | Size and layout |
+| `renderProps` | `RenderPropsConfig` | No | Custom render functions |
+| `dateFormat` | `DateFormat` | No | Custom date format function |
+| `locale` | `string` | No | Date locale (default: 'en-US') |
+| `imperativeRef` | `Ref<SliderExposedMethod>` | No | Imperative API reference |
 
-### Configuration Props
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `classNames` | `DateSliderClassNames` | Tailwind classes for all elements |
-| `icons` | `IconsConfig` | Custom icons for handles |
-| `behavior` | `BehaviorConfig` | Interaction behavior settings |
-| `layout` | `LayoutConfig` | Size and layout configuration |
-| `renderProps` | `RenderPropsConfig` | Custom render functions |
-| `imperativeRef` | `React.Ref<SliderExposedMethod>` | Imperative API reference |
-
-### DateSliderClassNames
-
-All className props accept Tailwind CSS utilities:
+### Value Types
 
 ```typescript
-type DateSliderClassNames = {
-  // Containers
-  wrapper?: string;           // Main container
-  slider?: string;            // Slider container
+// Point mode
+type PointValue = { point: Date };
 
-  // Track
-  track?: string;             // Track base element
-  trackInner?: string;        // Track inner wrapper
-  trackActive?: string;       // Active track portion
-  trackInactive?: string;     // Inactive track portion
+// Range mode
+type RangeValue = { start: Date; end: Date };
 
-  // Handles
-  handle?: string;            // Base handle styles
-  handlePoint?: string;       // Point handle
-  handleStart?: string;       // Range start handle
-  handleEnd?: string;         // Range end handle
-  handleDragging?: string;    // Dragging state
-  handleIcon?: string;        // Handle icon wrapper
-
-  // Visual elements
-  cursorLine?: string;        // Hover cursor line
-  scaleMark?: string;         // Scale tick marks
-  scaleMarkMajor?: string;    // Major tick marks
-  scaleMarkMedium?: string;   // Medium tick marks
-  scaleMarkMinor?: string;    // Minor tick marks
-  scaleLabel?: string;        // Scale labels
-};
+// Combined mode
+type CombinedValue = { point: Date; start: Date; end: Date };
 ```
 
 ### BehaviorConfig
 
 ```typescript
 type BehaviorConfig = {
-  scrollable?: boolean;                 // Enable horizontal scrolling (default: true)
-  freeSelectionOnTrackClick?: boolean;  // Free selection vs snap to units
-  handleLabelPersistent?: boolean;      // Keep labels always visible
-  handleLabelDisabled?: boolean;        // Completely hide handle labels
+  scrollable?: boolean;                    // Enable horizontal scrolling
+  freeSelectionOnTrackClick?: boolean;     // Free selection vs snap to units
+
+  // Handle label control (global)
+  handleLabelPersistent?: boolean;         // All handles: always visible
+  handleLabelDisabled?: boolean;           // All handles: disable labels
+
+  // Handle label control (specific)
+  pointHandleLabelPersistent?: boolean;    // Point handle: always visible
+  pointHandleLabelDisabled?: boolean;      // Point handle: disable label
+  rangeHandleLabelPersistent?: boolean;    // Range handles: always visible
+  rangeHandleLabelDisabled?: boolean;      // Range handles: disable labels
+
+  // Track hover behavior
+  trackHoverDateLabelDisabled?: boolean;   // Disable date label on track hover
+  trackHoverCursorLineDisabled?: boolean;  // Disable cursor line on track hover
 };
 ```
 
-### LayoutConfig
+### DateSliderClassNames
 
 ```typescript
-type LayoutConfig = {
-  width?: 'fill' | number;        // Slider width (px or fill parent)
-  height?: number;                // Slider height in pixels
-  trackPaddingX?: number;         // Horizontal track padding
-  showEndLabel?: boolean;         // Show end date label
-  minGapScaleUnits?: number;      // Minimum gap between handles
-  scaleUnitConfig?: {             // Custom scale configuration
-    gap: number;
-    width: { short: number; medium: number; long: number };
-    height: { short: number; medium: number; long: number };
-  };
+type DateSliderClassNames = {
+  // Containers
+  wrapper?: string;
+  slider?: string;
+
+  // Track
+  track?: string;
+  trackInner?: string;
+  trackActive?: string;
+  trackInactive?: string;
+
+  // Handles
+  handle?: string;              // Base handle styles
+  handlePoint?: string;         // Point handle
+  handleStart?: string;         // Range start handle
+  handleEnd?: string;           // Range end handle
+  handleDragging?: string;      // Dragging state
+  handleIcon?: string;          // Handle icon wrapper
+
+  // Visual elements
+  cursorLine?: string;          // Hover cursor line
+  scales?: string;              // Scales wrapper
+  scaleMark?: string;           // Base scale mark
+  scaleMarkMajor?: string;      // Major tick marks
+  scaleMarkMedium?: string;     // Medium tick marks
+  scaleMarkMinor?: string;      // Minor tick marks
+  scaleLabel?: string;          // Scale labels
 };
-```
-
-### RenderPropsConfig
-
-```typescript
-type RenderPropsConfig = {
-  renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
-  renderTimeDisplay?: (props: TimeDisplayRenderProps) => ReactNode;
-  renderTimeUnitSelection?: (props: TimeUnitSelectionRenderProps) => ReactNode;
-};
-```
-
-### Imperative API
-
-Control the slider programmatically:
-
-```tsx
-const sliderRef = useRef<SliderExposedMethod>(null);
-
-// Set date programmatically
-sliderRef.current?.setDateTime(new Date('2024-06-15'), 'point');
-
-// Focus a handle
-sliderRef.current?.focusHandle('point');
-
-<DateSlider imperativeRef={sliderRef} />
 ```
 
 ## 📦 TypeScript Support
 
-DateSlider is written in TypeScript and exports all necessary types and utilities:
+Full TypeScript support with exported types:
 
 ```tsx
-// Import components and utilities
 import {
   DateSlider,
-  dateFormatFn,          // Built-in date format (default)
-  formatDate,            // Format utility function
+  dateFormatFn,       // Default date format function
+  formatDate,         // Format utility
 } from 'date-slider-lib';
 
-// Import types
 import type {
-  // Main component types
-  SliderProps,           // Main props type
-  SelectionResult,       // onChange return type
-  SliderExposedMethod,   // Imperative API type
-
-  // Value types (for type guards)
-  PointValue,            // { point: Date }
-  RangeValue,            // { start: Date; end: Date }
-  CombinedValue,         // { point: Date; start: Date; end: Date }
-
-  // Configuration types
-  DateSliderClassNames,  // For classNames prop
-  LayoutConfig,          // For layout prop
-  BehaviorConfig,        // For behavior prop
-  RenderPropsConfig,     // For renderProps prop
-  IconsConfig,           // For icons prop
-
-  // Render prop parameter types
-  DateLabelRenderProps,
-  TimeDisplayRenderProps,
-  TimeUnitSelectionRenderProps,
-
-  // Utility types
-  TimeUnit,              // 'day' | 'month' | 'year'
-  DateGranularity,       // 'day' | 'hour' | 'minute'
-  DateFormat,            // Date format function type
+  SliderProps,
+  SelectionResult,
+  SliderExposedMethod,
+  PointValue,
+  RangeValue,
+  CombinedValue,
+  DateSliderClassNames,
+  LayoutConfig,
+  BehaviorConfig,
+  RenderPropsConfig,
+  IconsConfig,
+  DateFormat,
+  TimeUnit,
 } from 'date-slider-lib';
 ```
-
-## 🏗️ Architecture
-
-### UTC-First Design
-
-DateSlider follows a **"UTC Everywhere, Display Locally"** architecture:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  CONSUMER LAYER (Your Code)                             │
-│  - All dates are UTC Date objects                       │
-│  - Use new Date() with ISO strings                      │
-└─────────────────┬───────────────────────────────────────┘
-                  │
-                  ↓
-┌─────────────────────────────────────────────────────────┐
-│  DATESLIDER (UTC Dates Only)                            │
-│  - All Date props must be UTC Date objects              │
-│  - All calculations use UTC methods                     │
-│  - Single source of truth                               │
-└─────────────────┬───────────────────────────────────────┘
-                  │
-                  ↓
-┌─────────────────────────────────────────────────────────┐
-│  DISPLAY LAYER (User Interface)                         │
-│  - Formats dates for visual display                     │
-│  - Shows dates in UTC (configurable locale)             │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Why UTC?**
-
-1. **Unambiguous**: No DST or timezone confusion
-2. **Consistent**: Same timestamp for all users globally
-3. **Scalable**: Works for days, hours, minutes
 
 ## 💡 Best Practices
 
-### Store Dates as UTC
+### Use UTC Dates
+
+All dates should be UTC Date objects:
 
 ```tsx
-// ✅ CORRECT - Use UTC Date objects
+// ✅ CORRECT
+<DateSlider
+  min={new Date('2024-01-01T00:00:00Z')}
+  max={new Date('2024-12-31T23:59:59Z')}
+  value={{ point: new Date('2024-06-15T00:00:00Z') }}
+/>
+
+// ✅ Also works (assumes UTC when only date is provided)
 <DateSlider
   min={new Date('2024-01-01')}
   max={new Date('2024-12-31')}
   value={{ point: new Date('2024-06-15') }}
-/>
-
-// ❌ WRONG - Don't use date strings directly
-<DateSlider
-  min="2024-01-01"  // TypeScript error
 />
 ```
 
@@ -476,149 +458,30 @@ DateSlider follows a **"UTC Everywhere, Display Locally"** architecture:
 ```tsx
 const handleChange = useCallback((selection: SelectionResult) => {
   if ('point' in selection) {
-    // TypeScript knows this is PointSelection
-    const date = selection.point;
-    console.log(date.toISOString());
+    console.log('Point:', selection.point);
+  }
+  if ('start' in selection) {
+    console.log('Range:', selection.start, selection.end);
   }
 }, []);
 ```
 
-### Use Memoization for Performance
+### Optimize Performance
 
 ```tsx
+// Memoize dates to prevent unnecessary re-renders
 const minDate = useMemo(() => new Date('2024-01-01'), []);
 const maxDate = useMemo(() => new Date('2024-12-31'), []);
 
 <DateSlider min={minDate} max={maxDate} />
 ```
 
-## 🔧 Troubleshooting
-
-### Dates are off by one day
-
-**Cause:** Not using UTC Date objects properly
-
-**Solution:** Ensure all dates are valid UTC Date objects:
-```tsx
-// ✅ CORRECT
-const date = new Date('2024-01-15T00:00:00Z');  // Explicit UTC
-
-// ❌ WRONG
-const date = new Date('2024-01-15');  // May use local timezone
-```
-
-### Handle not focusing programmatically
-
-**Cause:** Using imperativeRef incorrectly
-
-**Solution:**
-```tsx
-const sliderRef = useRef<SliderExposedMethod>(null);
-
-// ✅ CORRECT
-sliderRef.current?.focusHandle('point');
-
-<DateSlider imperativeRef={sliderRef} />
-```
-
 ## ♿ Accessibility
 
-DateSlider is built with accessibility in mind:
-
-- **Keyboard Navigation**: Full keyboard support (Arrow keys, Home, End, Page Up/Down)
-- **ARIA Labels**: Proper ARIA labels for screen readers
+- **Keyboard Navigation**: Arrow keys, Home, End, Page Up/Down
+- **ARIA Labels**: Screen reader support
 - **Focus Management**: Visible focus indicators
-- **WCAG Compliant**: Color contrast ratios meet WCAG AAA standards
-- **Touch Support**: Works seamlessly on touch devices
-
-## 🛠️ Development
-
-### Install Dependencies
-
-```bash
-pnpm install
-```
-
-### Run Storybook
-
-```bash
-pnpm storybook
-```
-
-This will start Storybook at http://localhost:6006
-
-### Build Library
-
-```bash
-pnpm build
-```
-
-This will:
-1. Generate TypeScript declarations
-2. Bundle the library with Vite (ESM and CJS formats)
-3. Output to the `dist` directory
-
-### Quality Scripts
-
-```bash
-pnpm lint         # Run ESLint
-pnpm lint:fix     # Auto-fix ESLint issues
-pnpm format       # Format code with Prettier
-pnpm type-check   # TypeScript type checking
-pnpm validate     # Run all checks
-```
-
-## 📂 Project Structure
-
-```
-src/
-├── components/                      # DateSlider components
-│   ├── DateSlider.tsx              # Main component
-│   ├── DateSlider.stories.tsx      # Storybook stories (15 variants)
-│   ├── SliderTrack.tsx             # Track with scales (refactored)
-│   ├── SliderHandle.tsx            # Draggable handles
-│   ├── DateLabel.tsx               # Floating date labels
-│   ├── TimeDisplay.tsx             # Date navigation display
-│   ├── TimeUnitSelection.tsx       # Time unit selector
-│   ├── ScalesUnitLabels.tsx        # Scale unit labels
-│   └── index.ts
-├── hooks/                          # Custom React hooks
-│   ├── useDateLabelPersist.ts      # Label persistence logic
-│   ├── useDragState.ts             # Drag state management
-│   ├── useEventHandlers.ts         # Event handlers
-│   ├── useFocusManagement.ts       # Focus management
-│   ├── usePositionState.ts         # Position calculations
-│   ├── useDrag.ts                  # Generic drag hook
-│   ├── useElementSize.ts           # Element size observer
-│   ├── useResizeObserver.ts        # Resize observer
-│   ├── useViewPortSize.ts          # Viewport size tracking
-│   ├── useHandleVisible.ts         # Handle visibility logic
-│   ├── useInitialAutoScrollPosition.ts  # Auto-scroll positioning
-│   └── useRAFDFn.ts                # RAF debouncing
-├── utils/                          # Utility functions
-│   ├── dateSliderUtils.ts          # Date calculations
-│   ├── cn.ts                       # Tailwind class merger
-│   ├── clamp.ts                    # Number clamping
-│   ├── clampToLowerBound.ts        # Lower bound clamping
-│   ├── debounce.ts                 # Debounce utility
-│   ├── checkDateDuration.ts        # Date duration checks
-│   └── snapToClosestStep.ts        # Snapping logic
-├── type.ts                         # TypeScript types
-├── constants.ts                    # Constants
-├── index.css                       # Global styles
-└── index.ts                        # Library entry point
-```
-
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) for details on:
-
-- Development workflow
-- Commit message conventions
-- Pull request process
-- Code quality standards
-
+- **Touch Support**: Mobile-friendly
 
 ## 📄 License
 

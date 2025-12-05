@@ -574,9 +574,6 @@ export const CombinedMode: Story = {
     behavior: {
       pointHandleLabelPersistent: true,
       handleLabelPersistent: true,
-      rangeHandleLabelDisabled: true,
-      trackHoverDateLabelDisabled: true,
-      trackHoverCursorLineDisabled: true,
     },
     renderProps: { renderDateLabel: customDateLabelRenderer },
   },
