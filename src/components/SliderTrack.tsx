@@ -126,6 +126,7 @@ export const SliderTrack = memo(
     withEndLabel,
     dateLabelDistanceOverHandle,
     dateFormat,
+    locale,
     ...props
   }: SliderTrackProps) => {
     const [isHoverTrack, setIsHoverTrack] = useState(false);
@@ -144,7 +145,7 @@ export const SliderTrack = memo(
         const label = formatDate(
           getDateFromPercent(percentage, startDate, endDate),
           dateFormat,
-          'en-AU',
+          locale,
           'label'
         );
 
@@ -154,7 +155,7 @@ export const SliderTrack = memo(
         //get handle ref, make lable always above handle in a confiured height.
         setLabelPosition(calculateLabelPosition(handleRef, clientX, dateLabelDistanceOverHandle));
       },
-      [startDate, endDate, dateFormat, handleRef, dateLabelDistanceOverHandle]
+      [startDate, endDate, dateFormat, locale, handleRef, dateLabelDistanceOverHandle]
     );
 
     const handleMouseLeave = useCallback(() => {
@@ -263,6 +264,7 @@ export const SliderTrack = memo(
             withEndLabel={withEndLabel}
             classNames={classNames}
             dateFormat={dateFormat}
+            locale={locale}
           />
           <CursorLine
             position={mouseHoverPosition}
@@ -287,6 +289,7 @@ export const SliderTrack = memo(
         trackWidth,
         withEndLabel,
         dateFormat,
+        locale,
         mouseHoverPosition,
         showCursorLine,
         showDateLabel,

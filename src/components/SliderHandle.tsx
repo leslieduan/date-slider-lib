@@ -118,6 +118,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     sliderContainerRef,
     dateLabelDistanceOverHandle,
     dateFormat,
+    locale,
   }) => {
     const commonProps = {
       onFocus: onHandleFocus,
@@ -140,7 +141,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               label={formatDate(
                 getDateFromPercent(rangeStart, startDate, endDate),
                 dateFormat,
-                'en-AU',
+                locale,
                 'label'
               )}
               onMouseDown={onMouseDown('start')}
@@ -164,7 +165,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               label={formatDate(
                 getDateFromPercent(rangeEnd, startDate, endDate),
                 dateFormat,
-                'en-AU',
+                locale,
                 'label'
               )}
               onMouseDown={onMouseDown('end')}
@@ -192,7 +193,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             label={formatDate(
               getDateFromPercent(pointPosition, startDate, endDate),
               dateFormat,
-              'en-AU',
+              locale,
               'label'
             )}
             onMouseDown={onMouseDown('point')}

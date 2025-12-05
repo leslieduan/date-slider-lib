@@ -503,6 +503,8 @@ type CommonSliderProps = {
 
   dateFormat?: DateFormat;
 
+  locale?: string;
+
   /** Imperative API reference for external control */
   imperativeRef?: React.Ref<SliderExposedMethod>;
 };
@@ -614,6 +616,7 @@ type BaseSliderTrackProps = {
   withEndLabel?: boolean;
   dateLabelDistanceOverHandle: number;
   dateFormat: DateFormat;
+  locale: string;
 };
 
 type PointModeProps = {
@@ -687,6 +690,7 @@ export type RenderSliderHandleProps = {
   sliderContainerRef: RefObject<HTMLDivElement | null>;
   dateLabelDistanceOverHandle: number;
   dateFormat: DateFormat;
+  locale: string;
 };
 
 export type TimeUnitSelectionProps = {
@@ -705,6 +709,7 @@ export type TimeDisplayProps = {
   renderTimeDisplay: (props: TimeDisplayRenderProps) => ReactNode;
   dateFormat: DateFormat;
   timeUnit: TimeUnit;
+  locale: string;
 };
 
 export type ScalesUnitLabelsProps = {
@@ -715,6 +720,7 @@ export type ScalesUnitLabelsProps = {
   withEndLabel?: boolean;
   classNames?: DateSliderClassNames;
   dateFormat: DateFormat;
+  locale: string;
 };
 
 export type DateLabelProps = {

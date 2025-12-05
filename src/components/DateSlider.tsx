@@ -64,8 +64,8 @@ export const DateSlider = memo(
     icons,
     behavior,
     layout,
-    // Advanced
     dateFormat = dateFormatFn,
+    locale = 'en-AU',
     imperativeRef: imperativeHandleRef,
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
@@ -470,6 +470,7 @@ export const DateSlider = memo(
             renderTimeDisplay={renderProps?.renderTimeDisplay}
             dateFormat={dateFormat}
             timeUnit={timeUnit}
+            locale={locale}
           />
         )}
 
@@ -526,6 +527,7 @@ export const DateSlider = memo(
                   withEndLabel={withEndLabel}
                   dateLabelDistanceOverHandle={dateLabelDistance}
                   dateFormat={dateFormat}
+                  locale={locale}
                 />
 
                 <RenderSliderHandle
@@ -554,6 +556,7 @@ export const DateSlider = memo(
                   sliderContainerRef={sliderContainerRef}
                   dateLabelDistanceOverHandle={dateLabelDistance}
                   dateFormat={dateFormat}
+                  locale={locale}
                 />
               </div>
             </div>

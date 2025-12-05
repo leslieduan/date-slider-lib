@@ -10,11 +10,12 @@ export const TimeDisplay = ({
   renderTimeDisplay,
   dateFormat,
   timeUnit,
+  locale,
 }: TimeDisplayProps) => {
   const dateLabel = useMemo(() => {
     const date = getDateFromPercent(position, startDate, endDate);
-    return formatDate(date, dateFormat, 'en-AU', 'label');
-  }, [position, startDate, endDate, dateFormat]);
+    return formatDate(date, dateFormat, locale, 'label');
+  }, [position, startDate, endDate, dateFormat, locale]);
 
   const handleDateUpdate = (direction: 'forward' | 'backward') => {
     const currentDate = getDateFromPercent(position, startDate, endDate);

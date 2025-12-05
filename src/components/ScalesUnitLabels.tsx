@@ -11,6 +11,7 @@ export const ScalesUnitLabels = memo(
     withEndLabel = true,
     classNames,
     dateFormat,
+    locale,
   }: ScalesUnitLabelsProps) => {
     const getVisibleLabels = useCallback((): TimeLabel[] => {
       if (!timeLabels.length || !scales.length) return [];
@@ -49,7 +50,7 @@ export const ScalesUnitLabels = memo(
             style={{ left: `${position}%` }}
             aria-hidden="true"
           >
-            {formatDate(date, dateFormat, 'en-AU').toUpperCase()}
+            {formatDate(date, dateFormat, locale, 'scale').toUpperCase()}
           </span>
         ))}
       </>
