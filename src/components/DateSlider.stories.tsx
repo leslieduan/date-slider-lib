@@ -439,7 +439,7 @@ export const RangeMode: Story = {
   args: {
     mode: 'range',
     value: {
-      start: toUTCDate('2021-03-01'),
+      start: toUTCDate('2020-03-01'),
       end: toUTCDate('2021-08-01'),
     },
     min: toUTCDate('2020-01-01'),

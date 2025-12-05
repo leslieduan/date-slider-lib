@@ -411,7 +411,6 @@ Full TypeScript support with exported types:
 import {
   DateSlider,
   dateFormatFn,       // Default date format function
-  formatDate,         // Format utility
 } from 'date-slider-lib';
 
 import type {

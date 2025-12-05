@@ -674,6 +674,7 @@ export type SliderHandleProps = {
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   sliderContainerRef: RefObject<HTMLDivElement | null>;
   dateLabelDistanceOverHandle: number;
+  sliderPositionX: number;
 };
 
 export type RenderSliderHandleProps = {
@@ -705,6 +706,7 @@ export type RenderSliderHandleProps = {
   dateLabelDistanceOverHandle: number;
   dateFormat: DateFormat;
   locale: string;
+  sliderPositionX: number;
 };
 
 export type TimeUnitSelectionProps = {

@@ -245,6 +245,9 @@ export const DateSlider = memo(
 
     //TODO: 4. add tests.
     //TODO: 5. improve performance, avoid too many re-renders when dragging.
+    //TODO: investigate when scroll page, date lable will go with scroll, lost correct position.
+    //TODO: when click on track, all range handle and point date labels appear. it should only appear when correspoinding handle udpate.
+    //TODO: snap to unit can be configured, along with steps.
 
     useHandleVisible({
       pointHandleRef,
@@ -572,6 +575,7 @@ export const DateSlider = memo(
                   dateLabelDistanceOverHandle={dateLabelDistance}
                   dateFormat={dateFormat}
                   locale={locale}
+                  sliderPositionX={sliderPosition.x}
                 />
               </div>
             </div>

@@ -24,6 +24,7 @@ export const SliderHandle = ({
   renderDateLabel,
   sliderContainerRef,
   dateLabelDistanceOverHandle,
+  sliderPositionX,
 }: SliderHandleProps) => {
   const { leftOut, rightOut } = handleOutsideVisibleArea({
     handleRef: ref,
@@ -47,7 +48,7 @@ export const SliderHandle = ({
     };
 
     updatePosition();
-  }, [ref, position, dateLabelDistanceOverHandle]);
+  }, [ref, position, dateLabelDistanceOverHandle, sliderPositionX]);
 
   // Get handle-specific className
   const handleSpecificClass =
@@ -130,6 +131,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     dateLabelDistanceOverHandle,
     dateFormat,
     locale,
+    sliderPositionX,
   }) => {
     const commonProps = {
       onFocus: onHandleFocus,
@@ -166,6 +168,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               renderDateLabel={renderDateLabel}
               sliderContainerRef={sliderContainerRef}
               dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
+              sliderPositionX={sliderPositionX}
             />
             <SliderHandle
               viewMode={viewMode}
@@ -191,6 +194,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               renderDateLabel={renderDateLabel}
               sliderContainerRef={sliderContainerRef}
               dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
+              sliderPositionX={sliderPositionX}
             />
           </>
         )}
@@ -220,6 +224,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             renderDateLabel={renderDateLabel}
             sliderContainerRef={sliderContainerRef}
             dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
+            sliderPositionX={sliderPositionX}
           />
         )}
       </>
