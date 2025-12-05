@@ -440,10 +440,10 @@ export const RangeMode: Story = {
     mode: 'range',
     value: {
       start: toUTCDate('2021-03-01'),
-      end: toUTCDate('2021-06-01'),
+      end: toUTCDate('2021-08-01'),
     },
     min: toUTCDate('2020-01-01'),
-    max: toUTCDate('2025-03-15'),
+    max: toUTCDate('2022-03-15'),
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 800,
@@ -453,6 +453,10 @@ export const RangeMode: Story = {
       trackActive: 'bg-blue-400/20',
       track: 'bg-gray-400',
     },
+    behavior: {
+      handleLabelPersistent: true,
+    },
+    renderProps: { renderDateLabel: customDateLabelRenderer },
   },
   parameters: {
     docs: {
@@ -567,6 +571,10 @@ export const CombinedMode: Story = {
       trackActive: 'bg-purple-400/20',
       track: 'bg-gray-300',
     },
+    behavior: {
+      handleLabelPersistent: true,
+    },
+    renderProps: { renderDateLabel: customDateLabelRenderer },
   },
   parameters: {
     docs: {

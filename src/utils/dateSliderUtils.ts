@@ -635,7 +635,7 @@ export const handleOutsideVisibleArea = ({
   const distanceFromLeftEdge = (handleRect?.left || 0) - (containerRect?.left || 0);
 
   return {
-    left: distanceFromLeftEdge < 0,
-    right: distanceFromRightEdge < 0,
+    leftOut: distanceFromLeftEdge < 0,
+    rightOut: distanceFromRightEdge < 0,
   };
 };

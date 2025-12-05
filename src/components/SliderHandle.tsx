@@ -25,15 +25,15 @@ export const SliderHandle = ({
   sliderContainerRef,
   dateLabelDistanceOverHandle,
 }: SliderHandleProps) => {
-  const { left, right } = handleOutsideVisibleArea({
+  const { leftOut, rightOut } = handleOutsideVisibleArea({
     handleRef: ref,
     sliderContainerRef,
   });
 
-  const outsideVisibleArea = left || right;
+  const outsideVisibleArea = leftOut || rightOut;
 
   const generateLabelPosition = () => {
-    if (!ref.current || handleType !== 'point') return;
+    if (!ref.current) return;
     return {
       x: ref.current.getBoundingClientRect().left + ref.current.getBoundingClientRect().width / 2,
       y: ref.current.getBoundingClientRect().top - dateLabelDistanceOverHandle,
@@ -78,7 +78,7 @@ export const SliderHandle = ({
       onFocus={onFocus}
     >
       {icon}
-      {!onDragging && !isSliderDragging && !outsideVisibleArea && handleType === 'point' && (
+      {!onDragging && !isSliderDragging && !outsideVisibleArea && (
         <DateLabel
           position={generateLabelPosition()}
           label={label}
@@ -149,6 +149,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               value={rangeStart}
               handleType="start"
               onKeyDown={onKeyDown('start')}
+              isSliderDragging={isSliderDragging}
               handleLabelPersistent={handleLabelPersistent}
               handleLabelDisabled={handleLabelDisabled}
               renderDateLabel={renderDateLabel}
@@ -173,6 +174,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               value={rangeEnd}
               handleType="end"
               onKeyDown={onKeyDown('end')}
+              isSliderDragging={isSliderDragging}
               handleLabelPersistent={handleLabelPersistent}
               handleLabelDisabled={handleLabelDisabled}
               renderDateLabel={renderDateLabel}

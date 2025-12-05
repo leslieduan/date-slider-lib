@@ -138,7 +138,10 @@ export const SliderTrack = memo(
     }>();
     const [dateLabel, setDateLabel] = useState<string>();
     //point handle and range handle should be in same height, and there must be at least existing one handle.
-    const handleRef = pointHandleRef || startHandleRef;
+    const handleRef =
+      props.mode === 'point' || props.mode === 'combined'
+        ? pointHandleRef
+        : startHandleRef || endHandleRef;
 
     const updateDateLabel = useCallback(
       (percentage: number, clientX: number, isHover: boolean) => {
