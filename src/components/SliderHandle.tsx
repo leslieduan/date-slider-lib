@@ -111,8 +111,10 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     onTouchStart,
     onKeyDown,
     isSliderDragging,
-    handleLabelPersistent,
-    handleLabelDisabled,
+    pointHandleLabelPersistent,
+    pointHandleLabelDisabled,
+    rangeHandleLabelPersistent,
+    rangeHandleLabelDisabled,
     classNames,
     renderDateLabel,
     sliderContainerRef,
@@ -150,8 +152,8 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               handleType="start"
               onKeyDown={onKeyDown('start')}
               isSliderDragging={isSliderDragging}
-              handleLabelPersistent={handleLabelPersistent}
-              handleLabelDisabled={handleLabelDisabled}
+              handleLabelPersistent={rangeHandleLabelPersistent}
+              handleLabelDisabled={rangeHandleLabelDisabled}
               renderDateLabel={renderDateLabel}
               sliderContainerRef={sliderContainerRef}
               dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
@@ -175,8 +177,8 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               handleType="end"
               onKeyDown={onKeyDown('end')}
               isSliderDragging={isSliderDragging}
-              handleLabelPersistent={handleLabelPersistent}
-              handleLabelDisabled={handleLabelDisabled}
+              handleLabelPersistent={rangeHandleLabelPersistent}
+              handleLabelDisabled={rangeHandleLabelDisabled}
               renderDateLabel={renderDateLabel}
               sliderContainerRef={sliderContainerRef}
               dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
@@ -204,8 +206,8 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             handleType="point"
             onKeyDown={onKeyDown('point')}
             isSliderDragging={isSliderDragging}
-            handleLabelPersistent={handleLabelPersistent}
-            handleLabelDisabled={handleLabelDisabled}
+            handleLabelPersistent={pointHandleLabelPersistent}
+            handleLabelDisabled={pointHandleLabelDisabled}
             renderDateLabel={renderDateLabel}
             sliderContainerRef={sliderContainerRef}
             dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}

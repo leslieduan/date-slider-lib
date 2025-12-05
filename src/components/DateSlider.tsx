@@ -80,8 +80,18 @@ export const DateSlider = memo(
     // Extract behavior config with defaults
     const scrollable = behavior?.scrollable ?? true;
     const freeSelectionOnTrackClick = behavior?.freeSelectionOnTrackClick ?? false;
-    const handleLabelPersistent = isSmallScreen || (behavior?.handleLabelPersistent ?? false);
-    const handleLabelDisabled = behavior?.handleLabelDisabled ?? false;
+
+    // Handle label behavior - specific settings override general ones
+    const globalLabelPersistent = isSmallScreen || (behavior?.handleLabelPersistent ?? false);
+    const globalLabelDisabled = behavior?.handleLabelDisabled ?? false;
+
+    const pointHandleLabelPersistent =
+      behavior?.pointHandleLabelPersistent ?? globalLabelPersistent;
+    const pointHandleLabelDisabled = behavior?.pointHandleLabelDisabled ?? globalLabelDisabled;
+
+    const rangeHandleLabelPersistent =
+      behavior?.rangeHandleLabelPersistent ?? globalLabelPersistent;
+    const rangeHandleLabelDisabled = behavior?.rangeHandleLabelDisabled ?? globalLabelDisabled;
 
     // Extract layout config with defaults
     const sliderWidth = layout?.width;
@@ -518,8 +528,6 @@ export const DateSlider = memo(
                   startHandleRef={startHandleRef}
                   endHandleRef={endHandleRef}
                   pointHandleRef={pointHandleRef}
-                  handleLabelPersistent={handleLabelPersistent}
-                  handleLabelDisabled={handleLabelDisabled}
                   classNames={classNames}
                   renderDateLabel={renderProps?.renderDateLabel}
                   trackWidth={trackWidth}
@@ -549,8 +557,10 @@ export const DateSlider = memo(
                   onTouchStart={handleTouchStart}
                   onKeyDown={handleHandleKeyDown}
                   isSliderDragging={isSliderDragging}
-                  handleLabelPersistent={handleLabelPersistent}
-                  handleLabelDisabled={handleLabelDisabled}
+                  pointHandleLabelPersistent={pointHandleLabelPersistent}
+                  pointHandleLabelDisabled={pointHandleLabelDisabled}
+                  rangeHandleLabelPersistent={rangeHandleLabelPersistent}
+                  rangeHandleLabelDisabled={rangeHandleLabelDisabled}
                   classNames={classNames}
                   renderDateLabel={renderProps?.renderDateLabel}
                   sliderContainerRef={sliderContainerRef}

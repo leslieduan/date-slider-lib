@@ -556,8 +556,8 @@ export const CombinedMode: Story = {
     mode: 'combined',
     value: {
       start: toUTCDate('2021-03-01'),
-      end: toUTCDate('2021-06-01'),
-      point: toUTCDate('2023-08-01'),
+      end: toUTCDate('2022-06-01'),
+      point: toUTCDate('2021-08-01'),
     },
     min: toUTCDate('2020-10-05'),
     max: toUTCDate('2025-11-11'),
@@ -572,7 +572,9 @@ export const CombinedMode: Story = {
       track: 'bg-gray-300',
     },
     behavior: {
+      pointHandleLabelPersistent: true,
       handleLabelPersistent: true,
+      rangeHandleLabelDisabled: true,
     },
     renderProps: { renderDateLabel: customDateLabelRenderer },
   },

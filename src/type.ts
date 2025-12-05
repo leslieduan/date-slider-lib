@@ -253,10 +253,18 @@ export type BehaviorConfig = {
   scrollable?: boolean;
   /** Allow free datetime selection on track click (not limited to scale units) */
   freeSelectionOnTrackClick?: boolean;
-  /** Keep handle date label visible persistently */
+  /** Keep handle date label visible persistently (applies to all handles if specific ones not set) */
   handleLabelPersistent?: boolean;
-  /** always disable hadle label */
+  /** Always disable handle label (applies to all handles if specific ones not set) */
   handleLabelDisabled?: boolean;
+  /** Keep point handle date label visible persistently */
+  pointHandleLabelPersistent?: boolean;
+  /** Always disable point handle label */
+  pointHandleLabelDisabled?: boolean;
+  /** Keep range handles (start/end) date labels visible persistently */
+  rangeHandleLabelPersistent?: boolean;
+  /** Always disable range handles (start/end) labels */
+  rangeHandleLabelDisabled?: boolean;
 };
 
 /**
@@ -606,8 +614,6 @@ type BaseSliderTrackProps = {
   startHandleRef: React.RefObject<HTMLButtonElement | null>;
   endHandleRef: React.RefObject<HTMLButtonElement | null>;
   pointHandleRef: React.RefObject<HTMLButtonElement | null>;
-  handleLabelPersistent?: boolean;
-  handleLabelDisabled?: boolean;
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   timeLabels: TimeLabel[];
@@ -683,8 +689,10 @@ export type RenderSliderHandleProps = {
   onTouchStart: (handle: DragHandle) => (e: React.TouchEvent) => void;
   onKeyDown: (handle: DragHandle) => (e: React.KeyboardEvent) => void;
   isSliderDragging: boolean;
-  handleLabelPersistent?: boolean;
-  handleLabelDisabled?: boolean;
+  pointHandleLabelPersistent?: boolean;
+  pointHandleLabelDisabled?: boolean;
+  rangeHandleLabelPersistent?: boolean;
+  rangeHandleLabelDisabled?: boolean;
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   sliderContainerRef: RefObject<HTMLDivElement | null>;
