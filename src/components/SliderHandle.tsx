@@ -1,6 +1,6 @@
 import type { SliderHandleProps, RenderSliderHandleProps } from '@/type';
 import { cn, formatDate, getDateFromPercent, handleOutsideVisibleArea } from '@/utils';
-import { memo } from 'react';
+import { memo, useLayoutEffect, useState } from 'react';
 import { DateLabel } from './DateLabel';
 
 export const SliderHandle = ({
@@ -32,13 +32,22 @@ export const SliderHandle = ({
 
   const outsideVisibleArea = leftOut || rightOut;
 
-  const generateLabelPosition = () => {
+  const [labelPosition, setLabelPosition] = useState<{ x: number; y: number } | undefined>();
+
+  useLayoutEffect(() => {
     if (!ref.current) return;
-    return {
-      x: ref.current.getBoundingClientRect().left + ref.current.getBoundingClientRect().width / 2,
-      y: ref.current.getBoundingClientRect().top - dateLabelDistanceOverHandle,
+
+    const updatePosition = () => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      setLabelPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top - dateLabelDistanceOverHandle,
+      });
     };
-  };
+
+    updatePosition();
+  }, [ref, position, dateLabelDistanceOverHandle]);
 
   // Get handle-specific className
   const handleSpecificClass =
@@ -80,7 +89,7 @@ export const SliderHandle = ({
       {icon}
       {!onDragging && !isSliderDragging && !outsideVisibleArea && (
         <DateLabel
-          position={generateLabelPosition()}
+          position={labelPosition}
           label={label}
           immediateDisappear={isSliderDragging}
           handleLabelPersistent={handleLabelPersistent}
