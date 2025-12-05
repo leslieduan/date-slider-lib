@@ -466,15 +466,6 @@ const handleChange = useCallback((selection: SelectionResult) => {
 }, []);
 ```
 
-### Optimize Performance
-
-```tsx
-// Memoize dates to prevent unnecessary re-renders
-const minDate = useMemo(() => new Date('2024-01-01'), []);
-const maxDate = useMemo(() => new Date('2024-12-31'), []);
-
-<DateSlider min={minDate} max={maxDate} />
-```
 
 ## ♿ Accessibility
 
