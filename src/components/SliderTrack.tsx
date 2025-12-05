@@ -119,6 +119,8 @@ export const SliderTrack = memo(
     startHandleRef,
     endHandleRef,
     pointHandleRef,
+    trackHoverDateLabelDisabled,
+    trackHoverCursorLineDisabled,
     classNames,
     renderDateLabel,
     timeLabels,
@@ -245,8 +247,10 @@ export const SliderTrack = memo(
       [classNames?.track]
     );
 
-    const showCursorLine = isHoverTrack && !onDragging && !isHandleHover;
-    const showDateLabel = isHoverTrack;
+    const showCursorLine =
+      isHoverTrack && !trackHoverCursorLineDisabled && !onDragging && !isHandleHover;
+    const showDateLabel =
+      isHoverTrack && !trackHoverDateLabelDisabled && !onDragging && !isHandleHover;
 
     const commonElements = useMemo(
       () => (

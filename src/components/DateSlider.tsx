@@ -93,6 +93,9 @@ export const DateSlider = memo(
       behavior?.rangeHandleLabelPersistent ?? globalLabelPersistent;
     const rangeHandleLabelDisabled = behavior?.rangeHandleLabelDisabled ?? globalLabelDisabled;
 
+    const trackHoverDateLabelDisabled = behavior?.trackHoverDateLabelDisabled ?? false;
+    const trackHoverCursorLineDisabled = behavior?.trackHoverCursorLineDisabled ?? false;
+
     // Extract layout config with defaults
     const sliderWidth = layout?.width;
     const sliderHeight = layout?.height;
@@ -528,6 +531,8 @@ export const DateSlider = memo(
                   startHandleRef={startHandleRef}
                   endHandleRef={endHandleRef}
                   pointHandleRef={pointHandleRef}
+                  trackHoverDateLabelDisabled={trackHoverDateLabelDisabled}
+                  trackHoverCursorLineDisabled={trackHoverCursorLineDisabled}
                   classNames={classNames}
                   renderDateLabel={renderProps?.renderDateLabel}
                   trackWidth={trackWidth}

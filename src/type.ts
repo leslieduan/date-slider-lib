@@ -265,6 +265,10 @@ export type BehaviorConfig = {
   rangeHandleLabelPersistent?: boolean;
   /** Always disable range handles (start/end) labels */
   rangeHandleLabelDisabled?: boolean;
+  /** Disable date label when hovering over track */
+  trackHoverDateLabelDisabled?: boolean;
+  /** Disable cursor line when hovering over track */
+  trackHoverCursorLineDisabled?: boolean;
 };
 
 /**
@@ -614,6 +618,8 @@ type BaseSliderTrackProps = {
   startHandleRef: React.RefObject<HTMLButtonElement | null>;
   endHandleRef: React.RefObject<HTMLButtonElement | null>;
   pointHandleRef: React.RefObject<HTMLButtonElement | null>;
+  trackHoverDateLabelDisabled?: boolean;
+  trackHoverCursorLineDisabled?: boolean;
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   timeLabels: TimeLabel[];
