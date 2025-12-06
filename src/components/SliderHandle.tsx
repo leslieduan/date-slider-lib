@@ -118,8 +118,8 @@ export const SliderHandle = ({
 export const RenderSliderHandle = memo<RenderSliderHandleProps>(
   ({
     viewMode,
-    rangeStart,
-    rangeEnd,
+    rangeStartPosition,
+    rangeEndPosition,
     pointPosition,
     startDate,
     endDate,
@@ -155,14 +155,24 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
 
     const startLabel = useMemo(
       () =>
-        formatDate(getDateFromPercent(rangeStart, startDate, endDate), dateFormat, locale, 'label'),
-      [rangeStart, startDate, endDate, dateFormat, locale]
+        formatDate(
+          getDateFromPercent(rangeStartPosition, startDate, endDate),
+          dateFormat,
+          locale,
+          'label'
+        ),
+      [rangeStartPosition, startDate, endDate, dateFormat, locale]
     );
 
     const endLabel = useMemo(
       () =>
-        formatDate(getDateFromPercent(rangeEnd, startDate, endDate), dateFormat, locale, 'label'),
-      [rangeEnd, startDate, endDate, dateFormat, locale]
+        formatDate(
+          getDateFromPercent(rangeEndPosition, startDate, endDate),
+          dateFormat,
+          locale,
+          'label'
+        ),
+      [rangeEndPosition, startDate, endDate, dateFormat, locale]
     );
 
     const pointLabel = useMemo(
@@ -186,11 +196,11 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               {...commonProps}
               icon={rangeHandleIcon}
               onDragging={isDragging === 'start'}
-              position={rangeStart}
+              position={rangeStartPosition}
               label={startLabel}
               onMouseDown={onMouseDown('start')}
               onTouchStart={onTouchStart('start')}
-              value={rangeStart}
+              value={rangeStartPosition}
               handleType="start"
               onKeyDown={onKeyDown('start')}
               isSliderDragging={isSliderDragging}
@@ -207,11 +217,11 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               {...commonProps}
               icon={rangeHandleIcon}
               onDragging={isDragging === 'end'}
-              position={rangeEnd}
+              position={rangeEndPosition}
               label={endLabel}
               onMouseDown={onMouseDown('end')}
               onTouchStart={onTouchStart('end')}
-              value={rangeEnd}
+              value={rangeEndPosition}
               handleType="end"
               onKeyDown={onKeyDown('end')}
               isSliderDragging={isSliderDragging}

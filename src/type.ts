@@ -638,15 +638,15 @@ type PointModeProps = {
 
 type CombinedModeProps = {
   mode: 'combined';
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStartPosition: number;
+  rangeEndPosition: number;
   pointPosition: number;
 };
 
 type RangeModeProps = {
   mode: 'range';
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStartPosition: number;
+  rangeEndPosition: number;
 };
 
 export type SliderTrackProps = BaseSliderTrackProps &
@@ -679,8 +679,8 @@ export type SliderHandleProps = {
 
 export type RenderSliderHandleProps = {
   viewMode: 'point' | 'range' | 'combined';
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStartPosition: number;
+  rangeEndPosition: number;
   pointPosition: number;
   startDate: Date;
   endDate: Date;

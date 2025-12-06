@@ -329,8 +329,8 @@ export const SliderTrack = memo(
           <div
             className={baseActiveClasses}
             style={{
-              left: `${props.rangeStart}%`,
-              width: `${(props.rangeEnd ?? 0) - (props.rangeStart ?? 0)}%`,
+              left: `${props.rangeStartPosition}%`,
+              width: `${(props.rangeEndPosition ?? 0) - (props.rangeStartPosition ?? 0)}%`,
             }}
           />
         );

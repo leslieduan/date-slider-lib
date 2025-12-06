@@ -7,16 +7,16 @@ export const useInitialAutoScrollPosition = ({
   dimensions,
   viewMode,
   pointPosition,
-  rangeStart,
-  rangeEnd,
+  rangeStartPosition,
+  rangeEndPosition,
   resetPosition,
 }: {
   scrollable: boolean;
   dimensions: Dimension;
   viewMode: 'point' | 'range' | 'combined';
   pointPosition: number;
-  rangeStart: number;
-  rangeEnd: number;
+  rangeStartPosition: number;
+  rangeEndPosition: number;
   resetPosition: (newPosition?: { x: number; y: number }) => void;
 }) => {
   const hasAutoScrolledRef = useRef(false);
@@ -37,7 +37,7 @@ export const useInitialAutoScrollPosition = ({
       targetPercent = pointPosition;
     } else if (viewMode === 'range') {
       // Center on the middle of the range
-      targetPercent = (rangeStart + rangeEnd) / 2;
+      targetPercent = (rangeStartPosition + rangeEndPosition) / 2;
     } else if (viewMode === 'combined') {
       // Center on the point position
       targetPercent = pointPosition;
@@ -54,5 +54,13 @@ export const useInitialAutoScrollPosition = ({
 
     resetPosition({ x: clampedOffset, y: 0 });
     hasAutoScrolledRef.current = true;
-  }, [scrollable, dimensions, viewMode, pointPosition, rangeStart, rangeEnd, resetPosition]);
+  }, [
+    scrollable,
+    dimensions,
+    viewMode,
+    pointPosition,
+    rangeStartPosition,
+    rangeEndPosition,
+    resetPosition,
+  ]);
 };

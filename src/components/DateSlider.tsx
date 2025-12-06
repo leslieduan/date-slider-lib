@@ -143,11 +143,11 @@ export const DateSlider = memo(
     );
 
     const {
-      rangeStart,
-      rangeEnd,
+      rangeStartPosition,
+      rangeEndPosition,
       pointPosition,
-      setRangeStart,
-      setRangeEnd,
+      setRangeStartPosition,
+      setRangeEndPosition,
       setPointPosition,
       rangeStartRef,
       rangeEndRef,
@@ -266,8 +266,8 @@ export const DateSlider = memo(
       dimensions,
       viewMode,
       pointPosition,
-      rangeStart,
-      rangeEnd,
+      rangeStartPosition,
+      rangeEndPosition,
       resetPosition,
     });
 
@@ -315,12 +315,12 @@ export const DateSlider = memo(
         switch (actualTarget) {
           case 'start': {
             const newStart = clamp(clampPercentage, 0, rangeEndRef.current - minGapPercent);
-            setRangeStart(newStart);
+            setRangeStartPosition(newStart);
             break;
           }
           case 'end': {
             const newEnd = clamp(clampPercentage, 100, rangeStartRef.current + minGapPercent);
-            setRangeEnd(newEnd);
+            setRangeEndPosition(newEnd);
             break;
           }
           case 'point': {
@@ -337,8 +337,8 @@ export const DateSlider = memo(
         rangeStartRef,
         rangeEndRef,
         minGapPercent,
-        setRangeStart,
-        setRangeEnd,
+        setRangeStartPosition,
+        setRangeEndPosition,
         setPointPosition,
       ]
     );
@@ -362,7 +362,7 @@ export const DateSlider = memo(
               0,
               Math.min(clampedPercentage, rangeEndRef.current - minGapPercent)
             );
-            setRangeStart(newStart);
+            setRangeStartPosition(newStart);
             break;
           }
           case 'end': {
@@ -370,7 +370,7 @@ export const DateSlider = memo(
               clampedPercentage,
               Math.max(percentage, rangeStartRef.current + minGapPercent) // Use original percentage here
             );
-            setRangeEnd(newEnd);
+            setRangeEndPosition(newEnd);
             break;
           }
           case 'point': {
@@ -379,7 +379,14 @@ export const DateSlider = memo(
           }
         }
       },
-      [rangeEndRef, minGapPercent, setRangeStart, rangeStartRef, setRangeEnd, setPointPosition]
+      [
+        rangeEndRef,
+        minGapPercent,
+        setRangeStartPosition,
+        rangeStartRef,
+        setRangeEndPosition,
+        setPointPosition,
+      ]
     );
 
     const {
@@ -426,19 +433,27 @@ export const DateSlider = memo(
       []
     );
 
-    console.log({ pointPosition, rangeStart, rangeEnd });
+    console.log({ pointPosition, rangeStartPosition, rangeEndPosition });
 
     useEffect(() => {
       const selection = createSelectionResult(
-        rangeStart,
+        rangeStartPosition,
         startDate,
         endDate,
-        rangeEnd,
+        rangeEndPosition,
         pointPosition,
         viewMode
       );
       debouncedOnChange(selection);
-    }, [debouncedOnChange, endDate, pointPosition, rangeEnd, rangeStart, startDate, viewMode]);
+    }, [
+      debouncedOnChange,
+      endDate,
+      pointPosition,
+      rangeEndPosition,
+      rangeStartPosition,
+      startDate,
+      viewMode,
+    ]);
     return (
       // Date Slider wrapper
       <div
@@ -522,8 +537,8 @@ export const DateSlider = memo(
                 <SliderTrack
                   mode={viewMode}
                   pointPosition={pointPosition}
-                  rangeStart={rangeStart}
-                  rangeEnd={rangeEnd}
+                  rangeStartPosition={rangeStartPosition}
+                  rangeEndPosition={rangeEndPosition}
                   onTrackClick={handleTrackClick}
                   onTrackTouch={handleTrackTouch}
                   scales={scales}
@@ -550,8 +565,8 @@ export const DateSlider = memo(
 
                 <RenderSliderHandle
                   viewMode={viewMode}
-                  rangeStart={rangeStart}
-                  rangeEnd={rangeEnd}
+                  rangeStartPosition={rangeStartPosition}
+                  rangeEndPosition={rangeEndPosition}
                   pointPosition={pointPosition}
                   startDate={startDate}
                   endDate={endDate}

@@ -45,27 +45,29 @@ export function usePositionState(
     [initialRange, initialPoint, startDate, timeUnit, totalScaleUnits]
   );
 
-  const [rangeStart, setRangeStart] = useState(() => getInitialPosition('rangeStart'));
-  const [rangeEnd, setRangeEnd] = useState(() => getInitialPosition('rangeEnd'));
+  const [rangeStartPosition, setRangeStartPosition] = useState(() =>
+    getInitialPosition('rangeStart')
+  );
+  const [rangeEndPosition, setRangeEndPosition] = useState(() => getInitialPosition('rangeEnd'));
   const [pointPosition, setPointPosition] = useState(() => getInitialPosition('point'));
 
   // Use refs for stable references in callbacks
-  const rangeStartRef = useRef(rangeStart);
-  const rangeEndRef = useRef(rangeEnd);
+  const rangeStartRef = useRef(rangeStartPosition);
+  const rangeEndRef = useRef(rangeEndPosition);
   const pointPositionRef = useRef(pointPosition);
 
   useEffect(() => {
-    rangeStartRef.current = rangeStart;
-    rangeEndRef.current = rangeEnd;
+    rangeStartRef.current = rangeStartPosition;
+    rangeEndRef.current = rangeEndPosition;
     pointPositionRef.current = pointPosition;
-  }, [rangeStart, rangeEnd, pointPosition]);
+  }, [rangeStartPosition, rangeEndPosition, pointPosition]);
 
   return {
-    rangeStart,
-    rangeEnd,
+    rangeStartPosition,
+    rangeEndPosition,
     pointPosition,
-    setRangeStart,
-    setRangeEnd,
+    setRangeStartPosition,
+    setRangeEndPosition,
     setPointPosition,
     rangeStartRef,
     rangeEndRef,
