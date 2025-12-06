@@ -667,6 +667,20 @@ function WithoutScaleMarks() {
 
 /**
  * Persistent Handle Labels - Labels always visible
+ *
+ * This story demonstrates persistent handle labels that remain visible at all times.
+ * The label shows the currently selected date and stays visible above the handle.
+ *
+ * ## Label Behavior
+ * - When `handleLabelPersistent` is `true`, labels are always visible
+ * - When `false`, labels appear only on hover, drag, or temporarily after interaction
+ * - On mobile devices, labels are automatically persistent for better usability
+ *
+ * ## Smart Label Display
+ * The component intelligently shows labels to avoid confusion:
+ * - Only the actively moved handle's label appears during interaction
+ * - When clicking the track, only the moved handle's label is shown
+ * - During scrolling, labels remain stable without flickering
  */
 export const PersistentHandleLabels: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
@@ -722,6 +736,21 @@ function PersistentLabels() {
 
 /**
  * Year Time Unit - Navigate by years
+ *
+ * This story demonstrates year-level navigation with combined mode (both range and point selection).
+ *
+ * ## Features Demonstrated
+ * - Year-based time unit navigation
+ * - Combined mode with all three handles (start, end, point)
+ * - Custom date format showing years
+ * - Custom time display renderer
+ * - Smart label behavior: only the moved handle's label appears when interacting
+ *
+ * ## Try It Out
+ * - Click on the track to move the nearest handle
+ * - Drag any handle to change its position
+ * - Notice that only the actively moved handle shows its date label
+ * - Use the time display controls to navigate through years
  */
 export const YearTimeUnit: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,

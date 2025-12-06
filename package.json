@@ -70,7 +70,7 @@
   "homepage": "https://github.com/leslieduan/date-slider-lib#readme",
   "repository": {
     "type": "git",
-    "url": "git+ttps://github.com/leslieduan/date-slider-lib.git"
+    "url": "git+https://github.com/leslieduan/date-slider-lib.git"
   },
   "bugs": {
     "url": "https://github.com/leslieduan/date-slider-lib/issues"

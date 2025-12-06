@@ -14,10 +14,11 @@ A powerful, fully customizable React date slider component with range, point, an
 - **Fully Customizable**: Style with Tailwind CSS classes
 - **Type-Safe**: Complete TypeScript support
 - **Accessible**: WCAG compliant with keyboard navigation
-- **Responsive**: Works on mobile and desktop
+- **Responsive & Mobile-Optimized**: Auto-adapts to mobile devices with persistent labels
 - **Flexible Time Units**: Day, month, and year navigation
 - **Custom Rendering**: Full UI customization via render props
 - **Label Control**: Configurable handle and track hover labels
+- **Touch-Friendly**: Optimized touch interactions for mobile devices
 
 ## 🚀 Quick Start
 
@@ -245,6 +246,8 @@ Control when date labels appear:
 />
 ```
 
+**Note**: On mobile devices (small screens), all handle labels are automatically persistent regardless of these settings to ensure better usability on touch devices.
+
 ### Layout Configuration
 
 ```tsx
@@ -331,7 +334,7 @@ function App() {
 | `layout` | `LayoutConfig` | No | Size and layout |
 | `renderProps` | `RenderPropsConfig` | No | Custom render functions |
 | `dateFormat` | `DateFormat` | No | Custom date format function |
-| `locale` | `string` | No | Date locale (default: 'en-US') |
+| `locale` | `string` | No | Date locale (default: 'en-AU') |
 | `imperativeRef` | `Ref<SliderExposedMethod>` | No | Imperative API reference |
 
 ### Value Types
@@ -367,8 +370,13 @@ type BehaviorConfig = {
   // Track hover behavior
   trackHoverDateLabelDisabled?: boolean;   // Disable date label on track hover
   trackHoverCursorLineDisabled?: boolean;  // Disable cursor line on track hover
+
+  // Auto-scroll behavior
+  sliderAutoScrollToPointHandleVisibleEnabled?: boolean; // Auto-scroll to keep point handle visible (default: true)
 };
 ```
+
+**Note**: On mobile devices, `handleLabelPersistent` is automatically set to `true` regardless of configuration.
 
 ### DateSliderClassNames
 
@@ -472,6 +480,41 @@ const handleChange = useCallback((selection: SelectionResult) => {
 - **ARIA Labels**: Screen reader support
 - **Focus Management**: Visible focus indicators
 - **Touch Support**: Mobile-friendly
+
+## 📱 Mobile & Responsive Behavior
+
+The DateSlider automatically adapts to different screen sizes with mobile-optimized behavior:
+
+### Automatic Mobile Optimizations
+
+On small screens (mobile devices), the following behaviors are automatically applied:
+
+1. **Persistent Handle Labels**: All handle labels become persistent (always visible) on mobile devices, regardless of the `handleLabelPersistent` setting. This ensures better usability on touch devices.
+
+2. **Touch-Optimized Interactions**: Handle dragging is optimized for touch input with proper touch event handling.
+
+3. **Responsive Sizing**: The slider automatically adjusts its layout for smaller viewports.
+
+### Mobile Best Practices
+
+```tsx
+<DateSlider
+  mode="point"
+  value={{ point: new Date('2024-06-15') }}
+  layout={{
+    width: 'fill', // Use 'fill' to adapt to parent container
+    height: 100,   // Ensure sufficient height for touch targets
+  }}
+  behavior={{
+    scrollable: true, // Enable scrolling for better mobile UX
+  }}
+  // Labels will be persistent on mobile automatically
+/>
+```
+
+### Testing on Mobile
+
+The component detects small screens automatically. On desktop, you can simulate mobile behavior by resizing your browser window to a mobile viewport size.
 
 ## 📄 License
 
