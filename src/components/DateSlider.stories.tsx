@@ -257,31 +257,7 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
 };
 
 /**
- * Getting Started
- *
- * The simplest DateSlider configuration. This is all you need to get started!
- *
- * ## Basic Usage:
- * ```tsx
- * import { DateSlider } from 'date-slider-lib';
- * import { CircleIcon } from '@/icons';
- *
- * function App() {
- *   const [value, setValue] = useState({ point: new Date() });
- *
- *   return (
- *     <DateSlider
- *       mode="point"
- *       value={value}
- *       onChange={setValue}
- *       min={new Date('2024-01-01')}
- *       max={new Date('2024-12-31')}
- *       initialTimeUnit="day"
- *       icons={{ point: <CircleIcon /> }}
- *     />
- *   );
- * }
- * ```
+ * Getting Started - Minimal Configuration
  */
 export const GettingStarted: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
@@ -302,8 +278,6 @@ export const GettingStarted: Story = {
 
 /**
  * Point Mode
- *
- * Select a single date point. Perfect for calendars, date pickers, and event selection.
  */
 export const PointMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
@@ -317,51 +291,69 @@ export const PointMode: Story = {
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 700,
-      height: 90,
+      height: 100,
       dateLabelEnabled: true,
+      showEndLabel: true,
     },
     classNames: {
-      trackActive: 'bg-green-400/20',
-      track: 'bg-gray-400',
+      trackActive: 'bg-green-400/30',
+      track: 'bg-gray-300',
+      handle: 'bg-green-600 border-2 border-white shadow-lg hover:shadow-xl',
+      scaleMarkMajor: 'bg-green-600',
+      scaleMarkMinor: 'bg-gray-400',
+      scaleLabel: 'text-green-800 font-medium',
+    },
+    // Custom date format: show month abbreviations
+    dateFormat: (date: Date) => {
+      const day = date.getUTCDate();
+      if (day === 1) return 'MMM'; // "Jan", "Feb", etc
+      return 'dd'; // "15"
     },
   },
 };
 
 /**
  * Range Mode
- *
- * Select a date range with start and end dates. Ideal for booking systems, filters, and analytics.
  */
 export const RangeMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
     mode: 'range',
     value: {
-      start: toUTCDate('2024-03-01'),
-      end: toUTCDate('2024-09-01'),
+      start: toUTCDate('2020-03-01'),
+      end: toUTCDate('2022-09-01'),
     },
-    min: toUTCDate('2024-01-01'),
+    min: toUTCDate('2020-01-01'),
     max: toUTCDate('2024-12-31'),
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 800,
-      height: 100,
+      height: 110,
       dateLabelEnabled: true,
+      trackPaddingX: 20,
+      scaleUnitConfig: {
+        gap: 80,
+        width: { short: 1, medium: 1, long: 2 },
+        height: { short: 15, medium: 25, long: 45 },
+      },
     },
     behavior: {
       rangeHandleLabelPersistent: true,
+      scrollable: true,
+      freeSelectionOnTrackClick: true,
     },
     classNames: {
-      trackActive: 'bg-blue-400/20',
-      track: 'bg-gray-400',
+      trackActive: 'bg-blue-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-blue-600 border-2 border-white shadow-md',
+      scaleMarkMajor: 'bg-blue-600',
+      scaleLabel: 'text-blue-900 font-semibold',
     },
   },
 };
 
 /**
  * Combined Mode
- *
- * Use both point and range selection simultaneously. Great for complex filtering scenarios.
  */
 export const CombinedMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
@@ -377,26 +369,30 @@ export const CombinedMode: Story = {
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 900,
-      height: 120,
+      height: 130,
+      dateLabelEnabled: false,
     },
     classNames: {
-      trackActive: 'bg-purple-400/20',
-      track: 'bg-gray-300',
+      trackActive: 'bg-purple-500/25',
+      track: 'bg-gray-200',
+      handlePoint: 'bg-purple-700 border-2 border-white shadow-lg scale-110',
+      handleStart: 'bg-purple-500 border-2 border-white shadow-md',
+      handleEnd: 'bg-purple-500 border-2 border-white shadow-md',
+      scaleMarkMajor: 'bg-purple-600',
+      scaleLabel: 'text-purple-900',
     },
   },
 };
 
 /**
- * With UI Components
- *
+ * With Render Components
  *
  * ## Component Toggles:
  * - `dateLabelEnabled`: Show date labels on handles
  * - `timeDisplayEnabled`: Show time display with navigation controls
  * - `timeUnitSelectionEnabled`: Show day/month/year selector
-
  */
-export const WithUIComponents: Story = {
+export const WithRenderComponents: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
     mode: 'combined',
