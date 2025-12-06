@@ -1,6 +1,6 @@
 import type { SliderHandleProps, RenderSliderHandleProps } from '@/type';
 import { cn, formatDate, getDateFromPercent, handleOutsideVisibleArea } from '@/utils';
-import { memo, useCallback, useLayoutEffect, useState } from 'react';
+import { memo, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { DateLabel } from './DateLabel';
 import { useIsScrolling } from '@/hooks';
 
@@ -31,7 +31,6 @@ export const SliderHandle = ({
     handleRef: ref,
     sliderContainerRef,
   });
-
   const outsideVisibleArea = leftOut || rightOut;
 
   const [labelPosition, setLabelPosition] = useState<{ x: number; y: number } | undefined>();
@@ -73,6 +72,8 @@ export const SliderHandle = ({
   const handleBaseClass = classNames?.handle || handleSpecificClass;
   const handleDraggingClass = onDragging ? classNames?.handleDragging : '';
 
+  const isHandleVisible = !onDragging && !isSliderDragging && !outsideVisibleArea && !isScrolling;
+
   return (
     <button
       ref={ref}
@@ -100,7 +101,7 @@ export const SliderHandle = ({
       onFocus={onFocus}
     >
       {icon}
-      {!onDragging && !isSliderDragging && !outsideVisibleArea && !isScrolling && (
+      {isHandleVisible && (
         <DateLabel
           position={labelPosition}
           label={label}
@@ -152,6 +153,29 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
       classNames,
     };
 
+    const startLabel = useMemo(
+      () =>
+        formatDate(getDateFromPercent(rangeStart, startDate, endDate), dateFormat, locale, 'label'),
+      [rangeStart, startDate, endDate, dateFormat, locale]
+    );
+
+    const endLabel = useMemo(
+      () =>
+        formatDate(getDateFromPercent(rangeEnd, startDate, endDate), dateFormat, locale, 'label'),
+      [rangeEnd, startDate, endDate, dateFormat, locale]
+    );
+
+    const pointLabel = useMemo(
+      () =>
+        formatDate(
+          getDateFromPercent(pointPosition, startDate, endDate),
+          dateFormat,
+          locale,
+          'label'
+        ),
+      [pointPosition, startDate, endDate, dateFormat, locale]
+    );
+
     return (
       <>
         {(viewMode === 'range' || viewMode === 'combined') && (
@@ -163,12 +187,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               icon={rangeHandleIcon}
               onDragging={isDragging === 'start'}
               position={rangeStart}
-              label={formatDate(
-                getDateFromPercent(rangeStart, startDate, endDate),
-                dateFormat,
-                locale,
-                'label'
-              )}
+              label={startLabel}
               onMouseDown={onMouseDown('start')}
               onTouchStart={onTouchStart('start')}
               value={rangeStart}
@@ -189,12 +208,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               icon={rangeHandleIcon}
               onDragging={isDragging === 'end'}
               position={rangeEnd}
-              label={formatDate(
-                getDateFromPercent(rangeEnd, startDate, endDate),
-                dateFormat,
-                locale,
-                'label'
-              )}
+              label={endLabel}
               onMouseDown={onMouseDown('end')}
               onTouchStart={onTouchStart('end')}
               value={rangeEnd}
@@ -219,12 +233,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             icon={pointHandleIcon}
             onDragging={isDragging === 'point'}
             position={pointPosition}
-            label={formatDate(
-              getDateFromPercent(pointPosition, startDate, endDate),
-              dateFormat,
-              locale,
-              'label'
-            )}
+            label={pointLabel}
             onMouseDown={onMouseDown('point')}
             onTouchStart={onTouchStart('point')}
             value={pointPosition}

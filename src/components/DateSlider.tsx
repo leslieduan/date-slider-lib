@@ -426,6 +426,8 @@ export const DateSlider = memo(
       []
     );
 
+    console.log({ pointPosition, rangeStart, rangeEnd });
+
     useEffect(() => {
       const selection = createSelectionResult(
         rangeStart,

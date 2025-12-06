@@ -20,6 +20,7 @@ export const DateLabel = memo(
       label,
       handleLabelPersistent || false
     );
+
     if (!position || !label || !renderDateLabel || handleLabelDisabled) return null;
     if (!showDateLabel && !handleLabelPersistent) return null;
 
