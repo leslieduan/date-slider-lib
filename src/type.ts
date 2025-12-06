@@ -745,6 +745,7 @@ export type ScalesUnitLabelsProps = {
 export type DateLabelProps = {
   position?: { x: number; y: number };
   label?: string;
+  visible?: boolean;
   immediateDisappear?: boolean;
   handleLabelPersistent?: boolean;
   handleLabelDisabled?: boolean;

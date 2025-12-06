@@ -101,16 +101,15 @@ export const SliderHandle = ({
       onFocus={onFocus}
     >
       {icon}
-      {isHandleVisible && (
-        <DateLabel
-          position={labelPosition}
-          label={label}
-          immediateDisappear={isSliderDragging}
-          handleLabelPersistent={handleLabelPersistent}
-          handleLabelDisabled={handleLabelDisabled}
-          renderDateLabel={renderDateLabel}
-        />
-      )}
+      <DateLabel
+        position={labelPosition}
+        label={label}
+        visible={isHandleVisible}
+        immediateDisappear={isSliderDragging}
+        handleLabelPersistent={handleLabelPersistent}
+        handleLabelDisabled={handleLabelDisabled}
+        renderDateLabel={renderDateLabel}
+      />
     </button>
   );
 };
