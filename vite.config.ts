@@ -2,10 +2,18 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
+import dts from 'vite-plugin-dts';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), svgr()],
+  plugins: [
+    react(),
+    svgr(),
+    dts({
+      tsconfigPath: 'tsconfig.build.json',
+      insertTypesEntry: true,
+    }),
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -20,12 +28,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // Externalize deps that shouldn't be bundled
-      external: [
-        'react',
-        'react-dom',
-        'react/jsx-runtime',
-        'lucide-react', // Don't bundle icons
-      ],
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
       output: {
         // Global vars to use in UMD build for externalized deps
         globals: {
@@ -35,8 +38,6 @@ export default defineConfig({
         },
       },
     },
-    sourcemap: false, // Don't generate source maps for production
-    // Don't clear output directory - preserve .d.ts files from tsc
-    emptyOutDir: false,
+    emptyOutDir: true,
   },
 });
