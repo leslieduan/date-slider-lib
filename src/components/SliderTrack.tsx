@@ -173,8 +173,10 @@ export const SliderTrack = memo(
     const handleMouseMove = useCallback(
       (e: MouseEvent) => {
         if (!trackRef.current) return;
-        const percentage = getPercentageFromMouseEvent(e, trackRef);
-        updateDateLabel(percentage, e.clientX, true);
+        requestAnimationFrame(() => {
+          const percentage = getPercentageFromMouseEvent(e, trackRef);
+          updateDateLabel(percentage, e.clientX, true);
+        });
       },
       [trackRef, updateDateLabel]
     );
@@ -182,9 +184,11 @@ export const SliderTrack = memo(
     const handleTouchMove = useCallback(
       (e: TouchEvent) => {
         e.preventDefault();
-        const percentage = getPercentageFromTouchEvent(e, trackRef);
-        const touchX = e.touches?.[0]?.clientX ?? 0;
-        updateDateLabel(percentage, touchX, false);
+        requestAnimationFrame(() => {
+          const percentage = getPercentageFromTouchEvent(e, trackRef);
+          const touchX = e.touches?.[0]?.clientX ?? 0;
+          updateDateLabel(percentage, touchX, false);
+        });
       },
       [trackRef, updateDateLabel]
     );

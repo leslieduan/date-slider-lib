@@ -134,9 +134,11 @@ export const useDrag = ({
       onDragStart?.(position);
 
       const handleMouseMove = (e: MouseEvent) => {
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
-        updatePosition(deltaX, deltaY);
+        requestAnimationFrame(() => {
+          const deltaX = e.clientX - startX;
+          const deltaY = e.clientY - startY;
+          updatePosition(deltaX, deltaY);
+        });
       };
 
       const handleMouseUp = () => {
@@ -184,10 +186,12 @@ export const useDrag = ({
 
       const handleTouchMove = (e: TouchEvent) => {
         e.preventDefault();
-        const touch = e.touches[0];
-        const deltaX = touch.clientX - startX;
-        const deltaY = touch.clientY - startY;
-        updatePosition(deltaX, deltaY);
+        requestAnimationFrame(() => {
+          const touch = e.touches[0];
+          const deltaX = touch.clientX - startX;
+          const deltaY = touch.clientY - startY;
+          updatePosition(deltaX, deltaY);
+        });
       };
 
       const handleTouchEnd = () => {

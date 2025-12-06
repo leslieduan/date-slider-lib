@@ -1,22 +1,32 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 
-export function useRAFDFn(callback: () => void) {
-  const rafIdRef = useRef<number>(null);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useRAFDFn<T extends any[]>(callback: (...args: T) => void) {
+  const rafIdRef = useRef<number | null>(null);
   const isScheduledRef = useRef(false);
+  const latestArgsRef = useRef<T | null>(null);
 
-  const scheduleUpdate = useCallback(() => {
-    if (isScheduledRef.current) return;
+  const scheduleUpdate = useCallback(
+    (...args: T) => {
+      latestArgsRef.current = args;
 
-    isScheduledRef.current = true;
-    rafIdRef.current = requestAnimationFrame(() => {
-      callback();
-      isScheduledRef.current = false;
-    });
-  }, [callback]);
+      if (isScheduledRef.current) return;
+
+      isScheduledRef.current = true;
+
+      rafIdRef.current = requestAnimationFrame(() => {
+        if (latestArgsRef.current) {
+          callback(...latestArgsRef.current);
+        }
+        isScheduledRef.current = false;
+      });
+    },
+    [callback]
+  );
 
   useEffect(() => {
     return () => {
-      if (rafIdRef.current) {
+      if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
       }
     };

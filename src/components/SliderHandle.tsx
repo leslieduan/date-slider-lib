@@ -2,7 +2,7 @@ import type { SliderHandleProps, RenderSliderHandleProps } from '@/type';
 import { cn, formatDate, getDateFromPercent, handleOutsideVisibleArea } from '@/utils';
 import { memo, useCallback, useLayoutEffect, useState } from 'react';
 import { DateLabel } from './DateLabel';
-import { useIsScrolling, useRAFDFn } from '@/hooks';
+import { useIsScrolling } from '@/hooks';
 
 export const SliderHandle = ({
   onDragging,
@@ -33,6 +33,7 @@ export const SliderHandle = ({
   });
 
   const outsideVisibleArea = leftOut || rightOut;
+
   const [labelPosition, setLabelPosition] = useState<{ x: number; y: number } | undefined>();
   const isScrolling = useIsScrolling(window);
 
@@ -45,30 +46,21 @@ export const SliderHandle = ({
     });
   }, [ref, dateLabelDistanceOverHandle]);
 
-  const scheduledUpdatePosition = useRAFDFn(updatePosition);
-
   useLayoutEffect(() => {
     if (!ref.current) return;
 
     const handleScroll = () => {
-      if (!isScrolling) scheduledUpdatePosition();
+      if (!isScrolling) updatePosition();
     };
 
-    scheduledUpdatePosition();
+    updatePosition();
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [
-    ref,
-    position,
-    dateLabelDistanceOverHandle,
-    sliderPositionX,
-    scheduledUpdatePosition,
-    isScrolling,
-  ]);
+  }, [ref, position, dateLabelDistanceOverHandle, sliderPositionX, isScrolling, updatePosition]);
 
   // Get handle-specific className
   const handleSpecificClass =

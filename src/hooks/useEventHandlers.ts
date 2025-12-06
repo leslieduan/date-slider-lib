@@ -113,7 +113,7 @@ export function useEventHandlers(
       if (!isDragging) return;
 
       if ('touches' in e) {
-        e.preventDefault(); // prevent scrolling when touch event
+        e.preventDefault();
       }
 
       requestAnimationFrame(() => {
