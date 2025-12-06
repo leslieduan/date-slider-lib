@@ -49,10 +49,10 @@ import { SliderTrack } from './SliderTrack';
 import { TimeDisplay } from './TimeDisplay';
 import { TimeUnitSelection } from './TimeUnitSelection';
 import {
-  customDateLabelRenderer,
   customTimeDisplayRenderer,
+  customDateLabelRenderer,
   customTimeUnitSelectionRenderer,
-} from './DateSlider.stories';
+} from './defaultRender';
 
 export const DateSlider = memo(
   ({

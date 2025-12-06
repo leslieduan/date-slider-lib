@@ -6,13 +6,11 @@ import type {
   SliderProps,
   SelectionResult,
   SliderExposedMethod,
-  DateLabelRenderProps,
-  TimeDisplayRenderProps,
-  TimeUnitSelectionRenderProps,
   TimeUnit,
+  DateLabelRenderProps,
 } from '@/type';
 import { toUTCDate } from '@/utils';
-import { ChevronLeftIcon, ChevronRightIcon, CircleIcon, MoveHorizontalIcon } from '@/icons';
+import { CircleIcon, MoveHorizontalIcon } from '@/icons';
 
 const meta: Meta<typeof DateSlider> = {
   title: 'Components/DateSlider',
@@ -42,14 +40,14 @@ type Story = StoryObj<Partial<SliderProps>>;
 
 // Memoized selection display component
 const SelectionDisplay = memo(({ selection }: { selection?: SelectionResult }) => {
-  if (!selection) return '';
+  if (!selection) return null;
   let result = '';
   if ('start' in selection && 'point' in selection) {
-    result = `start: ${selection.start} \nend: ${selection.end} \npoint: ${selection.point}`;
+    result = `start: ${selection.start.toISOString()}\nend: ${selection.end.toISOString()}\npoint: ${selection.point.toISOString()}`;
   } else if ('start' in selection) {
-    result = `start: ${selection.start} \nend: ${selection.end}`;
+    result = `start: ${selection.start.toISOString()}\nend: ${selection.end.toISOString()}`;
   } else if ('point' in selection) {
-    result = `point: ${selection.point}`;
+    result = `point: ${selection.point.toISOString()}`;
   }
   return (
     <div className="mt-6 font-mono">
@@ -146,177 +144,6 @@ const ControlButtons = memo(
 );
 
 ControlButtons.displayName = 'ControlButtons';
-
-// Custom render prop examples
-export const customDateLabelRenderer = ({ label }: DateLabelRenderProps) => {
-  return (
-    <span className="bg-blue-700 text-white text-xs px-3 py-1.5 rounded shadow-md font-semibold">
-      {label}
-    </span>
-  );
-};
-
-export const customTimeDisplayRenderer = ({
-  toNextDate,
-  toPrevDate,
-  dateLabel,
-}: TimeDisplayRenderProps) => {
-  return (
-    <div className="flex items-center gap-1 bg-white rounded-lg px-2 py-1.5 shadow-sm border border-gray-300 w-40 shrink-0">
-      <button
-        onClick={toPrevDate}
-        className="p-1 hover:bg-blue-50 rounded transition-colors shrink-0 cursor-pointer"
-        aria-label="Previous date"
-      >
-        <ChevronLeftIcon className="w-4 h-4 text-gray-700" />
-      </button>
-      <span className="text-sm font-semibold text-gray-900 flex-1 text-center">{dateLabel}</span>
-      <button
-        onClick={toNextDate}
-        className="p-1 hover:bg-blue-50 rounded transition-colors shrink-0 cursor-pointer"
-        aria-label="Next date"
-      >
-        <ChevronRightIcon className="w-4 h-4 text-gray-700" />
-      </button>
-    </div>
-  );
-};
-
-export const customTimeUnitSelectionRenderer = ({
-  timeUnit,
-  handleTimeUnitNextSelect,
-  handleTimeUnitPreviousSelect,
-  isNextBtnDisabled,
-  isPrevBtnDisabled,
-}: TimeUnitSelectionRenderProps) => {
-  return (
-    <div className="flex flex-col items-center gap-1 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-300 w-20 shrink-0">
-      <button
-        onClick={handleTimeUnitPreviousSelect}
-        disabled={isPrevBtnDisabled()}
-        className="p-1 hover:bg-blue-50 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0 cursor-pointer"
-        aria-label="Previous time unit"
-      >
-        <ChevronLeftIcon className="w-3 h-3 text-gray-700 rotate-90" />
-      </button>
-      <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">{timeUnit}</span>
-      <button
-        onClick={handleTimeUnitNextSelect}
-        disabled={isNextBtnDisabled()}
-        className="p-1 hover:bg-blue-50 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0 cursor-pointer"
-        aria-label="Next time unit"
-      >
-        <ChevronRightIcon className="w-3 h-3 text-gray-700 rotate-90" />
-      </button>
-    </div>
-  );
-};
-
-// Getting Started template component
-const GettingStartedTemplate = () => {
-  const [selection, setSelection] = useState<SelectionResult>();
-
-  const value = { point: toUTCDate('2024-06-15') };
-
-  return (
-    <div className="p-8 bg-linear-to-br from-gray-50 to-gray-100 min-h-[400px] rounded-lg">
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">Getting Started with DateSlider</h2>
-        <p className="text-gray-700 mb-6">
-          This is the simplest possible DateSlider configuration. Try dragging the handle or using
-          keyboard arrows!
-        </p>
-
-        <DateSlider
-          mode="point"
-          value={value}
-          min={toUTCDate('2024-01-01')}
-          max={toUTCDate('2024-12-31')}
-          initialTimeUnit="day"
-          onChange={setSelection}
-          icons={{ point: <CircleIcon /> }}
-          layout={{ width: 600, height: 80 }}
-        />
-
-        {selection && (
-          <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
-            <strong className="text-blue-900">Selected Date:</strong>
-            <pre className="mt-2 text-sm text-blue-800">
-              {'point' in selection && selection.point.toISOString()}
-            </pre>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-/**
- * Getting Started
- *
- * This story demonstrates the absolute minimum code needed to use DateSlider.
- * Perfect for beginners who want to quickly integrate the component.
- *
- * ## Basic Usage:
- * ```tsx
- * import { DateSlider } from 'date-slider-lib';
- * import { CircleIcon } from '@/icons';
- *
- * function App() {
- *   const [value, setValue] = useState({ point: new Date() });
- *
- *   return (
- *     <DateSlider
- *       mode="point"
- *       value={value}
- *       onChange={setValue}
- *       min={new Date('2024-01-01')}
- *       max={new Date('2024-12-31')}
- *       initialTimeUnit="day"
- *       icons={{ point: <CircleIcon /> }}
- *     />
- *   );
- * }
- * ```
- *
- * ## Key Props:
- * - `mode`: Selection type ('point', 'range', or 'combined')
- * - `value`: Current selection (UTC dates)
- * - `onChange`: Callback when selection changes
- * - `min` / `max`: Date range boundaries
- * - `initialTimeUnit`: Starting granularity ('day', 'month', 'year')
- * - `icons`: Custom icons for handles
- */
-export const GettingStarted: Story = {
-  render: () => <GettingStartedTemplate />,
-  args: {},
-  parameters: {
-    docs: {
-      source: {
-        code: `
- import { DateSlider } from 'date-slider-lib';
- import { CircleIcon } from '@/icons';
- 
- function App() {
-   const [value, setValue] = useState({ point: new Date() });
- 
-   return (
-     <DateSlider
-       mode="point"
-       value={value}
-       onChange={setValue}
-       min={new Date('2024-01-01')}
-       max={new Date('2024-12-31')}
-       initialTimeUnit="day"
-       icons={{ point: <CircleIcon /> }}
-     />
-   );
- }
- `,
-      },
-    },
-  },
-};
 
 // Enhanced template with better performance and accessibility
 const DateSliderTemplate = (args: Partial<SliderProps>) => {
@@ -429,189 +256,83 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
   }
 };
 
-// Story configurations with better defaults and documentation
-
 /**
- * Range Mode - Basic date range selection
+ * Getting Started
+ *
+ * The simplest DateSlider configuration. This is all you need to get started!
+ *
+ * ## Basic Usage:
+ * ```tsx
+ * import { DateSlider } from 'date-slider-lib';
+ * import { CircleIcon } from '@/icons';
+ *
+ * function App() {
+ *   const [value, setValue] = useState({ point: new Date() });
+ *
+ *   return (
+ *     <DateSlider
+ *       mode="point"
+ *       value={value}
+ *       onChange={setValue}
+ *       min={new Date('2024-01-01')}
+ *       max={new Date('2024-12-31')}
+ *       initialTimeUnit="day"
+ *       icons={{ point: <CircleIcon /> }}
+ *     />
+ *   );
+ * }
+ * ```
  */
-export const RangeMode: Story = {
+export const GettingStarted: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
-    mode: 'range',
+    mode: 'point',
     value: {
-      start: toUTCDate('2020-03-01'),
-      end: toUTCDate('2021-08-01'),
+      point: toUTCDate('2024-06-15'),
     },
-    min: toUTCDate('2020-01-01'),
-    max: toUTCDate('2022-03-15'),
-    initialTimeUnit: 'month' as TimeUnit,
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'day' as TimeUnit,
     layout: {
-      width: 800,
-      height: 120,
-    },
-    classNames: {
-      trackActive: 'bg-blue-400/20',
-      track: 'bg-gray-400',
-    },
-    behavior: {
-      handleLabelPersistent: true,
-    },
-    renderProps: { renderDateLabel: customDateLabelRenderer },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from '@/icons';
-
-function RangeSlider() {
-  const [selection, setSelection] = useState();
-
-  return (
-    <DateSlider
-      mode="range"
-      value={{
-        start: new Date('2021-03-01'),
-        end: new Date('2021-06-01')
-      }}
-      min={new Date('2020-01-01')}
-      max={new Date('2025-03-15')}
-      initialTimeUnit="month"
-      onChange={setSelection}
-      icons={{
-        rangeStart: <MoveHorizontalIcon />,
-        rangeEnd: <MoveHorizontalIcon />
-      }}
-    />
-  );
-}`,
-      },
+      width: 600,
+      height: 80,
     },
   },
 };
 
 /**
- * Point Mode - Single date point selection
- * Uses custom numeric date format for compact display
+ * Point Mode
+ *
+ * Select a single date point. Perfect for calendars, date pickers, and event selection.
  */
 export const PointMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
     mode: 'point',
     value: {
-      point: toUTCDate('2019-01-01'),
+      point: toUTCDate('2024-06-15'),
     },
-    min: toUTCDate('2019-01-01'),
-    max: toUTCDate('2019-02-08'),
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
-      width: 600,
+      width: 700,
       height: 90,
+      dateLabelEnabled: true,
     },
     classNames: {
       trackActive: 'bg-green-400/20',
       track: 'bg-gray-400',
     },
-    // Custom format: numeric dates
-    dateFormat: (date: Date) => {
-      const month = date.getUTCMonth();
-      const day = date.getUTCDate();
-      if (month === 0 && day === 1) return 'mm-yyyy'; // "01 2019"
-      if (day === 1) return 'mm'; // "02"
-      return 'dd'; // "15"
-    },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon } from '@/icons';
-
-function PointSlider() {
-  const [selection, setSelection] = useState();
-
-  return (
-    <DateSlider
-      mode="point"
-      value={{ point: new Date('2019-01-01') }}
-      min={new Date('2019-01-01')}
-      max={new Date('2019-02-08')}
-      initialTimeUnit="day"
-      onChange={setSelection}
-      icons={{ point: <CircleIcon /> }}
-    />
-  );
-}`,
-      },
-    },
   },
 };
 
 /**
- * Combined Mode - Both point and range selection
+ * Range Mode
+ *
+ * Select a date range with start and end dates. Ideal for booking systems, filters, and analytics.
  */
-export const CombinedMode: Story = {
-  render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
-  args: {
-    mode: 'combined',
-    value: {
-      start: toUTCDate('2021-03-01'),
-      end: toUTCDate('2022-06-01'),
-      point: toUTCDate('2021-08-01'),
-    },
-    min: toUTCDate('2020-10-05'),
-    max: toUTCDate('2025-11-11'),
-    initialTimeUnit: 'month' as TimeUnit,
-    layout: {
-      width: 900,
-      height: 140,
-      minGapScaleUnits: 2,
-    },
-    classNames: {
-      trackActive: 'bg-purple-400/20',
-      track: 'bg-gray-300',
-    },
-    behavior: {
-      pointHandleLabelPersistent: true,
-      handleLabelPersistent: true,
-    },
-    renderProps: { renderDateLabel: customDateLabelRenderer },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon, MoveHorizontalIcon } from '@/icons';
-
-function CombinedSlider() {
-  return (
-    <DateSlider
-      mode="combined"
-      value={{
-        start: new Date('2021-03-01'),
-        end: new Date('2021-06-01'),
-        point: new Date('2023-08-01')
-      }}
-      min={new Date('2020-10-05')}
-      max={new Date('2025-11-11')}
-      initialTimeUnit="month"
-      icons={{
-        point: <CircleIcon />,
-        rangeStart: <MoveHorizontalIcon />,
-        rangeEnd: <MoveHorizontalIcon />
-      }}
-    />
-  );
-}`,
-      },
-    },
-  },
-};
-
-/**
- * Without Scale Marks - Hides all tick marks on the track
- */
-export const WithoutScaleMarks: Story = {
+export const RangeMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
     mode: 'range',
@@ -622,264 +343,85 @@ export const WithoutScaleMarks: Story = {
     min: toUTCDate('2024-01-01'),
     max: toUTCDate('2024-12-31'),
     initialTimeUnit: 'month' as TimeUnit,
-    layout: { width: 700, height: 100 },
-    classNames: {
-      trackActive: 'bg-blue-500/30',
-      track: 'bg-gray-300',
-      scaleMark: 'hidden',
-      scaleMarkMajor: 'hidden',
-      scaleMarkMedium: 'hidden',
-      scaleMarkMinor: 'hidden',
+    layout: {
+      width: 800,
+      height: 100,
+      dateLabelEnabled: true,
     },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from '@/icons';
-
-function WithoutScaleMarks() {
-  return (
-    <DateSlider
-      mode="range"
-      value={{
-        start: new Date('2024-03-01'),
-        end: new Date('2024-09-01')
-      }}
-      min={new Date('2024-01-01')}
-      max={new Date('2024-12-31')}
-      initialTimeUnit="month"
-      icons={{
-        rangeStart: <MoveHorizontalIcon />,
-        rangeEnd: <MoveHorizontalIcon />
-      }}
-      classNames={{
-        scaleMark: 'hidden', // Hide scale marks
-        scaleMarkMajor: 'hidden',
-      }}
-    />
-  );
-}`,
-      },
-    },
-  },
-};
-
-/**
- * Persistent Handle Labels - Labels always visible
- *
- * This story demonstrates persistent handle labels that remain visible at all times.
- * The label shows the currently selected date and stays visible above the handle.
- *
- * ## Label Behavior
- * - When `handleLabelPersistent` is `true`, labels are always visible
- * - When `false`, labels appear only on hover, drag, or temporarily after interaction
- * - On mobile devices, labels are automatically persistent for better usability
- *
- * ## Smart Label Display
- * The component intelligently shows labels to avoid confusion:
- * - Only the actively moved handle's label appears during interaction
- * - When clicking the track, only the moved handle's label is shown
- * - During scrolling, labels remain stable without flickering
- */
-export const PersistentHandleLabels: Story = {
-  render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
-  args: {
-    mode: 'point',
-    value: {
-      point: toUTCDate('2024-08-01'),
-    },
-    min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'day' as TimeUnit,
-    layout: { width: 700, height: 100 },
     behavior: {
-      handleLabelPersistent: true,
+      rangeHandleLabelPersistent: true,
     },
     classNames: {
-      trackActive: 'bg-blue-500/30',
-      track: 'bg-gray-300',
-    },
-    renderProps: { renderDateLabel: customDateLabelRenderer },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from '@/icons';
-
-function PersistentLabels() {
-  return (
-    <DateSlider
-      mode="range"
-      value={{
-        start: new Date('2024-04-01'),
-        end: new Date('2024-08-01')
-      }}
-      min={new Date('2024-01-01')}
-      max={new Date('2024-12-31')}
-      initialTimeUnit="month"
-      icons={{
-        rangeStart: <MoveHorizontalIcon />,
-        rangeEnd: <MoveHorizontalIcon />
-      }}
-      behavior={{
-        handleLabelPersistent: true // Labels always visible
-      }}
-    />
-  );
-}`,
-      },
+      trackActive: 'bg-blue-400/20',
+      track: 'bg-gray-400',
     },
   },
 };
 
 /**
- * Year Time Unit - Navigate by years
+ * Combined Mode
  *
- * This story demonstrates year-level navigation with combined mode (both range and point selection).
- *
- * ## Features Demonstrated
- * - Year-based time unit navigation
- * - Combined mode with all three handles (start, end, point)
- * - Custom date format showing years
- * - Custom time display renderer
- * - Smart label behavior: only the moved handle's label appears when interacting
- *
- * ## Try It Out
- * - Click on the track to move the nearest handle
- * - Drag any handle to change its position
- * - Notice that only the actively moved handle shows its date label
- * - Use the time display controls to navigate through years
+ * Use both point and range selection simultaneously. Great for complex filtering scenarios.
  */
-export const YearTimeUnit: Story = {
+export const CombinedMode: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
     mode: 'combined',
     value: {
-      start: toUTCDate('2015-01-01'),
-      end: toUTCDate('2023-01-01'),
-      point: toUTCDate('2018-01-01'),
+      start: toUTCDate('2024-03-01'),
+      end: toUTCDate('2024-09-01'),
+      point: toUTCDate('2024-06-15'),
     },
-    min: toUTCDate('2000-01-01'),
-    max: toUTCDate('2030-12-31'),
-    initialTimeUnit: 'year' as TimeUnit,
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'month' as TimeUnit,
     layout: {
-      width: 700,
-      height: 100,
-      scaleUnitConfig: {
-        gap: 60,
-        width: { short: 1, medium: 1, long: 2 },
-        height: { short: 15, medium: 25, long: 45 },
-      },
+      width: 900,
+      height: 120,
     },
     classNames: {
-      trackActive: 'bg-orange-500/30',
+      trackActive: 'bg-purple-400/20',
       track: 'bg-gray-300',
-    },
-    // Custom format: always show year for year-level navigation
-    dateFormat: () => 'yyyy', // Always show 4-digit year
-    renderProps: {
-      renderDateLabel: customDateLabelRenderer,
-      renderTimeDisplay: customTimeDisplayRenderer,
-    },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { MoveHorizontalIcon } from '@/icons';
-
-function YearSlider() {
-  return (
-    <DateSlider
-      mode="range"
-      value={{
-        start: new Date('2015-01-01'),
-        end: new Date('2023-01-01')
-      }}
-      min={new Date('2000-01-01')}
-      max={new Date('2030-12-31')}
-      initialTimeUnit="year" // Navigate by years
-      icons={{
-        rangeStart: <MoveHorizontalIcon />,
-        rangeEnd: <MoveHorizontalIcon />
-      }}
-    />
-  );
-}`,
-      },
     },
   },
 };
 
 /**
- * With Custom Render Props - Custom UI components
+ * With UI Components
+ *
+ *
+ * ## Component Toggles:
+ * - `dateLabelEnabled`: Show date labels on handles
+ * - `timeDisplayEnabled`: Show time display with navigation controls
+ * - `timeUnitSelectionEnabled`: Show day/month/year selector
+
  */
-export const WithCustomRenderProps: Story = {
+export const WithUIComponents: Story = {
   render: (args: Partial<SliderProps>) => <DateSliderTemplate {...args} />,
   args: {
-    mode: 'point',
+    mode: 'combined',
     value: {
-      point: toUTCDate('2022-06-15'),
+      start: toUTCDate('2024-03-01'),
+      end: toUTCDate('2024-09-01'),
+      point: toUTCDate('2024-06-15'),
     },
-    min: toUTCDate('2022-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'day' as TimeUnit,
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2025-12-31'),
+    initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 800,
-      height: 100,
+      height: 120,
+      // Simply toggle components on - defaults are provided!
+      dateLabelEnabled: true,
+      timeDisplayEnabled: true,
+      timeUnitSelectionEnabled: true,
     },
-    behavior: { handleLabelPersistent: false, sliderAutoScrollToPointHandleVisibleEnabled: false },
+    behavior: {
+      handleLabelPersistent: true,
+    },
     classNames: {
-      trackActive: 'bg-purple-400/20',
+      trackActive: 'bg-indigo-500/30',
       track: 'bg-gray-300',
-    },
-    renderProps: {
-      renderDateLabel: customDateLabelRenderer,
-      renderTimeDisplay: customTimeDisplayRenderer,
-      renderTimeUnitSelection: customTimeUnitSelectionRenderer,
-    },
-  },
-  parameters: {
-    docs: {
-      source: {
-        code: `import { DateSlider } from 'date-slider-lib';
-import { CircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@/icons';
-
-// Custom date label renderer
-const customDateLabelRenderer = ({ label }) => (
-  <span className="bg-blue-700 text-white text-xs px-3 py-1.5 rounded shadow-md">
-    {label}
-  </span>
-);
-
-// Custom time display renderer
-const customTimeDisplayRenderer = ({ toNextDate, toPrevDate, dateLabel }) => (
-  <div className="flex items-center gap-1 bg-white rounded-lg px-2 py-1.5">
-    <button onClick={toPrevDate}><ChevronLeftIcon /></button>
-    <span>{dateLabel}</span>
-    <button onClick={toNextDate}><ChevronRightIcon /></button>
-  </div>
-);
-
-function CustomRenderProps() {
-  return (
-    <DateSlider
-      mode="point"
-      value={{ point: new Date('2022-06-15') }}
-      min={new Date('2022-01-01')}
-      max={new Date('2022-12-31')}
-      initialTimeUnit="day"
-      icons={{ point: <CircleIcon /> }}
-      renderProps={{
-        renderDateLabel: customDateLabelRenderer,
-        renderTimeDisplay: customTimeDisplayRenderer,
-      }}
-    />
-  );
-}`,
-      },
     },
   },
 };
@@ -953,13 +495,7 @@ const TimelineTemplate = (args: Partial<SliderProps>) => {
 
 /**
  * Timeline Style - Beautiful gradient design for timeline interfaces
- *
- * A visually stunning timeline slider with:
- * - Vibrant gradient background (purple to pink)
- * - Animated blur effects
- * - White transparent handle
- * - Minute-level precision
- * - Perfect for event timelines, video scrubbers, or any time-based UI
+ 
  */
 export const TimelineStyle: Story = {
   render: (args: Partial<SliderProps>) => <TimelineTemplate {...args} />,
