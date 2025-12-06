@@ -1,7 +1,8 @@
 import type { SliderHandleProps, RenderSliderHandleProps } from '@/type';
 import { cn, formatDate, getDateFromPercent, handleOutsideVisibleArea } from '@/utils';
-import { memo, useLayoutEffect, useState } from 'react';
+import { memo, useCallback, useLayoutEffect, useState } from 'react';
 import { DateLabel } from './DateLabel';
+import { useIsScrolling, useRAFDFn } from '@/hooks';
 
 export const SliderHandle = ({
   onDragging,
@@ -32,23 +33,42 @@ export const SliderHandle = ({
   });
 
   const outsideVisibleArea = leftOut || rightOut;
-
   const [labelPosition, setLabelPosition] = useState<{ x: number; y: number } | undefined>();
+  const isScrolling = useIsScrolling(window);
+
+  const updatePosition = useCallback(() => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    setLabelPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.top - dateLabelDistanceOverHandle,
+    });
+  }, [ref, dateLabelDistanceOverHandle]);
+
+  const scheduledUpdatePosition = useRAFDFn(updatePosition);
 
   useLayoutEffect(() => {
     if (!ref.current) return;
 
-    const updatePosition = () => {
-      if (!ref.current) return;
-      const rect = ref.current.getBoundingClientRect();
-      setLabelPosition({
-        x: rect.left + rect.width / 2,
-        y: rect.top - dateLabelDistanceOverHandle,
-      });
+    const handleScroll = () => {
+      if (!isScrolling) scheduledUpdatePosition();
     };
 
-    updatePosition();
-  }, [ref, position, dateLabelDistanceOverHandle, sliderPositionX]);
+    scheduledUpdatePosition();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [
+    ref,
+    position,
+    dateLabelDistanceOverHandle,
+    sliderPositionX,
+    scheduledUpdatePosition,
+    isScrolling,
+  ]);
 
   // Get handle-specific className
   const handleSpecificClass =
@@ -88,7 +108,7 @@ export const SliderHandle = ({
       onFocus={onFocus}
     >
       {icon}
-      {!onDragging && !isSliderDragging && !outsideVisibleArea && (
+      {!onDragging && !isSliderDragging && !outsideVisibleArea && !isScrolling && (
         <DateLabel
           position={labelPosition}
           label={label}

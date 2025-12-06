@@ -10,3 +10,4 @@ export * from './usePositionState';
 export * from './useDateLabelPersist';
 export * from './useHandleVisible';
 export * from './useViewPortSize';
+export * from './useIsScrolling';
