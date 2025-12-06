@@ -202,19 +202,37 @@ Enable optional UI components. Default renderers are provided.
 
 ### Date Formatting
 
+Customize date formats separately for scale marks and handle labels:
+
 ```tsx
 <DateSlider
   mode="point"
   value={{ point: new Date() }}
-  dateFormat={(date) => {
-    const day = date.getUTCDate();
-    if (day === 1) return 'MMM';  // "Jun"
-    return 'dd';                   // "15"
+  dateFormat={{
+    scale: (date) => {
+      const day = date.getUTCDate();
+      if (day === 1) return 'MMM';  // "Jun" on first day
+      return 'dd';                   // "15" on other days
+    },
+    label: (date) => 'dd-MMM-yyyy',  // "15-Jun-2024" on handle labels
   }}
 />
 ```
 
 **Format tokens**: `yyyy`, `mm`, `dd`, `MMM`, `MMMM`, `hh`, `MM`
+
+You can specify `scale` only, `label` only, or both:
+
+```tsx
+// Same format for both scale and labels
+dateFormat={{ scale: (date) => 'yyyy-mm-dd' }}
+
+// Different formats
+dateFormat={{
+  scale: (date) => 'dd',
+  label: (date) => 'dd-MMM-yyyy'
+}}
+```
 
 ### Label Behavior
 
@@ -309,7 +327,7 @@ function App() {
 | `behavior` | `object` | No | Interaction behavior options |
 | `layout` | `object` | No | Size and layout configuration |
 | `renderProps` | `object` | No | Custom render functions (optional) |
-| `dateFormat` | `function` | No | Custom date format function |
+| `dateFormat` | `object` | No | Custom date format for scale and labels `{ scale?, label? }` |
 | `locale` | `string` | No | Date locale (default: 'en-AU') |
 | `imperativeRef` | `Ref` | No | Imperative API reference |
 
@@ -376,28 +394,6 @@ Test mobile behavior by resizing your browser to mobile viewport.
 - ✅ Visible focus indicators
 - ✅ Touch support
 
-## TypeScript Support
-
-```tsx
-import {
-  DateSlider,
-  dateFormatFn,
-} from 'date-slider-lib';
-
-import type {
-  SliderProps,
-  SelectionResult,
-  SliderExposedMethod,
-  PointValue,
-  RangeValue,
-  CombinedValue,
-  DateSliderClassNames,
-  LayoutConfig,
-  BehaviorConfig,
-  DateFormat,
-  TimeUnit,
-} from 'date-slider-lib';
-```
 
 ## License
 

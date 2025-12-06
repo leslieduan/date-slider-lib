@@ -29,7 +29,7 @@ export type {
   // Render prop parameter types (for custom renderers)
   HandleRenderProps,
   DateLabelRenderProps,
-  TimeDisplayRenderProps,
+  SelectionPanelRenderProps,
   TimeUnitSelectionRenderProps,
 
   // Utility types
