@@ -1,3 +1,4 @@
+import { TIMING } from '@/constants';
 import { useState, useRef, useEffect } from 'react';
 
 /**
@@ -38,7 +39,7 @@ export const useDateLabelPersist = (
 
       disableTimeoutId.current = setTimeout(() => {
         setShowDateLabel(false);
-      }, 1500);
+      }, TIMING.LABEL_PERSISTENCE);
     } else {
       setShowDateLabel(false);
     }
