@@ -801,7 +801,7 @@ export const WithCustomRenderProps: Story = {
       width: 800,
       height: 100,
     },
-    behavior: { handleLabelPersistent: false },
+    behavior: { handleLabelPersistent: false, sliderAutoScrollToPointHandleVisibleEnabled: false },
     classNames: {
       trackActive: 'bg-purple-400/20',
       track: 'bg-gray-300',

@@ -80,6 +80,8 @@ export const DateSlider = memo(
     // Extract behavior config with defaults
     const scrollable = behavior?.scrollable ?? true;
     const freeSelectionOnTrackClick = behavior?.freeSelectionOnTrackClick ?? false;
+    const sliderAutoScrollToPointHandleVisibleEnabled =
+      behavior?.sliderAutoScrollToPointHandleVisibleEnabled ?? true;
 
     // Handle label behavior - specific settings override general ones
     const globalLabelPersistent = isSmallScreen || (behavior?.handleLabelPersistent ?? false);
@@ -223,7 +225,7 @@ export const DateSlider = memo(
       [dimensions.sliderContainerWidth, dimensions.trackContainerWidth]
     );
 
-    const autoScrollToVisibleAreaEnabled = useRef(false);
+    const autoScrollToVisibleAreaRef = useRef(false);
 
     const {
       position: sliderPosition,
@@ -239,7 +241,7 @@ export const DateSlider = memo(
       onDragEnd: handleDragComplete,
       onDragStarted: () => {
         setHandleDragStarted(true);
-        autoScrollToVisibleAreaEnabled.current = false;
+        autoScrollToVisibleAreaRef.current = false;
       },
     });
 
@@ -258,7 +260,8 @@ export const DateSlider = memo(
       resetPosition,
       pointPosition,
       isSliderDragging,
-      autoScrollToVisibleAreaEnabled,
+      autoScrollToVisibleAreaRef,
+      sliderAutoScrollToPointHandleVisibleEnabled,
     });
 
     useInitialAutoScrollPosition({
@@ -328,7 +331,7 @@ export const DateSlider = memo(
             break;
           }
         }
-        autoScrollToVisibleAreaEnabled.current = true;
+        autoScrollToVisibleAreaRef.current = true;
       },
       [
         startDate,
@@ -416,7 +419,7 @@ export const DateSlider = memo(
       isSliderDragging,
       totalScaleUnits,
       freeSelectionOnTrackClick,
-      autoScrollToVisibleAreaEnabled
+      autoScrollToVisibleAreaRef
     );
 
     const onChangeRef = useRef(onChange);
@@ -432,8 +435,6 @@ export const DateSlider = memo(
         ),
       []
     );
-
-    console.log({ pointPosition, rangeStartPosition, rangeEndPosition });
 
     useEffect(() => {
       const selection = createSelectionResult(

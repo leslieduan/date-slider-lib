@@ -253,6 +253,9 @@ export type BehaviorConfig = {
   scrollable?: boolean;
   /** Allow free datetime selection on track click (not limited to scale units) */
   freeSelectionOnTrackClick?: boolean;
+  /**Keep point handle always visible, slider will auto scroll into point handle visible area */
+  sliderAutoScrollToPointHandleVisibleEnabled?: boolean;
+
   /** Keep handle date label visible persistently (applies to all handles if specific ones not set) */
   handleLabelPersistent?: boolean;
   /** Always disable handle label (applies to all handles if specific ones not set) */
