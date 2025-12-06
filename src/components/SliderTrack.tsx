@@ -10,6 +10,7 @@ import {
 import { memo, useCallback, useState, useEffect, useMemo } from 'react';
 import { DateLabel } from './DateLabel';
 import { ScalesUnitLabels } from './ScalesUnitLabels';
+import { useIsScrolling } from '@/hooks';
 
 const CursorLine = memo(
   ({
@@ -133,13 +134,13 @@ export const SliderTrack = memo(
   }: SliderTrackProps) => {
     const [isHoverTrack, setIsHoverTrack] = useState(false);
     const [isHandleHover, setIsHandleHover] = useState(false);
-    const [isScrolling, setIsScrolling] = useState(false);
     const [mouseHoverPosition, setMouseHoverPosition] = useState<number>();
     const [labelPosition, setLabelPosition] = useState<{
       x: number;
       y: number;
     }>();
     const [dateLabel, setDateLabel] = useState<string>();
+    const isScrolling = useIsScrolling(window);
     //point handle and range handle should be in same height, and there must be at least existing one handle.
     const handleRef =
       props.mode === 'point' || props.mode === 'combined'
@@ -212,22 +213,6 @@ export const SliderTrack = memo(
       if (!trackRefInstance) return;
 
       const handleRefs = [startHandleRef.current, endHandleRef.current, pointHandleRef.current];
-      let scrollTimeout: NodeJS.Timeout | null = null;
-
-      const handleScroll = () => {
-        // Hide label immediately when scrolling starts
-        setIsScrolling(true);
-
-        // Clear previous timeout
-        if (scrollTimeout) {
-          clearTimeout(scrollTimeout);
-        }
-
-        // Show label again after scrolling stops
-        scrollTimeout = setTimeout(() => {
-          setIsScrolling(false);
-        }, 150); // 150ms debounce
-      };
 
       trackRefInstance.addEventListener('touchend', handleTouchEnd);
       trackRefInstance.addEventListener('touchmove', handleTouchMove);
@@ -239,8 +224,6 @@ export const SliderTrack = memo(
         handleRef?.addEventListener('mouseleave', handleHandlerMouseLeave);
       });
 
-      window.addEventListener('scroll', handleScroll, { passive: true });
-
       return () => {
         trackRefInstance.removeEventListener('touchend', handleTouchEnd);
         trackRefInstance.removeEventListener('touchmove', handleTouchMove);
@@ -251,11 +234,6 @@ export const SliderTrack = memo(
           handleRef?.removeEventListener('mousemove', handleHandlerMouseMove);
           handleRef?.removeEventListener('mouseleave', handleHandlerMouseLeave);
         });
-
-        window.removeEventListener('scroll', handleScroll);
-        if (scrollTimeout) {
-          clearTimeout(scrollTimeout);
-        }
       };
     }, [
       trackRef,

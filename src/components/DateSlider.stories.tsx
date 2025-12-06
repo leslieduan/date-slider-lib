@@ -752,6 +752,7 @@ export const YearTimeUnit: Story = {
     dateFormat: () => 'yyyy', // Always show 4-digit year
     renderProps: {
       renderDateLabel: customDateLabelRenderer,
+      renderTimeDisplay: customTimeDisplayRenderer,
     },
   },
   parameters: {
