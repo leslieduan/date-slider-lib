@@ -7,7 +7,6 @@ import {
   useRef,
   useState,
 } from 'react';
-
 import {
   useDrag,
   useElementSize,
@@ -53,6 +52,7 @@ import {
   customDateLabelRenderer,
   customTimeUnitSelectionRenderer,
 } from './defaultRender';
+import { CircleIcon, MoveHorizontalIcon } from '@/icons';
 
 export const DateSlider = memo(
   ({
@@ -76,11 +76,8 @@ export const DateSlider = memo(
     const { isSmallScreen } = useViewportSize();
 
     // Extract icon config with defaults - safely handle discriminated union
-    const pointHandleIcon = icons && 'point' in icons ? icons.point : undefined;
-    const rangeHandleIcon =
-      icons && ('rangeStart' in icons || 'rangeEnd' in icons)
-        ? (icons.rangeStart ?? icons.rangeEnd)
-        : undefined;
+    const pointHandleIcon = icons && 'point' in icons ? icons.point : <CircleIcon />;
+    const rangeHandleIcon = icons && 'range' in icons ? icons.range : <MoveHorizontalIcon />;
 
     // Extract behavior config with defaults
     const scrollable = behavior?.scrollable ?? true;

@@ -203,8 +203,7 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             onChange={handleSelectionChange}
             imperativeRef={sliderMethodRef}
             icons={{
-              rangeStart: <MoveHorizontalIcon />,
-              rangeEnd: <MoveHorizontalIcon />,
+              range: <MoveHorizontalIcon />,
             }}
             classNames={args.classNames}
             behavior={args.behavior}
@@ -239,8 +238,7 @@ const DateSliderTemplate = (args: Partial<SliderProps>) => {
             imperativeRef={sliderMethodRef}
             icons={{
               point: <CircleIcon />,
-              rangeStart: <MoveHorizontalIcon />,
-              rangeEnd: <MoveHorizontalIcon />,
+              range: <MoveHorizontalIcon />,
             }}
             classNames={args.classNames}
             behavior={args.behavior}
@@ -298,7 +296,6 @@ export const PointMode: Story = {
     classNames: {
       trackActive: 'bg-green-400/30',
       track: 'bg-gray-300',
-      handle: 'bg-green-600 border-2 border-white shadow-lg hover:shadow-xl',
       scaleMarkMajor: 'bg-green-600',
       scaleMarkMinor: 'bg-gray-400',
       scaleLabel: 'text-green-800 font-medium',
@@ -464,7 +461,7 @@ const TimelineTemplate = (args: Partial<SliderProps>) => {
             initialTimeUnit={args.initialTimeUnit ?? 'day'}
             onChange={setSelection}
             icons={{
-              point: <CircleIcon className="fill-white text-white" />,
+              point: <CircleIcon />,
             }}
             classNames={args.classNames}
             behavior={args.behavior}

@@ -543,8 +543,7 @@ type PointModeSliderProps = {
   /** Icon configuration - only point icon is used */
   icons?: {
     point?: ReactNode;
-    rangeStart?: never;
-    rangeEnd?: never;
+    range?: never;
   };
 };
 
@@ -561,8 +560,7 @@ type RangeModeSliderProps = {
   /** Icon configuration - only range icons are used */
   icons?: {
     point?: never;
-    rangeStart?: ReactNode;
-    rangeEnd?: ReactNode;
+    range?: ReactNode;
   };
 };
 
@@ -579,8 +577,7 @@ type CombinedModeSliderProps = {
   /** Icon configuration - all icons can be used */
   icons?: {
     point?: ReactNode;
-    rangeStart?: ReactNode;
-    rangeEnd?: ReactNode;
+    range?: ReactNode;
   };
 };
 
