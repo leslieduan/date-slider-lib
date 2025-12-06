@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@/icons';
 import type {
   DateLabelRenderProps,
-  TimeDisplayRenderProps,
+  SelectionPanelRenderProps,
   TimeUnitSelectionRenderProps,
 } from '@/type';
 
@@ -14,11 +14,11 @@ export const customDateLabelRenderer = ({ label }: DateLabelRenderProps) => {
   );
 };
 
-export const customTimeDisplayRenderer = ({
+export const customSelectionPanelRenderer = ({
   toNextDate,
   toPrevDate,
   dateLabel,
-}: TimeDisplayRenderProps) => {
+}: SelectionPanelRenderProps) => {
   return (
     <div className="flex items-center gap-1 bg-white rounded-lg px-2 py-1.5 shadow-sm border border-gray-300 w-40 shrink-0">
       <button

@@ -5,7 +5,7 @@ import './index.css';
 export { DateSlider } from './components';
 
 // Export utility functions
-export { dateFormatFn } from './utils';
+export { scaleDateFormatFn as dateFormatFn } from './utils';
 
 // Export types - Public API only
 export type {

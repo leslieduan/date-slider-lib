@@ -2,6 +2,7 @@ import type { RefObject } from 'react';
 
 import type {
   DateFormat,
+  DateFormatFn,
   NumOfScales,
   Scale,
   ScaleType,
@@ -511,7 +512,7 @@ export function addTime(
   return result;
 }
 
-export const dateFormatFn: DateFormat = (date: Date) => {
+export const scaleDateFormatFn: DateFormatFn = (date: Date) => {
   const month = date.getUTCMonth();
   const day = date.getUTCDate();
 
@@ -526,9 +527,13 @@ export const dateFormatFn: DateFormat = (date: Date) => {
   return 'dd';
 };
 
+export const labelDateFormatFn: DateFormatFn = () => {
+  return 'dd-MMM-yyyy';
+};
+
 export function formatDate(
   date: Date,
-  format: DateFormat,
+  format: Required<DateFormat>,
   locale: string = 'en-AU',
   variant: 'scale' | 'label' = 'scale'
 ): string {
@@ -553,7 +558,7 @@ export function formatDate(
     MMMM: monthLong,
   };
 
-  return (variant === 'scale' ? format(date) : 'dd-MMM-yyyy')
+  return (variant === 'scale' ? format.scale(date) : format.label(date))
     .split('-')
     .map((token) => {
       const v = map[token];

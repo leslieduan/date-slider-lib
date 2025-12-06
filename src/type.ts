@@ -55,7 +55,7 @@ export type DragHandle = 'start' | 'end' | 'point' | null;
  *
  * @see {@link dateFormatFn} - Built-in format for scale and date labels
  */
-export type DateFormat = (date: Date) => // Date only
+export type DateFormatFn = (date: Date) => // Date only
   | 'yyyy-mm-dd'
   | 'dd-mm-yyyy'
   | 'mm-dd-yyyy'
@@ -94,6 +94,11 @@ export type DateFormat = (date: Date) => // Date only
   | 'MMM'
   | 'MMM-yyyy'
   | 'dd-MMM-yyyy';
+
+export type DateFormat = {
+  scale?: DateFormatFn;
+  label?: DateFormatFn;
+};
 
 /**
  * Time label for scale marks on the slider track
@@ -292,8 +297,8 @@ export type LayoutConfig = {
   scaleUnitConfig?: ScaleUnitConfig;
   /** DateLabel distance over handle and track in pixels */
   dateLabelDistanceOverHandle?: number;
-  /** Whether render TimeDisplay Component*/
-  timeDisplayEnabled?: boolean;
+  /** Whether render SelectionPanel Component*/
+  selectionPanelEnabled?: boolean;
   /**  Whether render TimeUnitSelection component*/
   timeUnitSelectionEnabled?: boolean;
   /** Whether render Date label */
@@ -387,7 +392,7 @@ export type DateLabelRenderProps = {
  *
  * @example
  * ```tsx
- * renderTimeDisplay={({ dateLabel, toNextDate, toPrevDate }) => (
+ * renderSelectionPanel={({ dateLabel, toNextDate, toPrevDate }) => (
  *   <div>
  *     <button onClick={toPrevDate}>←</button>
  *     <span>{dateLabel}</span>
@@ -396,7 +401,7 @@ export type DateLabelRenderProps = {
  * )}
  * ```
  */
-export type TimeDisplayRenderProps = {
+export type SelectionPanelRenderProps = {
   /** Navigate to the next date based on current time unit */
   toNextDate: () => void;
   /** Navigate to the previous date based on current time unit */
@@ -438,8 +443,8 @@ export type TimeUnitSelectionRenderProps = {
 export type RenderPropsConfig = {
   /** Custom date label renderer */
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
-  /** Custom TimeDisplay renderer */
-  renderTimeDisplay?: (props: TimeDisplayRenderProps) => ReactNode;
+  /** Custom selectionPanel renderer */
+  renderSelectionPanel?: (props: SelectionPanelRenderProps) => ReactNode;
   /** Custom TimeUnitSelection renderer */
   renderTimeUnitSelection?: (props: TimeUnitSelectionRenderProps) => ReactNode;
 };
@@ -633,7 +638,7 @@ type BaseSliderTrackProps = {
   minDistance?: number;
   withEndLabel?: boolean;
   dateLabelDistanceOverHandle: number;
-  dateFormat: DateFormat;
+  dateFormat: Required<DateFormat>;
   locale: string;
 };
 
@@ -710,7 +715,7 @@ export type RenderSliderHandleProps = {
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
   sliderContainerRef: RefObject<HTMLDivElement | null>;
   dateLabelDistanceOverHandle: number;
-  dateFormat: DateFormat;
+  dateFormat: Required<DateFormat>;
   locale: string;
   sliderPositionX: number;
 };
@@ -723,13 +728,13 @@ export type TimeUnitSelectionProps = {
   renderTimeUnitSelection: (props: TimeUnitSelectionRenderProps) => ReactNode;
 };
 
-export type TimeDisplayProps = {
+export type SelectionPanelProps = {
   position: number;
   startDate: Date;
   endDate: Date;
   setDateTime: (date: Date, target?: DragHandle) => void;
-  renderTimeDisplay: (props: TimeDisplayRenderProps) => ReactNode;
-  dateFormat: DateFormat;
+  renderSelectionPanel: (props: SelectionPanelRenderProps) => ReactNode;
+  dateFormat: Required<DateFormat>;
   timeUnit: TimeUnit;
   locale: string;
 };
@@ -741,7 +746,7 @@ export type ScalesUnitLabelsProps = {
   minDistance?: number;
   withEndLabel?: boolean;
   classNames?: DateSliderClassNames;
-  dateFormat: DateFormat;
+  dateFormat: Required<DateFormat>;
   locale: string;
 };
 

@@ -26,13 +26,14 @@ import {
   clampPercent,
   cn,
   createSelectionResult,
-  dateFormatFn,
+  scaleDateFormatFn,
   debounce,
   generateScalesWithInfo,
   generateTimeLabelsWithPositions,
   generateTrackWidth,
   getPercentFromDate,
   getTotalScales,
+  labelDateFormatFn,
 } from '@/utils';
 import {
   LAYOUT,
@@ -45,10 +46,10 @@ import {
 import type { SliderProps, TimeUnit, DragHandle, SelectionResult, Dimension } from '@/type';
 import { RenderSliderHandle } from './SliderHandle';
 import { SliderTrack } from './SliderTrack';
-import { TimeDisplay } from './TimeDisplay';
+import { SelectionPanel } from './SelectionPanel';
 import { TimeUnitSelection } from './TimeUnitSelection';
 import {
-  customTimeDisplayRenderer,
+  customSelectionPanelRenderer,
   customDateLabelRenderer,
   customTimeUnitSelectionRenderer,
 } from './defaultRender';
@@ -69,7 +70,7 @@ export const DateSlider = memo(
     icons,
     behavior,
     layout,
-    dateFormat = dateFormatFn,
+    dateFormat,
     locale = 'en-AU',
     imperativeRef: imperativeHandleRef,
   }: SliderProps) => {
@@ -84,6 +85,11 @@ export const DateSlider = memo(
     const freeSelectionOnTrackClick = behavior?.freeSelectionOnTrackClick ?? false;
     const sliderAutoScrollToPointHandleVisibleEnabled =
       behavior?.sliderAutoScrollToPointHandleVisibleEnabled ?? true;
+
+    const dataFormat = {
+      scale: dateFormat?.scale || scaleDateFormatFn,
+      label: dateFormat?.label || labelDateFormatFn,
+    };
 
     // Handle label behavior - specific settings override general ones
     const globalLabelPersistent = isSmallScreen || (behavior?.handleLabelPersistent ?? false);
@@ -107,7 +113,7 @@ export const DateSlider = memo(
     // if not scrollable, track is fixed with, which is 100% of slider container width.
     const isTrackFixedWidth = !scrollable;
 
-    const timeDisplayEnabled = layout?.timeDisplayEnabled ?? false;
+    const selectionPanelEnabled = layout?.selectionPanelEnabled ?? false;
     const timeUnitSelectionEnabled = layout?.timeUnitSelectionEnabled ?? false;
     const dateLabelEnabled = layout?.dateLabelEnabled ?? false;
 
@@ -484,17 +490,17 @@ export const DateSlider = memo(
       >
         {/*
           Layout Architecture:
-          - DateSlider wrapper width = TimeDisplay + SliderContainer + TimeUnitSelection (flex layout)
+          - DateSlider wrapper width = SelectionPanel + SliderContainer + TimeUnitSelection (flex layout)
           - SliderContainer is the scrollable viewport (flex-1)
           - Track is the actual slider with scales, contained in SliderContainer
 
           Width Modes:
           1. 'fill' mode: Sets width: 100%, fills parent container. DateSlider wrapper width same as parent, SliderContainer width is flex-1, fill remaining width besides
-          TimeUnitSelection and TimeDisplay. 
+          TimeUnitSelection and SelectionPanel. 
           2. Specified width: Sets explicit width in pixels. DateSlider wrapper width is specified width, SliderContainer width is flex-1, fill remaining width besides
-          TimeUnitSelection and TimeDisplay. 
+          TimeUnitSelection and SelectionPanel. 
           3. Undefined: Uses flex sizing without width constraint. DateSlider wrapper width will fit content, largest to fill its parent div or screen. SliderContainer 
-          width is flex-1, fill remaining width besides TimeUnitSelection and TimeDisplay. 
+          width is flex-1, fill remaining width besides TimeUnitSelection and SelectionPanel. 
 
           Track Behavior:
           - Scrollable (default): Track width = calculated from scales, enables horizontal scroll if needed
@@ -502,14 +508,14 @@ export const DateSlider = memo(
         */}
 
         {/* Time display and date selection operation */}
-        {timeDisplayEnabled && (
-          <TimeDisplay
+        {selectionPanelEnabled && (
+          <SelectionPanel
             startDate={startDate}
             endDate={endDate}
             position={pointPosition}
             setDateTime={setDateTime}
-            renderTimeDisplay={renderProps?.renderTimeDisplay || customTimeDisplayRenderer}
-            dateFormat={dateFormat}
+            renderSelectionPanel={renderProps?.renderSelectionPanel || customSelectionPanelRenderer}
+            dateFormat={dataFormat}
             timeUnit={timeUnit}
             locale={locale}
           />
@@ -571,7 +577,7 @@ export const DateSlider = memo(
                   timeLabels={timeLabels}
                   withEndLabel={withEndLabel}
                   dateLabelDistanceOverHandle={dateLabelDistance}
-                  dateFormat={dateFormat}
+                  dateFormat={dataFormat}
                   locale={locale}
                 />
 
@@ -606,7 +612,7 @@ export const DateSlider = memo(
                   }
                   sliderContainerRef={sliderContainerRef}
                   dateLabelDistanceOverHandle={dateLabelDistance}
-                  dateFormat={dateFormat}
+                  dateFormat={dataFormat}
                   locale={locale}
                   sliderPositionX={sliderPosition.x}
                 />

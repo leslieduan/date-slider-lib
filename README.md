@@ -170,7 +170,7 @@ Enable optional UI components. Default renderers are provided.
   value={{ point: new Date() }}
   layout={{
     dateLabelEnabled: true,           // Show date labels on handles
-    timeDisplayEnabled: true,          // Show time display with navigation
+    selectionPanelEnabled: true,          // Show time display with navigation
     timeUnitSelectionEnabled: true,    // Show day/month/year selector
   }}
   // No renderProps needed - defaults are provided!
@@ -185,11 +185,11 @@ Enable optional UI components. Default renderers are provided.
   value={{ point: new Date() }}
   layout={{
     dateLabelEnabled: true,
-    timeDisplayEnabled: true,
+    selectionPanelEnabled: true,
   }}
   renderProps={{
     renderDateLabel: ({ label }) => <span className="...">{label}</span>,
-    renderTimeDisplay: ({ dateLabel, toNextDate, toPrevDate }) => (
+    renderSelectionPanel: ({ dateLabel, toNextDate, toPrevDate }) => (
       <div>
         <button onClick={toPrevDate}>←</button>
         <span>{dateLabel}</span>
@@ -354,7 +354,7 @@ type CombinedValue = { point: Date; start: Date; end: Date };
   dateLabelDistanceOverHandle?: number;
 
   // Component toggles (default: false)
-  timeDisplayEnabled?: boolean;
+  selectionPanelEnabled?: boolean;
   timeUnitSelectionEnabled?: boolean;
   dateLabelEnabled?: boolean;
 }

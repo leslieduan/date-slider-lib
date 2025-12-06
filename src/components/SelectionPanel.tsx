@@ -1,17 +1,17 @@
-import type { TimeDisplayProps } from '@/type';
+import type { SelectionPanelProps } from '@/type';
 import { getDateFromPercent, formatDate, addTime } from '@/utils';
 import { useMemo } from 'react';
 
-export const TimeDisplay = ({
+export const SelectionPanel = ({
   position,
   startDate,
   endDate,
   setDateTime,
-  renderTimeDisplay,
+  renderSelectionPanel,
   dateFormat,
   timeUnit,
   locale,
-}: TimeDisplayProps) => {
+}: SelectionPanelProps) => {
   const dateLabel = useMemo(() => {
     const date = getDateFromPercent(position, startDate, endDate);
     return formatDate(date, dateFormat, locale, 'label');
@@ -24,7 +24,7 @@ export const TimeDisplay = ({
     const newDate = addTime(currentDate, amount, timeUnit);
     setDateTime(newDate, 'point');
   };
-  return renderTimeDisplay({
+  return renderSelectionPanel({
     dateLabel,
     toNextDate: () => handleDateUpdate('forward'),
     toPrevDate: () => handleDateUpdate('backward'),
