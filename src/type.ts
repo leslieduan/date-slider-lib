@@ -292,6 +292,12 @@ export type LayoutConfig = {
   scaleUnitConfig?: ScaleUnitConfig;
   /** DateLabel distance over handle and track in pixels */
   dateLabelDistanceOverHandle?: number;
+  /** Whether render TimeDisplay Component*/
+  timeDisplayEnabled?: boolean;
+  /**  Whether render TimeUnitSelection component*/
+  timeUnitSelectionEnabled?: boolean;
+  /** Whether render Date label */
+  dateLabelEnabled?: boolean;
 };
 
 /**

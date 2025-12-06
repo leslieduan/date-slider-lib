@@ -48,6 +48,11 @@ import { RenderSliderHandle } from './SliderHandle';
 import { SliderTrack } from './SliderTrack';
 import { TimeDisplay } from './TimeDisplay';
 import { TimeUnitSelection } from './TimeUnitSelection';
+import {
+  customDateLabelRenderer,
+  customTimeDisplayRenderer,
+  customTimeUnitSelectionRenderer,
+} from './DateSlider.stories';
 
 export const DateSlider = memo(
   ({
@@ -104,6 +109,11 @@ export const DateSlider = memo(
     const trackPaddingX = layout?.trackPaddingX ?? LAYOUT.TRACK_PADDING_X;
     // if not scrollable, track is fixed with, which is 100% of slider container width.
     const isTrackFixedWidth = !scrollable;
+
+    const timeDisplayEnabled = layout?.timeDisplayEnabled ?? false;
+    const timeUnitSelectionEnabled = layout?.timeUnitSelectionEnabled ?? false;
+    const dateLabelEnabled = layout?.dateLabelEnabled ?? false;
+
     const withEndLabel = layout?.showEndLabel ?? true;
     const minGapScaleUnits = layout?.minGapScaleUnits ?? DEFAULTS.MIN_GAP_SCALE_UNITS;
     const scaleUnitConfig = layout?.scaleUnitConfig ?? DEFAULT_SCALE_CONFIG;
@@ -495,13 +505,13 @@ export const DateSlider = memo(
         */}
 
         {/* Time display and date selection operation */}
-        {renderProps?.renderTimeDisplay && (
+        {timeDisplayEnabled && (
           <TimeDisplay
             startDate={startDate}
             endDate={endDate}
             position={pointPosition}
             setDateTime={setDateTime}
-            renderTimeDisplay={renderProps?.renderTimeDisplay}
+            renderTimeDisplay={renderProps?.renderTimeDisplay || customTimeDisplayRenderer}
             dateFormat={dateFormat}
             timeUnit={timeUnit}
             locale={locale}
@@ -555,7 +565,11 @@ export const DateSlider = memo(
                   trackHoverDateLabelDisabled={trackHoverDateLabelDisabled}
                   trackHoverCursorLineDisabled={trackHoverCursorLineDisabled}
                   classNames={classNames}
-                  renderDateLabel={renderProps?.renderDateLabel}
+                  renderDateLabel={
+                    dateLabelEnabled
+                      ? renderProps?.renderDateLabel || customDateLabelRenderer
+                      : undefined
+                  }
                   trackWidth={trackWidth}
                   timeLabels={timeLabels}
                   withEndLabel={withEndLabel}
@@ -588,7 +602,11 @@ export const DateSlider = memo(
                   rangeHandleLabelPersistent={rangeHandleLabelPersistent}
                   rangeHandleLabelDisabled={rangeHandleLabelDisabled}
                   classNames={classNames}
-                  renderDateLabel={renderProps?.renderDateLabel}
+                  renderDateLabel={
+                    dateLabelEnabled
+                      ? renderProps?.renderDateLabel || customDateLabelRenderer
+                      : undefined
+                  }
                   sliderContainerRef={sliderContainerRef}
                   dateLabelDistanceOverHandle={dateLabelDistance}
                   dateFormat={dateFormat}
@@ -601,13 +619,15 @@ export const DateSlider = memo(
         </div>
 
         {/* toggle time unit */}
-        {renderProps?.renderTimeUnitSelection && (
+        {timeUnitSelectionEnabled && (
           <TimeUnitSelection
             isMonthValid={checkDateDuration(startDate, endDate).moreThanOneMonth}
             isYearValid={checkDateDuration(startDate, endDate).moreThanOneYear}
             onChange={handleTimeUnitChange}
             initialTimeUnit={initialTimeUnit}
-            renderTimeUnitSelection={renderProps.renderTimeUnitSelection}
+            renderTimeUnitSelection={
+              renderProps?.renderTimeUnitSelection || customTimeUnitSelectionRenderer
+            }
           />
         )}
       </div>

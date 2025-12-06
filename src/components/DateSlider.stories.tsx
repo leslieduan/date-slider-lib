@@ -148,7 +148,7 @@ const ControlButtons = memo(
 ControlButtons.displayName = 'ControlButtons';
 
 // Custom render prop examples
-const customDateLabelRenderer = ({ label }: DateLabelRenderProps) => {
+export const customDateLabelRenderer = ({ label }: DateLabelRenderProps) => {
   return (
     <span className="bg-blue-700 text-white text-xs px-3 py-1.5 rounded shadow-md font-semibold">
       {label}
@@ -156,7 +156,7 @@ const customDateLabelRenderer = ({ label }: DateLabelRenderProps) => {
   );
 };
 
-const customTimeDisplayRenderer = ({
+export const customTimeDisplayRenderer = ({
   toNextDate,
   toPrevDate,
   dateLabel,
@@ -182,7 +182,7 @@ const customTimeDisplayRenderer = ({
   );
 };
 
-const customTimeUnitSelectionRenderer = ({
+export const customTimeUnitSelectionRenderer = ({
   timeUnit,
   handleTimeUnitNextSelect,
   handleTimeUnitPreviousSelect,
