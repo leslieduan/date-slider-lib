@@ -133,7 +133,7 @@ export const PointMode: Story = {
     mode: 'point',
     value: { point: toUTCDate('2024-06-15') },
     min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
+    max: toUTCDate('2034-12-31'),
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 700,
@@ -462,6 +462,55 @@ export const LocaleSupport: Story = {
       handle: 'bg-rose-600 border-2 border-white shadow-lg',
       scaleMarkMajor: 'bg-rose-400',
       scaleLabel: 'text-rose-700 font-medium',
+    },
+  },
+};
+
+/**
+ * Large Date Range - Performance test with virtualization
+ *
+ * Demonstrates performance with a 10-year range (3,650+ days).
+ * Only visible scale marks and labels are rendered thanks to virtualization.
+ * Without virtualization: 3,650+ DOM elements
+ * With virtualization: ~150-200 DOM elements
+ * Try scrolling - smooth performance even with massive date range!
+ */
+export const LargeDateRange: Story = {
+  render: Template,
+  args: {
+    mode: 'range',
+    value: {
+      start: toUTCDate('2020-01-01'),
+      end: toUTCDate('2022-12-31'),
+    },
+    min: toUTCDate('2015-01-01'),
+    max: toUTCDate('2025-12-31'),
+    initialTimeUnit: 'month' as TimeUnit,
+    layout: {
+      width: 800,
+      height: 100,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      scrollable: true,
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+        if (day === 1 && month === 0) return 'YYYY';
+        if (day === 1) return 'MMM';
+        return 'DD';
+      },
+      label: () => 'DD MMM YYYY',
+    },
+    classNames: {
+      trackActive: 'bg-emerald-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-emerald-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-emerald-400',
+      scaleLabel: 'text-emerald-700 font-medium',
     },
   },
 };
