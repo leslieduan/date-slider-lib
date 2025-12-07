@@ -6,6 +6,12 @@ import type { SliderProps, SelectionResult, SliderExposedMethod, TimeUnit } from
 import { toUTCDate } from '@/utils';
 import { CircleIcon, MoveHorizontalIcon } from '@/icons';
 
+// Import dayjs locales for locale demo
+import 'dayjs/locale/fr';
+import 'dayjs/locale/de';
+import 'dayjs/locale/ja';
+import 'dayjs/locale/es';
+
 /**
  * DateSlider - A powerful, customizable date slider component
  *
@@ -144,9 +150,9 @@ export const PointMode: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'dd';
+        return day === 1 ? 'MMM' : 'DD';
       },
-      label: () => 'dd-MMM-yyyy',
+      label: () => 'DD-MMM-YYYY',
     },
   },
 };
@@ -306,9 +312,9 @@ export const YearNavigation: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'dd';
+        return day === 1 ? 'MMM' : 'DD';
       },
-      label: () => 'dd-MMM-yyyy',
+      label: () => 'DD-MMM-YYYY',
     },
   },
 };
@@ -339,6 +345,9 @@ export const CustomIcons: Story = {
       width: 800,
       height: 100,
       dateLabelEnabled: true,
+    },
+    behavior: {
+      handleLabelPersistent: true,
     },
     classNames: {
       trackActive: 'bg-gradient-to-r from-blue-400/20 to-red-400/20',
@@ -416,9 +425,97 @@ export const TimelineStyle: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'dd';
+        return day === 1 ? 'MMM' : 'DD';
       },
-      label: () => 'dd-MMM-yyyy',
+      label: () => 'DD-MMM-YYYY',
+    },
+  },
+};
+
+/**
+ * Flexible Date Formats - Demonstrates various date format separators
+ *
+ * Shows that date formats now support any separator (/, ., comma+space, etc.)
+ * The format string preserves whatever separator you use.
+ */
+export const FlexibleFormats: Story = {
+  render: Template,
+  args: {
+    mode: 'combined',
+    value: {
+      point: toUTCDate('2024-06-15'),
+      start: toUTCDate('2024-03-01'),
+      end: toUTCDate('2024-09-01'),
+    },
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'month' as TimeUnit,
+    layout: {
+      width: 700,
+      height: 90,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const day = date.getUTCDate();
+        // Scale uses slashes: "06/2024" or "15"
+        return day === 1 ? 'MM/YYYY' : 'DD';
+      },
+      // Handle labels use comma+space: "Jun 15, 2024"
+      label: () => 'MMM DD, YYYY',
+    },
+    classNames: {
+      trackActive: 'bg-indigo-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-indigo-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-indigo-400',
+      scaleLabel: 'text-indigo-700 font-medium',
+    },
+  },
+};
+
+/**
+ * Locale Support - French date formatting
+ *
+ * Demonstrates how to use different locales for date formatting.
+ * Month and day names will be displayed in French.
+ * Import the locale before using: `import 'dayjs/locale/fr'`
+ */
+export const LocaleSupport: Story = {
+  render: Template,
+  args: {
+    mode: 'point',
+    value: {
+      point: toUTCDate('2024-06-15'),
+    },
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'month' as TimeUnit,
+    locale: 'fr', // French locale
+    layout: {
+      width: 700,
+      height: 90,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const day = date.getUTCDate();
+        return day === 1 ? 'MMM YYYY' : 'DD'; // "juin 2024" or "15"
+      },
+      label: () => 'dddd, DD MMMM YYYY', // "samedi, 15 juin 2024"
+    },
+    classNames: {
+      trackActive: 'bg-rose-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-rose-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-rose-400',
+      scaleLabel: 'text-rose-700 font-medium',
     },
   },
 };

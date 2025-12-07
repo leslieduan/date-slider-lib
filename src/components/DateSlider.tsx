@@ -71,7 +71,7 @@ export const DateSlider = memo(
     behavior,
     layout,
     dateFormat,
-    locale = 'en-AU',
+    locale = 'en',
     imperativeRef: imperativeHandleRef,
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
@@ -260,9 +260,8 @@ export const DateSlider = memo(
 
     //TODO: 4. add tests.
     //TODO: 5. improve performance, avoid too many re-renders when dragging.
-    //TODO: investigate when scroll page, date lable will go with scroll, lost correct position.
-    //TODO: when click on track, all range handle and point date labels appear. it should only appear when correspoinding handle udpate.
     //TODO: snap to unit can be configured, along with steps.
+    //TODO: date format, now get date like 11 12 2025 23 11 59, this is not readable, should be readable like 11 12 2025 23:11:59 or 11 Dec ...
 
     useHandleVisible({
       pointHandleRef,
@@ -615,6 +614,7 @@ export const DateSlider = memo(
                   dateFormat={dataFormat}
                   locale={locale}
                   sliderPositionX={sliderPosition.x}
+                  trackWidth={trackWidth}
                 />
               </div>
             </div>

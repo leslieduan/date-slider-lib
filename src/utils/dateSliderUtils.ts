@@ -1,4 +1,8 @@
 import type { RefObject } from 'react';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 import type {
   DateFormat,
@@ -517,54 +521,28 @@ export const scaleDateFormatFn: DateFormatFn = (date: Date) => {
   const day = date.getUTCDate();
 
   if (month === 0 && day === 1) {
-    return 'yyyy';
+    return 'YYYY';
   }
 
   if (day === 1) {
     return 'MMM';
   }
 
-  return 'dd';
+  return 'DD';
 };
 
 export const labelDateFormatFn: DateFormatFn = () => {
-  return 'dd-MMM-yyyy';
+  return 'DD-MMM-YYYY';
 };
 
 export function formatDate(
   date: Date,
   format: Required<DateFormat>,
-  locale: string = 'en-AU',
+  locale: string = 'en',
   variant: 'scale' | 'label' = 'scale'
 ): string {
-  const year = date.getUTCFullYear();
-  const monthNum = date.getUTCMonth() + 1;
-  const day = date.getUTCDate();
-  const hour = date.getUTCHours();
-  const minutes = date.getUTCMinutes();
-
-  const pad = (n: number) => String(n).padStart(2, '0');
-
-  const monthShort = date.toLocaleString(locale, { month: 'short', timeZone: 'UTC' });
-  const monthLong = date.toLocaleString(locale, { month: 'long', timeZone: 'UTC' });
-
-  const map: Record<string, string> = {
-    yyyy: String(year),
-    mm: pad(monthNum),
-    dd: pad(day),
-    hh: pad(hour),
-    MM: pad(minutes),
-    MMM: monthShort,
-    MMMM: monthLong,
-  };
-
-  return (variant === 'scale' ? format.scale(date) : format.label(date))
-    .split('-')
-    .map((token) => {
-      const v = map[token];
-      return v ?? token;
-    })
-    .join(' ');
+  const pattern = variant === 'scale' ? format.scale(date) : format.label(date);
+  return dayjs.utc(date).locale(locale).format(pattern);
 }
 
 /**

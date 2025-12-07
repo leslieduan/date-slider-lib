@@ -26,6 +26,7 @@ export const SliderHandle = ({
   sliderContainerRef,
   dateLabelDistanceOverHandle,
   sliderPositionX,
+  trackWidth,
 }: SliderHandleProps) => {
   const { leftOut, rightOut } = handleOutsideVisibleArea({
     handleRef: ref,
@@ -59,7 +60,15 @@ export const SliderHandle = ({
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [ref, position, dateLabelDistanceOverHandle, sliderPositionX, isScrolling, updatePosition]);
+  }, [
+    ref,
+    position,
+    dateLabelDistanceOverHandle,
+    sliderPositionX,
+    trackWidth,
+    isScrolling,
+    updatePosition,
+  ]);
 
   // Get handle-specific className
   const handleSpecificClass =
@@ -144,6 +153,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     dateFormat,
     locale,
     sliderPositionX,
+    trackWidth,
   }) => {
     const commonProps = {
       onFocus: onHandleFocus,
@@ -209,6 +219,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               sliderContainerRef={sliderContainerRef}
               dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
               sliderPositionX={sliderPositionX}
+              trackWidth={trackWidth}
             />
             <SliderHandle
               viewMode={viewMode}
@@ -230,6 +241,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
               sliderContainerRef={sliderContainerRef}
               dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
               sliderPositionX={sliderPositionX}
+              trackWidth={trackWidth}
             />
           </>
         )}
@@ -255,6 +267,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
             sliderContainerRef={sliderContainerRef}
             dateLabelDistanceOverHandle={dateLabelDistanceOverHandle}
             sliderPositionX={sliderPositionX}
+            trackWidth={trackWidth}
           />
         )}
       </>
