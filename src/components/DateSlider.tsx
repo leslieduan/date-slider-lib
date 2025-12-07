@@ -260,7 +260,6 @@ export const DateSlider = memo(
     });
 
     //TODO: 4. add tests.
-    //TODO: 5. improve performance, avoid too many re-renders when dragging.
     //TODO: snap to unit can be configured, along with steps.
 
     // Only render scales that are visible in the viewport
