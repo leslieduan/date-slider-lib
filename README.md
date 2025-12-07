@@ -17,6 +17,38 @@ A powerful, fully customizable React date slider component with range, point, an
 - **Mobile-Optimized**: Auto-adapts with persistent labels on mobile
 - **Optional UI Components**: Time display, unit selector, and date labels with defaults
 - **Default Icons**: Built-in icons, customization optional
+- **High Performance**: Automatic virtualization for large date ranges
+
+## Performance
+
+DateSlider automatically optimizes rendering for large date ranges using **virtualization**. Only visible elements are rendered in the DOM, dramatically improving performance with no configuration required.
+
+**Performance Example**: A 10-year date range with daily granularity:
+- **Without virtualization**: ~7,300 DOM elements
+- **With virtualization**: ~200 DOM elements (97% reduction)
+
+**How it works**:
+- Virtualization activates automatically when `scrollable={true}` and the track width exceeds the viewport
+- Only scale marks and time labels in the visible area (plus a buffer zone) are rendered
+- As you scroll, elements smoothly appear and disappear
+- Completely transparent to users - no API changes or configuration needed
+
+**Example of a large date range**:
+```tsx
+<DateSlider
+  mode="range"
+  value={{
+    start: new Date('2020-01-01'),
+    end: new Date('2022-12-31'),
+  }}
+  min={new Date('2015-01-01')}
+  max={new Date('2025-12-31')}  // 10-year range
+  initialTimeUnit="day"
+  behavior={{ scrollable: true }}  // Virtualization activates automatically
+/>
+```
+
+**Note**: Non-scrollable sliders and small date ranges that fit in the viewport render all elements normally. Virtualization only activates when needed for performance.
 
 ## Installation
 
