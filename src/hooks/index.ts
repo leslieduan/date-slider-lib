@@ -12,3 +12,5 @@ export * from './useViewPortSize';
 export * from './useIsScrolling';
 export * from './useSliderConfig';
 export * from './useSliderDimensions';
+export * from './useScales';
+export * from './useSliderVirtualization';

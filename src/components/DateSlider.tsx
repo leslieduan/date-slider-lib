@@ -18,6 +18,8 @@ import {
   useViewportSize,
   useSliderConfig,
   useSliderDimesions,
+  useScales,
+  useSliderVirtualization,
 } from '@/hooks';
 import {
   checkDateDuration,
@@ -26,12 +28,8 @@ import {
   cn,
   createSelectionResult,
   debounce,
-  generateScalesWithInfo,
-  generateTimeLabelsWithPositions,
   generateTrackWidth,
   getPercentFromDate,
-  getTotalScales,
-  getTrackVisibleRange,
 } from '@/utils';
 import { LAYOUT, PERCENTAGE, TIMING, ACCESSIBILITY } from '@/constants';
 import type { SliderProps, TimeUnit, DragHandle, SelectionResult } from '@/type';
@@ -68,10 +66,12 @@ export const DateSlider = memo(
     const startDate = propStartDate;
     const endDate = propEndDate;
 
-    const totalScaleUnits = useMemo(
-      () => getTotalScales(startDate, endDate, timeUnit),
-      [startDate, endDate, timeUnit]
-    );
+    const { allScales, allTimeLabels, numberOfScales, totalScaleUnits } = useScales({
+      startDate,
+      endDate,
+      timeUnit,
+      scaleTypeResolver,
+    });
 
     const minGapPercent = useMemo(
       () => (1 / totalScaleUnits) * 100 * layout.minGapScaleUnits,
@@ -120,12 +120,6 @@ export const DateSlider = memo(
     const dimensions = useSliderDimesions(sliderContainerRef, trackContainerRef);
     const { sliderContainerWidth, trackContainerWidth } = dimensions;
 
-    const { scales: allScales, numberOfScales } = useMemo(
-      () =>
-        generateScalesWithInfo(startDate, endDate, timeUnit, totalScaleUnits, scaleTypeResolver),
-      [endDate, startDate, timeUnit, totalScaleUnits, scaleTypeResolver]
-    );
-
     const trackWidth = useMemo(() => {
       const safeGap =
         (sliderContainerWidth -
@@ -139,11 +133,6 @@ export const DateSlider = memo(
       };
       return generateTrackWidth(totalScaleUnits, numberOfScales, safeScaleUnitConfig);
     }, [numberOfScales, layout.scaleUnitConfig, sliderContainerWidth, totalScaleUnits]);
-
-    const allTimeLabels = useMemo(
-      () => generateTimeLabelsWithPositions(startDate, endDate, timeUnit),
-      [startDate, endDate, timeUnit]
-    );
 
     const dragBounds = useMemo(
       () => ({
@@ -173,42 +162,14 @@ export const DateSlider = memo(
       },
     });
 
-    //TODO: 4. add tests.
-    //TODO: snap to unit can be configured, along with steps.
-
-    // Only render scales that are visible in the viewport
-    const scales = useMemo(() => {
-      if (!behavior.scrollable || trackWidth <= sliderContainerWidth) {
-        return allScales;
-      }
-
-      const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
-        sliderPositionX: sliderPosition.x,
-        trackWidth,
-        sliderContainerWidth: sliderContainerWidth,
-      });
-
-      return allScales.filter(
-        (scale) => scale.position >= startWithBuffer && scale.position <= endWithBuffer
-      );
-    }, [allScales, behavior.scrollable, trackWidth, sliderContainerWidth, sliderPosition.x]);
-
-    // Only render time labels that are visible in the viewport
-    const timeLabels = useMemo(() => {
-      if (!behavior.scrollable || trackWidth <= sliderContainerWidth) {
-        return allTimeLabels;
-      }
-
-      const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
-        sliderPositionX: sliderPosition.x,
-        trackWidth,
-        sliderContainerWidth: sliderContainerWidth,
-      });
-
-      return allTimeLabels.filter(
-        (label) => label.position >= startWithBuffer && label.position <= endWithBuffer
-      );
-    }, [allTimeLabels, behavior.scrollable, trackWidth, sliderContainerWidth, sliderPosition.x]);
+    const { scales, timeLabels } = useSliderVirtualization({
+      behavior,
+      trackWidth,
+      sliderContainerWidth,
+      sliderPositionX: sliderPosition.x,
+      allScales,
+      allTimeLabels,
+    });
 
     useHandleAutoScrollToVisible({
       pointHandleRef,
