@@ -261,7 +261,6 @@ export const DateSlider = memo(
     //TODO: 4. add tests.
     //TODO: 5. improve performance, avoid too many re-renders when dragging.
     //TODO: snap to unit can be configured, along with steps.
-    //TODO: date format, now get date like 11 12 2025 23 11 59, this is not readable, should be readable like 11 12 2025 23:11:59 or 11 Dec ...
 
     useHandleVisible({
       pointHandleRef,

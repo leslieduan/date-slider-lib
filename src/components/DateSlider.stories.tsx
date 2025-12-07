@@ -280,46 +280,6 @@ export const WithUIComponents: Story = {
 };
 
 /**
- * Year Navigation - Long-term planning
- *
- * Demonstrates year-level navigation for historical data or long-term planning.
- * Shows custom date formatting to display years.
- */
-export const YearNavigation: Story = {
-  render: Template,
-  args: {
-    mode: 'range',
-    value: {
-      start: toUTCDate('2015-01-01'),
-      end: toUTCDate('2023-01-01'),
-    },
-    min: toUTCDate('2000-01-01'),
-    max: toUTCDate('2030-12-31'),
-    initialTimeUnit: 'year' as TimeUnit,
-    layout: {
-      width: 700,
-      height: 100,
-      dateLabelEnabled: true,
-      timeUnitSelectionEnabled: true,
-    },
-    behavior: {
-      handleLabelPersistent: true,
-    },
-    classNames: {
-      trackActive: 'bg-orange-500/30',
-      track: 'bg-gray-300',
-    },
-    dateFormat: {
-      scale: (date) => {
-        const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'DD';
-      },
-      label: () => 'DD-MMM-YYYY',
-    },
-  },
-};
-
-/**
  * Custom Icons - Personalized handles
  *
  * Shows how to provide custom icons for handles.
@@ -352,34 +312,6 @@ export const CustomIcons: Story = {
     classNames: {
       trackActive: 'bg-gradient-to-r from-blue-400/20 to-red-400/20',
       track: 'bg-gray-300',
-    },
-  },
-};
-
-/**
- * Fill Width - Responsive sizing
- *
- * Demonstrates using 'fill' width to adapt to parent container.
- * Useful for responsive layouts.
- */
-export const FillWidth: Story = {
-  render: Template,
-  args: {
-    mode: 'range',
-    value: {
-      start: toUTCDate('2024-03-01'),
-      end: toUTCDate('2024-09-01'),
-    },
-    min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'month' as TimeUnit,
-    layout: {
-      width: 'fill',
-      height: 90,
-      dateLabelEnabled: true,
-    },
-    behavior: {
-      rangeHandleLabelPersistent: true,
     },
   },
 };
@@ -461,10 +393,16 @@ export const FlexibleFormats: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        // Scale uses slashes: "06/2024" or "15"
-        return day === 1 ? 'MM/YYYY' : 'DD';
+        const month = date.getUTCMonth();
+
+        if (day === 1 && month === 0) {
+          return 'YYYY';
+        }
+        if (day === 1) {
+          return 'MMM';
+        }
+        return 'dd';
       },
-      // Handle labels use comma+space: "Jun 15, 2024"
       label: () => 'MMM DD, YYYY',
     },
     classNames: {
@@ -492,7 +430,7 @@ export const LocaleSupport: Story = {
       point: toUTCDate('2024-06-15'),
     },
     min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
+    max: toUTCDate('2025-01-15'),
     initialTimeUnit: 'month' as TimeUnit,
     locale: 'fr', // French locale
     layout: {
@@ -506,7 +444,15 @@ export const LocaleSupport: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM YYYY' : 'DD'; // "juin 2024" or "15"
+        const month = date.getUTCMonth();
+
+        if (day === 1 && month === 0) {
+          return 'YYYY';
+        }
+        if (day === 1) {
+          return 'MMM';
+        }
+        return 'dd';
       },
       label: () => 'dddd, DD MMMM YYYY', // "samedi, 15 juin 2024"
     },
