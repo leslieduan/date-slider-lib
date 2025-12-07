@@ -19,6 +19,7 @@ import {
   useRAFDFn,
   useResizeObserver,
   useViewportSize,
+  useSliderConfig,
 } from '@/hooks';
 import {
   checkDateDuration,
@@ -26,24 +27,15 @@ import {
   clampPercent,
   cn,
   createSelectionResult,
-  scaleDateFormatFn,
   debounce,
   generateScalesWithInfo,
   generateTimeLabelsWithPositions,
   generateTrackWidth,
   getPercentFromDate,
   getTotalScales,
-  labelDateFormatFn,
   getTrackVisibleRange,
 } from '@/utils';
-import {
-  LAYOUT,
-  DEFAULTS,
-  DEFAULT_SCALE_CONFIG,
-  PERCENTAGE,
-  TIMING,
-  ACCESSIBILITY,
-} from '@/constants';
+import { LAYOUT, PERCENTAGE, TIMING, ACCESSIBILITY } from '@/constants';
 import type { SliderProps, TimeUnit, DragHandle, SelectionResult, Dimension } from '@/type';
 import { RenderSliderHandle } from './SliderHandle';
 import { SliderTrack } from './SliderTrack';
@@ -54,100 +46,33 @@ import {
   customDateLabelRenderer,
   customTimeUnitSelectionRenderer,
 } from './defaultRender';
-import { CircleIcon, MoveHorizontalIcon } from '@/icons';
 
 export const DateSlider = memo(
   ({
-    // Core props
     mode: viewMode,
-    value,
     min: propStartDate,
     max: propEndDate,
     initialTimeUnit,
     onChange,
     renderProps,
-    // Grouped configs
     classNames,
-    icons,
-    behavior,
-    layout,
-    dateFormat,
-    locale = 'en',
-    scaleTypeResolver,
     imperativeRef: imperativeHandleRef,
+    ...restProps
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
 
-    // Extract icon config with defaults - safely handle discriminated union
-    const pointHandleIcon = icons && 'point' in icons ? icons.point : <CircleIcon />;
-    const rangeHandleIcon = icons && 'range' in icons ? icons.range : <MoveHorizontalIcon />;
+    const { locale, scaleTypeResolver, initialValues, icons, layout, behavior, dateFormat } =
+      useSliderConfig(restProps as SliderProps, isSmallScreen);
 
-    // Extract behavior config with defaults
-    const scrollable = behavior?.scrollable ?? true;
-    const freeSelectionOnTrackClick = behavior?.freeSelectionOnTrackClick ?? false;
-    const sliderAutoScrollToPointHandleVisibleEnabled =
-      behavior?.sliderAutoScrollToPointHandleVisibleEnabled ?? true;
-
-    const dataFormat = {
-      scale: dateFormat?.scale || scaleDateFormatFn,
-      label: dateFormat?.label || labelDateFormatFn,
-    };
-
-    // Handle label behavior - specific settings override general ones
-    const globalLabelPersistent = isSmallScreen || (behavior?.handleLabelPersistent ?? false);
-    const globalLabelDisabled = behavior?.handleLabelDisabled ?? false;
-
-    const pointHandleLabelPersistent =
-      behavior?.pointHandleLabelPersistent ?? globalLabelPersistent;
-    const pointHandleLabelDisabled = behavior?.pointHandleLabelDisabled ?? globalLabelDisabled;
-
-    const rangeHandleLabelPersistent =
-      behavior?.rangeHandleLabelPersistent ?? globalLabelPersistent;
-    const rangeHandleLabelDisabled = behavior?.rangeHandleLabelDisabled ?? globalLabelDisabled;
-
-    const trackHoverDateLabelDisabled = behavior?.trackHoverDateLabelDisabled ?? false;
-    const trackHoverCursorLineDisabled = behavior?.trackHoverCursorLineDisabled ?? false;
-
-    // Extract layout config with defaults
-    const sliderWidth = layout?.width;
-    const sliderHeight = layout?.height;
-    const trackPaddingX = layout?.trackPaddingX ?? LAYOUT.TRACK_PADDING_X;
-    // if not scrollable, track is fixed with, which is 100% of slider container width.
-    const isTrackFixedWidth = !scrollable;
-
-    const selectionPanelEnabled = layout?.selectionPanelEnabled ?? false;
-    const timeUnitSelectionEnabled = layout?.timeUnitSelectionEnabled ?? false;
-    const dateLabelEnabled = layout?.dateLabelEnabled ?? false;
-
-    const withEndLabel = layout?.showEndLabel ?? true;
-    const minGapScaleUnits = layout?.minGapScaleUnits ?? DEFAULTS.MIN_GAP_SCALE_UNITS;
-    const scaleUnitConfig = layout?.scaleUnitConfig ?? DEFAULT_SCALE_CONFIG;
-    const dateLabelDistance = layout?.dateLabelDistanceOverHandle ?? LAYOUT.DATE_LABEL_DISTANCE;
     const [dimensions, setDimensions] = useState<Dimension>({
       sliderContainerWidth: 0,
       trackContainerWidth: 0,
     });
     const [timeUnit, setTimeUnit] = useState<TimeUnit>(initialTimeUnit);
 
-    /**
-     * All prop dates are expected to be UTC Date objects
-     * No conversion needed - consumers use toUTCDate()  helpers
-     */
+    // all prop dates are expected to be UTC Date objects
     const startDate = propStartDate;
     const endDate = propEndDate;
-
-    // Extract initial values from the unified value prop (or use defaults based on mode)
-    const propInitialPoint =
-      value && 'point' in value ? value.point : viewMode === 'point' ? startDate : undefined;
-    const propInitialRange =
-      value && 'start' in value && 'end' in value
-        ? { start: value.start, end: value.end }
-        : viewMode === 'range' || viewMode === 'combined'
-          ? { start: startDate, end: endDate }
-          : undefined;
-
-    const initialPoint = propInitialPoint;
-    const initialRange = propInitialRange;
 
     const totalScaleUnits = useMemo(
       () => getTotalScales(startDate, endDate, timeUnit),
@@ -155,8 +80,8 @@ export const DateSlider = memo(
     );
 
     const minGapPercent = useMemo(
-      () => (1 / totalScaleUnits) * 100 * minGapScaleUnits,
-      [minGapScaleUnits, totalScaleUnits]
+      () => (1 / totalScaleUnits) * 100 * layout.minGapScaleUnits,
+      [layout.minGapScaleUnits, totalScaleUnits]
     );
 
     const {
@@ -169,7 +94,13 @@ export const DateSlider = memo(
       rangeStartRef,
       rangeEndRef,
       pointPositionRef,
-    } = usePositionState(initialRange, initialPoint, startDate, timeUnit, totalScaleUnits);
+    } = usePositionState(
+      initialValues.range,
+      initialValues.point,
+      startDate,
+      timeUnit,
+      totalScaleUnits
+    );
 
     const {
       requestHandleFocus,
@@ -205,16 +136,16 @@ export const DateSlider = memo(
     const trackWidth = useMemo(() => {
       const safeGap =
         (sliderContainerWidth -
-          (numberOfScales.long * scaleUnitConfig.width.long +
-            numberOfScales.medium * scaleUnitConfig.width.medium +
-            numberOfScales.short * scaleUnitConfig.width.short)) /
+          (numberOfScales.long * layout.scaleUnitConfig.width.long +
+            numberOfScales.medium * layout.scaleUnitConfig.width.medium +
+            numberOfScales.short * layout.scaleUnitConfig.width.short)) /
         totalScaleUnits;
       const safeScaleUnitConfig = {
-        ...scaleUnitConfig,
-        gap: Math.max(safeGap, scaleUnitConfig.gap ?? 0),
+        ...layout.scaleUnitConfig,
+        gap: Math.max(safeGap, layout.scaleUnitConfig.gap ?? 0),
       };
       return generateTrackWidth(totalScaleUnits, numberOfScales, safeScaleUnitConfig);
-    }, [numberOfScales, scaleUnitConfig, sliderContainerWidth, totalScaleUnits]);
+    }, [numberOfScales, layout.scaleUnitConfig, sliderContainerWidth, totalScaleUnits]);
 
     const allTimeLabels = useMemo(
       () => generateTimeLabelsWithPositions(startDate, endDate, timeUnit),
@@ -249,7 +180,7 @@ export const DateSlider = memo(
       isDragging: isSliderDragging,
       resetPosition,
     } = useDrag({
-      targetRef: scrollable ? trackContainerRef : undefined,
+      targetRef: behavior.scrollable ? trackContainerRef : undefined,
       initialPosition: { x: 0, y: 0 },
       constrainToAxis: 'x',
       bounds: dragBounds,
@@ -266,7 +197,7 @@ export const DateSlider = memo(
 
     // Only render scales that are visible in the viewport
     const scales = useMemo(() => {
-      if (!scrollable || trackWidth <= dimensions.sliderContainerWidth) {
+      if (!behavior.scrollable || trackWidth <= dimensions.sliderContainerWidth) {
         return allScales;
       }
 
@@ -279,11 +210,17 @@ export const DateSlider = memo(
       return allScales.filter(
         (scale) => scale.position >= startWithBuffer && scale.position <= endWithBuffer
       );
-    }, [allScales, scrollable, trackWidth, dimensions.sliderContainerWidth, sliderPosition.x]);
+    }, [
+      allScales,
+      behavior.scrollable,
+      trackWidth,
+      dimensions.sliderContainerWidth,
+      sliderPosition.x,
+    ]);
 
     // Only render time labels that are visible in the viewport
     const timeLabels = useMemo(() => {
-      if (!scrollable || trackWidth <= dimensions.sliderContainerWidth) {
+      if (!behavior.scrollable || trackWidth <= dimensions.sliderContainerWidth) {
         return allTimeLabels;
       }
 
@@ -296,7 +233,13 @@ export const DateSlider = memo(
       return allTimeLabels.filter(
         (label) => label.position >= startWithBuffer && label.position <= endWithBuffer
       );
-    }, [allTimeLabels, scrollable, trackWidth, dimensions.sliderContainerWidth, sliderPosition.x]);
+    }, [
+      allTimeLabels,
+      behavior.scrollable,
+      trackWidth,
+      dimensions.sliderContainerWidth,
+      sliderPosition.x,
+    ]);
 
     useHandleVisible({
       pointHandleRef,
@@ -308,11 +251,12 @@ export const DateSlider = memo(
       pointPosition,
       isSliderDragging,
       autoScrollToVisibleAreaRef,
-      sliderAutoScrollToPointHandleVisibleEnabled,
+      sliderAutoScrollToPointHandleVisibleEnabled:
+        behavior.sliderAutoScrollToPointHandleVisibleEnabled,
     });
 
     useInitialAutoScrollPosition({
-      scrollable,
+      scrollable: behavior.scrollable,
       dimensions,
       viewMode,
       pointPosition,
@@ -465,7 +409,7 @@ export const DateSlider = memo(
       handleDragStarted,
       isSliderDragging,
       totalScaleUnits,
-      freeSelectionOnTrackClick,
+      behavior.freeSelectionOnTrackClick,
       autoScrollToVisibleAreaRef
     );
 
@@ -507,15 +451,15 @@ export const DateSlider = memo(
       <div
         className={cn('flex', classNames?.wrapper)}
         style={
-          sliderWidth === 'fill'
+          layout.sliderWidth === 'fill'
             ? {
-                height: sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
+                height: layout.sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
                 width: '100%',
                 minWidth: LAYOUT.MIN_SLIDER_WIDTH,
               }
             : {
-                height: sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
-                width: sliderWidth,
+                height: layout.sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
+                width: layout.sliderWidth,
                 minWidth: LAYOUT.MIN_SLIDER_WIDTH,
               }
         }
@@ -542,14 +486,14 @@ export const DateSlider = memo(
         */}
 
         {/* Time display and date selection operation */}
-        {selectionPanelEnabled && (
+        {layout.selectionPanelEnabled && (
           <SelectionPanel
             startDate={startDate}
             endDate={endDate}
             position={pointPosition}
             setDateTime={setDateTime}
             renderSelectionPanel={renderProps?.renderSelectionPanel || customSelectionPanelRenderer}
-            dateFormat={dataFormat}
+            dateFormat={dateFormat}
             timeUnit={timeUnit}
             locale={locale}
           />
@@ -565,7 +509,7 @@ export const DateSlider = memo(
           <div
             // if track width is fixed, it will fill the width of slider container, it cannot be scrolled.
             style={
-              isTrackFixedWidth
+              layout.isTrackFixedWidth
                 ? { width: '100%', height: '100%' }
                 : { width: trackWidth, height: '100%' }
             }
@@ -574,8 +518,8 @@ export const DateSlider = memo(
           >
             <div
               style={{
-                paddingLeft: trackPaddingX,
-                paddingRight: trackPaddingX,
+                paddingLeft: layout.trackPaddingX,
+                paddingRight: layout.trackPaddingX,
                 height: '100%',
                 width: '100%',
               }}
@@ -590,7 +534,7 @@ export const DateSlider = memo(
                   onTrackClick={handleTrackClick}
                   onTrackTouch={handleTrackTouch}
                   scales={scales}
-                  scaleUnitConfig={scaleUnitConfig}
+                  scaleUnitConfig={layout.scaleUnitConfig}
                   trackRef={trackRef}
                   aria-label={ACCESSIBILITY.TRACK_ARIA_LABEL}
                   startDate={startDate}
@@ -599,19 +543,19 @@ export const DateSlider = memo(
                   startHandleRef={startHandleRef}
                   endHandleRef={endHandleRef}
                   pointHandleRef={pointHandleRef}
-                  trackHoverDateLabelDisabled={trackHoverDateLabelDisabled}
-                  trackHoverCursorLineDisabled={trackHoverCursorLineDisabled}
+                  trackHoverDateLabelDisabled={behavior.trackHoverDateLabelDisabled}
+                  trackHoverCursorLineDisabled={behavior.trackHoverCursorLineDisabled}
                   classNames={classNames}
                   renderDateLabel={
-                    dateLabelEnabled
+                    layout.dateLabelEnabled
                       ? renderProps?.renderDateLabel || customDateLabelRenderer
                       : undefined
                   }
                   trackWidth={trackWidth}
                   timeLabels={timeLabels}
-                  withEndLabel={withEndLabel}
-                  dateLabelDistanceOverHandle={dateLabelDistance}
-                  dateFormat={dataFormat}
+                  withEndLabel={layout.withEndLabel}
+                  dateLabelDistanceOverHandle={layout.dateLabelDistance}
+                  dateFormat={dateFormat}
                   locale={locale}
                 />
 
@@ -624,8 +568,8 @@ export const DateSlider = memo(
                   endDate={endDate}
                   timeUnit={timeUnit}
                   isDragging={isHandleDragging}
-                  rangeHandleIcon={rangeHandleIcon}
-                  pointHandleIcon={pointHandleIcon}
+                  rangeHandleIcon={icons.rangeHandleIcon}
+                  pointHandleIcon={icons.pointHandleIcon}
                   startHandleRef={startHandleRef}
                   endHandleRef={endHandleRef}
                   pointHandleRef={pointHandleRef}
@@ -634,19 +578,19 @@ export const DateSlider = memo(
                   onTouchStart={handleTouchStart}
                   onKeyDown={handleHandleKeyDown}
                   isSliderDragging={isSliderDragging}
-                  pointHandleLabelPersistent={pointHandleLabelPersistent}
-                  pointHandleLabelDisabled={pointHandleLabelDisabled}
-                  rangeHandleLabelPersistent={rangeHandleLabelPersistent}
-                  rangeHandleLabelDisabled={rangeHandleLabelDisabled}
+                  pointHandleLabelPersistent={behavior.pointHandleLabelPersistent}
+                  pointHandleLabelDisabled={behavior.pointHandleLabelDisabled}
+                  rangeHandleLabelPersistent={behavior.rangeHandleLabelPersistent}
+                  rangeHandleLabelDisabled={behavior.rangeHandleLabelDisabled}
                   classNames={classNames}
                   renderDateLabel={
-                    dateLabelEnabled
+                    layout.dateLabelEnabled
                       ? renderProps?.renderDateLabel || customDateLabelRenderer
                       : undefined
                   }
                   sliderContainerRef={sliderContainerRef}
-                  dateLabelDistanceOverHandle={dateLabelDistance}
-                  dateFormat={dataFormat}
+                  dateLabelDistanceOverHandle={layout.dateLabelDistance}
+                  dateFormat={dateFormat}
                   locale={locale}
                   sliderPositionX={sliderPosition.x}
                   trackWidth={trackWidth}
@@ -657,7 +601,7 @@ export const DateSlider = memo(
         </div>
 
         {/* toggle time unit */}
-        {timeUnitSelectionEnabled && (
+        {layout.timeUnitSelectionEnabled && (
           <TimeUnitSelection
             isMonthValid={checkDateDuration(startDate, endDate).moreThanOneMonth}
             isYearValid={checkDateDuration(startDate, endDate).moreThanOneYear}

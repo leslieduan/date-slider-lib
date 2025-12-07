@@ -11,3 +11,4 @@ export * from './useDateLabelPersist';
 export * from './useHandleVisible';
 export * from './useViewPortSize';
 export * from './useIsScrolling';
+export * from './useSliderConfig';
