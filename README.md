@@ -17,6 +17,38 @@ A powerful, fully customizable React date slider component with range, point, an
 - **Mobile-Optimized**: Auto-adapts with persistent labels on mobile
 - **Optional UI Components**: Time display, unit selector, and date labels with defaults
 - **Default Icons**: Built-in icons, customization optional
+- **High Performance**: Automatic virtualization for large date ranges
+
+## Performance
+
+DateSlider automatically optimizes rendering for large date ranges using **virtualization**. Only visible elements are rendered in the DOM, dramatically improving performance with no configuration required.
+
+**Performance Example**: A 10-year date range with daily granularity:
+- **Without virtualization**: ~7,300 DOM elements
+- **With virtualization**: ~200 DOM elements (97% reduction)
+
+**How it works**:
+- Virtualization activates automatically when `scrollable={true}` and the track width exceeds the viewport
+- Only scale marks and time labels in the visible area (plus a buffer zone) are rendered
+- As you scroll, elements smoothly appear and disappear
+- Completely transparent to users - no API changes or configuration needed
+
+**Example of a large date range**:
+```tsx
+<DateSlider
+  mode="range"
+  value={{
+    start: new Date('2020-01-01'),
+    end: new Date('2022-12-31'),
+  }}
+  min={new Date('2015-01-01')}
+  max={new Date('2025-12-31')}  // 10-year range
+  initialTimeUnit="day"
+  behavior={{ scrollable: true }}  // Virtualization activates automatically
+/>
+```
+
+**Note**: Non-scrollable sliders and small date ranges that fit in the viewport render all elements normally. Virtualization only activates when needed for performance.
 
 ## Installation
 
@@ -202,7 +234,7 @@ Enable optional UI components. Default renderers are provided.
 
 ### Date Formatting
 
-Customize date formats separately for scale marks and handle labels:
+Customize date formats using standard [dayjs format tokens](https://day.js.org/docs/en/display/format). Specify formats separately for scale marks and handle labels:
 
 ```tsx
 <DateSlider
@@ -211,28 +243,68 @@ Customize date formats separately for scale marks and handle labels:
   dateFormat={{
     scale: (date) => {
       const day = date.getUTCDate();
-      if (day === 1) return 'MMM';  // "Jun" on first day
-      return 'dd';                   // "15" on other days
+      if (day === 1) return 'MMM';      // "Jun" on first day
+      return 'DD';                       // "15" on other days
     },
-    label: (date) => 'dd-MMM-yyyy',  // "15-Jun-2024" on handle labels
+    label: (date) => 'DD-MMM-YYYY',      // "15-Jun-2024"
   }}
 />
 ```
 
-**Format tokens**: `yyyy`, `mm`, `dd`, `MMM`, `MMMM`, `hh`, `MM`
+**Common format tokens**: `YYYY`, `MM`, `DD`, `MMM`, `MMMM`, `HH`, `mm`, `ddd`, `dddd`
+
+**Full token list**: [dayjs format documentation](https://day.js.org/docs/en/display/format)
+
+**Separator examples**:
+```tsx
+dateFormat={{
+  scale: (date) => 'YYYY-MM-DD',   // "2024-06-15" (hyphens)
+  label: (date) => 'DD/MM/YYYY'    // "15/06/2024" (slashes)
+}}
+
+dateFormat={{
+  scale: (date) => 'MMM DD, YYYY', // "Jun 15, 2024" (comma + space)
+  label: (date) => 'YYYY.MM.DD'    // "2024.06.15" (dots)
+}}
+```
 
 You can specify `scale` only, `label` only, or both:
 
 ```tsx
 // Same format for both scale and labels
-dateFormat={{ scale: (date) => 'yyyy-mm-dd' }}
+dateFormat={{ scale: (date) => 'YYYY-MM-DD' }}
 
 // Different formats
 dateFormat={{
-  scale: (date) => 'dd',
-  label: (date) => 'dd-MMM-yyyy'
+  scale: (date) => 'DD',
+  label: (date) => 'DD-MMM-YYYY'
 }}
 ```
+
+### Locale Support
+
+Format dates in different languages using dayjs locales. Import the locale you need and pass the locale code:
+
+```tsx
+import 'dayjs/locale/fr';  // French
+import 'dayjs/locale/de';  // German
+import 'dayjs/locale/ja';  // Japanese
+import 'dayjs/locale/es';  // Spanish
+
+<DateSlider
+  mode="point"
+  value={{ point: new Date() }}
+  locale="fr"  // French locale
+  dateFormat={{
+    scale: (date) => 'DD MMM',
+    label: (date) => 'dddd, DD MMMM YYYY'  // "lundi, 15 juin 2024"
+  }}
+/>
+```
+
+**Available locales**: [dayjs locale list](https://github.com/iamkun/dayjs/tree/dev/src/locale)
+
+**Note**: Import locales at your app's entry point or before using the component. The default locale is `'en'` (English).
 
 ### Label Behavior
 
@@ -328,7 +400,7 @@ function App() {
 | `layout` | `object` | No | Size and layout configuration |
 | `renderProps` | `object` | No | Custom render functions (optional) |
 | `dateFormat` | `object` | No | Custom date format for scale and labels `{ scale?, label? }` |
-| `locale` | `string` | No | Date locale (default: 'en-AU') |
+| `locale` | `string` | No | Date locale for formatting (default: 'en') |
 | `imperativeRef` | `Ref` | No | Imperative API reference |
 
 ### Value Types

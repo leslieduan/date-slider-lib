@@ -34,6 +34,7 @@ import {
   getPercentFromDate,
   getTotalScales,
   labelDateFormatFn,
+  getTrackVisibleRange,
 } from '@/utils';
 import {
   LAYOUT,
@@ -71,7 +72,7 @@ export const DateSlider = memo(
     behavior,
     layout,
     dateFormat,
-    locale = 'en-AU',
+    locale = 'en',
     imperativeRef: imperativeHandleRef,
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
@@ -194,7 +195,7 @@ export const DateSlider = memo(
     const trackContainerRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
 
-    const { scales, numberOfScales } = useMemo(
+    const { scales: allScales, numberOfScales } = useMemo(
       () => generateScalesWithInfo(startDate, endDate, timeUnit, totalScaleUnits),
       [endDate, startDate, timeUnit, totalScaleUnits]
     );
@@ -213,7 +214,7 @@ export const DateSlider = memo(
       return generateTrackWidth(totalScaleUnits, numberOfScales, safeScaleUnitConfig);
     }, [numberOfScales, scaleUnitConfig, sliderContainerWidth, totalScaleUnits]);
 
-    const timeLabels = useMemo(
+    const allTimeLabels = useMemo(
       () => generateTimeLabelsWithPositions(startDate, endDate, timeUnit),
       [startDate, endDate, timeUnit]
     );
@@ -260,9 +261,41 @@ export const DateSlider = memo(
 
     //TODO: 4. add tests.
     //TODO: 5. improve performance, avoid too many re-renders when dragging.
-    //TODO: investigate when scroll page, date lable will go with scroll, lost correct position.
-    //TODO: when click on track, all range handle and point date labels appear. it should only appear when correspoinding handle udpate.
     //TODO: snap to unit can be configured, along with steps.
+
+    // Only render scales that are visible in the viewport
+    const scales = useMemo(() => {
+      if (!scrollable || trackWidth <= dimensions.sliderContainerWidth) {
+        return allScales;
+      }
+
+      const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
+        sliderPositionX: sliderPosition.x,
+        trackWidth,
+        sliderContainerWidth: dimensions.sliderContainerWidth,
+      });
+
+      return allScales.filter(
+        (scale) => scale.position >= startWithBuffer && scale.position <= endWithBuffer
+      );
+    }, [allScales, scrollable, trackWidth, dimensions.sliderContainerWidth, sliderPosition.x]);
+
+    // Only render time labels that are visible in the viewport
+    const timeLabels = useMemo(() => {
+      if (!scrollable || trackWidth <= dimensions.sliderContainerWidth) {
+        return allTimeLabels;
+      }
+
+      const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
+        sliderPositionX: sliderPosition.x,
+        trackWidth,
+        sliderContainerWidth: dimensions.sliderContainerWidth,
+      });
+
+      return allTimeLabels.filter(
+        (label) => label.position >= startWithBuffer && label.position <= endWithBuffer
+      );
+    }, [allTimeLabels, scrollable, trackWidth, dimensions.sliderContainerWidth, sliderPosition.x]);
 
     useHandleVisible({
       pointHandleRef,
@@ -615,6 +648,7 @@ export const DateSlider = memo(
                   dateFormat={dataFormat}
                   locale={locale}
                   sliderPositionX={sliderPosition.x}
+                  trackWidth={trackWidth}
                 />
               </div>
             </div>

@@ -26,74 +26,69 @@ export type TimeUnit = 'day' | 'month' | 'year';
 export type DragHandle = 'start' | 'end' | 'point' | null;
 
 /**
+ * Date format pattern using dayjs tokens with any separators.
+ * Uses standard dayjs formatting tokens. See: https://day.js.org/docs/en/display/format
+ *
+ * Common tokens:
+ * - 'YYYY': 4-digit year (e.g., "2024")
+ * - 'YY': 2-digit year (e.g., "24")
+ * - 'MM': 2-digit month (e.g., "06")
+ * - 'M': month without leading zero (e.g., "6")
+ * - 'DD': 2-digit day (e.g., "15")
+ * - 'D': day without leading zero (e.g., "15")
+ * - 'HH': 2-digit hour, 24-hour (e.g., "14")
+ * - 'H': hour without leading zero, 24-hour (e.g., "14")
+ * - 'hh': 2-digit hour, 12-hour (e.g., "02")
+ * - 'h': hour without leading zero, 12-hour (e.g., "2")
+ * - 'mm': 2-digit minutes (e.g., "30")
+ * - 'm': minutes without leading zero (e.g., "5")
+ * - 'ss': 2-digit seconds (e.g., "05")
+ * - 'MMM': short month name (e.g., "Jun")
+ * - 'MMMM': full month name (e.g., "June")
+ * - 'ddd': short day name (e.g., "Mon")
+ * - 'dddd': full day name (e.g., "Monday")
+ *
+ * Examples: 'YYYY-MM-DD', 'DD/MM/YYYY', 'MMM DD, YYYY', 'YYYY.MM.DD'
+ */
+type DatePattern = string;
+
+/**
  * Date format function type used with `formatDate()` utility
  *
- * A function that takes a Date and returns a format string template.
- * The template uses tokens like 'yyyy', 'mm', 'dd' which are replaced with actual values.
+ * A function that takes a Date and returns a dayjs format string.
+ * Uses standard dayjs tokens. Separators are preserved in the output.
+ * See: https://day.js.org/docs/en/display/format
  *
- * Format tokens:
- * - `yyyy`: 4-digit year (e.g., "2024")
- * - `mm`: 2-digit month number (e.g., "06")
- * - `dd`: 2-digit day (e.g., "15")
- * - `hh`: 2-digit hour (e.g., "14")
- * - `MM`: 2-digit minutes (e.g., "30")
+ * Common format tokens:
+ * - `YYYY`: 4-digit year (e.g., "2024")
+ * - `MM`: 2-digit month (e.g., "06")
+ * - `DD`: 2-digit day (e.g., "15")
+ * - `HH`: 2-digit hour, 24-hour (e.g., "14")
+ * - `mm`: 2-digit minutes (e.g., "30")
  * - `MMM`: Short month name (e.g., "Jun")
  * - `MMMM`: Full month name (e.g., "June")
  *
  * @example
- * // Simple static format
- * const simpleFormat: DateFormat = () => 'yyyy-mm-dd';
- * formatDate(new Date('2024-06-15'), simpleFormat); // → "2024 06 15"
+ * // Hyphens preserved
+ * const format1: DateFormatFn = () => 'YYYY-MM-DD';
+ * formatDate(new Date('2024-06-15'), format1); // → "2024-06-15"
+ *
+ * @example
+ * // Slashes and other separators
+ * const format2: DateFormatFn = () => 'DD/MM/YYYY';
+ * formatDate(new Date('2024-06-15'), format2); // → "15/06/2024"
  *
  * @example
  * // Dynamic format based on date
- * const adaptiveFormat: DateFormat = (date) => {
- *   return date.getUTCDate() === 1 ? 'mm-yyyy' : 'dd';
+ * const adaptiveFormat: DateFormatFn = (date) => {
+ *   return date.getUTCDate() === 1 ? 'MMM YYYY' : 'DD';
  * };
- * formatDate(new Date('2024-06-01'), adaptiveFormat); // → "06 2024"
+ * formatDate(new Date('2024-06-01'), adaptiveFormat); // → "Jun 2024"
  * formatDate(new Date('2024-06-15'), adaptiveFormat); // → "15"
  *
  * @see {@link dateFormatFn} - Built-in format for scale and date labels
  */
-export type DateFormatFn = (date: Date) => // Date only
-  | 'yyyy-mm-dd'
-  | 'dd-mm-yyyy'
-  | 'mm-dd-yyyy'
-  | 'yyyy-mm'
-  | 'mm-yyyy'
-  | 'dd-mm'
-  | 'mm-dd'
-  | 'yyyy'
-  | 'mm'
-  | 'dd'
-
-  // Time only
-  | 'hh'
-  | 'MM'
-  | 'hh-MM'
-
-  // Date + hour
-  | 'yyyy-mm-dd-hh'
-  | 'dd-mm-yyyy-hh'
-  | 'mm-dd-yyyy-hh'
-  | 'yyyy-mm-hh'
-  | 'mm-yyyy-hh'
-  | 'dd-mm-hh'
-  | 'mm-dd-hh'
-
-  // Date + hour + minutes
-  | 'yyyy-mm-dd-hh-MM'
-  | 'dd-mm-yyyy-hh-MM'
-  | 'mm-dd-yyyy-hh-MM'
-  | 'yyyy-mm-hh-MM'
-  | 'mm-yyyy-hh-MM'
-  | 'dd-mm-hh-MM'
-  | 'mm-dd-hh-MM'
-
-  // Month-name formats
-  | 'MMM'
-  | 'MMM-yyyy'
-  | 'dd-MMM-yyyy';
+export type DateFormatFn = (date: Date) => DatePattern;
 
 export type DateFormat = {
   scale?: DateFormatFn;
@@ -527,8 +522,39 @@ type CommonSliderProps = {
    */
   renderProps?: RenderPropsConfig;
 
+  /**
+   * Date format configuration for scale marks and handle labels.
+   * Uses dayjs format tokens. Supports separate formats for scale and labels.
+   * @see {@link https://day.js.org/docs/en/display/format dayjs format tokens}
+   * @example
+   * ```tsx
+   * <DateSlider
+   *   dateFormat={{
+   *     scale: (date) => date.getUTCDate() === 1 ? 'MMM YYYY' : 'DD',
+   *     label: () => 'DD-MMM-YYYY'
+   *   }}
+   * />
+   * ```
+   */
   dateFormat?: DateFormat;
 
+  /**
+   * Locale code for date formatting (month/day names).
+   * Requires importing the locale first: `import 'dayjs/locale/fr'`
+   * @default 'en'
+   * @see {@link https://github.com/iamkun/dayjs/tree/dev/src/locale Available locales}
+   * @example
+   * ```tsx
+   * import 'dayjs/locale/fr';
+   *
+   * <DateSlider
+   *   locale="fr"
+   *   dateFormat={{
+   *     label: () => 'dddd, DD MMMM YYYY' // "samedi, 15 juin 2024"
+   *   }}
+   * />
+   * ```
+   */
   locale?: string;
 
   /** Imperative API reference for external control */
@@ -686,6 +712,7 @@ export type SliderHandleProps = {
   sliderContainerRef: RefObject<HTMLDivElement | null>;
   dateLabelDistanceOverHandle: number;
   sliderPositionX: number;
+  trackWidth: number;
 };
 
 export type RenderSliderHandleProps = {
@@ -718,6 +745,7 @@ export type RenderSliderHandleProps = {
   dateFormat: Required<DateFormat>;
   locale: string;
   sliderPositionX: number;
+  trackWidth: number;
 };
 
 export type TimeUnitSelectionProps = {

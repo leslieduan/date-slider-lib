@@ -6,6 +6,12 @@ import type { SliderProps, SelectionResult, SliderExposedMethod, TimeUnit } from
 import { toUTCDate } from '@/utils';
 import { CircleIcon, MoveHorizontalIcon } from '@/icons';
 
+// Import dayjs locales for locale demo
+import 'dayjs/locale/fr';
+import 'dayjs/locale/de';
+import 'dayjs/locale/ja';
+import 'dayjs/locale/es';
+
 /**
  * DateSlider - A powerful, customizable date slider component
  *
@@ -144,9 +150,9 @@ export const PointMode: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'dd';
+        return day === 1 ? 'MMM' : 'DD';
       },
-      label: () => 'dd-MMM-yyyy',
+      label: () => 'DD-MMM-YYYY',
     },
   },
 };
@@ -274,46 +280,6 @@ export const WithUIComponents: Story = {
 };
 
 /**
- * Year Navigation - Long-term planning
- *
- * Demonstrates year-level navigation for historical data or long-term planning.
- * Shows custom date formatting to display years.
- */
-export const YearNavigation: Story = {
-  render: Template,
-  args: {
-    mode: 'range',
-    value: {
-      start: toUTCDate('2015-01-01'),
-      end: toUTCDate('2023-01-01'),
-    },
-    min: toUTCDate('2000-01-01'),
-    max: toUTCDate('2030-12-31'),
-    initialTimeUnit: 'year' as TimeUnit,
-    layout: {
-      width: 700,
-      height: 100,
-      dateLabelEnabled: true,
-      timeUnitSelectionEnabled: true,
-    },
-    behavior: {
-      handleLabelPersistent: true,
-    },
-    classNames: {
-      trackActive: 'bg-orange-500/30',
-      track: 'bg-gray-300',
-    },
-    dateFormat: {
-      scale: (date) => {
-        const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'dd';
-      },
-      label: () => 'dd-MMM-yyyy',
-    },
-  },
-};
-
-/**
  * Custom Icons - Personalized handles
  *
  * Shows how to provide custom icons for handles.
@@ -340,37 +306,12 @@ export const CustomIcons: Story = {
       height: 100,
       dateLabelEnabled: true,
     },
+    behavior: {
+      handleLabelPersistent: true,
+    },
     classNames: {
       trackActive: 'bg-gradient-to-r from-blue-400/20 to-red-400/20',
       track: 'bg-gray-300',
-    },
-  },
-};
-
-/**
- * Fill Width - Responsive sizing
- *
- * Demonstrates using 'fill' width to adapt to parent container.
- * Useful for responsive layouts.
- */
-export const FillWidth: Story = {
-  render: Template,
-  args: {
-    mode: 'range',
-    value: {
-      start: toUTCDate('2024-03-01'),
-      end: toUTCDate('2024-09-01'),
-    },
-    min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2024-12-31'),
-    initialTimeUnit: 'month' as TimeUnit,
-    layout: {
-      width: 'fill',
-      height: 90,
-      dateLabelEnabled: true,
-    },
-    behavior: {
-      rangeHandleLabelPersistent: true,
     },
   },
 };
@@ -416,9 +357,160 @@ export const TimelineStyle: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'dd';
+        return day === 1 ? 'MMM' : 'DD';
       },
-      label: () => 'dd-MMM-yyyy',
+      label: () => 'DD-MMM-YYYY',
+    },
+  },
+};
+
+/**
+ * Flexible Date Formats - Demonstrates various date format separators
+ *
+ * Shows that date formats now support any separator (/, ., comma+space, etc.)
+ * The format string preserves whatever separator you use.
+ */
+export const FlexibleFormats: Story = {
+  render: Template,
+  args: {
+    mode: 'combined',
+    value: {
+      point: toUTCDate('2024-06-15'),
+      start: toUTCDate('2024-03-01'),
+      end: toUTCDate('2024-09-01'),
+    },
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'month' as TimeUnit,
+    layout: {
+      width: 700,
+      height: 90,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+
+        if (day === 1 && month === 0) {
+          return 'YYYY';
+        }
+        if (day === 1) {
+          return 'MMM';
+        }
+        return 'dd';
+      },
+      label: () => 'MMM DD, YYYY',
+    },
+    classNames: {
+      trackActive: 'bg-indigo-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-indigo-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-indigo-400',
+      scaleLabel: 'text-indigo-700 font-medium',
+    },
+  },
+};
+
+/**
+ * Locale Support - French date formatting
+ *
+ * Demonstrates how to use different locales for date formatting.
+ * Month and day names will be displayed in French.
+ * Import the locale before using: `import 'dayjs/locale/fr'`
+ */
+export const LocaleSupport: Story = {
+  render: Template,
+  args: {
+    mode: 'point',
+    value: {
+      point: toUTCDate('2024-06-15'),
+    },
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2025-01-15'),
+    initialTimeUnit: 'month' as TimeUnit,
+    locale: 'fr', // French locale
+    layout: {
+      width: 700,
+      height: 90,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+
+        if (day === 1 && month === 0) {
+          return 'YYYY';
+        }
+        if (day === 1) {
+          return 'MMM';
+        }
+        return 'dd';
+      },
+      label: () => 'dddd, DD MMMM YYYY', // "samedi, 15 juin 2024"
+    },
+    classNames: {
+      trackActive: 'bg-rose-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-rose-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-rose-400',
+      scaleLabel: 'text-rose-700 font-medium',
+    },
+  },
+};
+
+/**
+ * Large Date Range - Performance test with virtualization
+ *
+ * Demonstrates performance with a 10-year range (3,650+ days).
+ * Only visible scale marks and labels are rendered thanks to virtualization.
+ * Without virtualization: 3,650+ DOM elements
+ * With virtualization: ~150-200 DOM elements
+ * Try scrolling - smooth performance even with massive date range!
+ */
+export const LargeDateRange: Story = {
+  render: Template,
+  args: {
+    mode: 'range',
+    value: {
+      start: toUTCDate('2020-01-01'),
+      end: toUTCDate('2022-12-31'),
+    },
+    min: toUTCDate('2015-01-01'),
+    max: toUTCDate('2025-12-31'),
+    initialTimeUnit: 'day' as TimeUnit,
+    layout: {
+      width: 800,
+      height: 100,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      scrollable: true,
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+        if (day === 1 && month === 0) return 'YYYY';
+        if (day === 1) return 'MMM';
+        return 'DD';
+      },
+      label: () => 'DD MMM YYYY',
+    },
+    classNames: {
+      trackActive: 'bg-emerald-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-emerald-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-emerald-400',
+      scaleLabel: 'text-emerald-700 font-medium',
     },
   },
 };
