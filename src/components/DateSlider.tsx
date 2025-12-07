@@ -12,12 +12,12 @@ import {
   useEventHandlers,
   useFocusManagement,
   useHandleDragState,
-  useHandleVisible,
+  useHandleAutoScrollToVisible,
   useInitialAutoScrollPosition,
   usePositionState,
   useViewportSize,
   useSliderConfig,
-  useDimesions,
+  useSliderDimesions,
 } from '@/hooks';
 import {
   checkDateDuration,
@@ -117,7 +117,7 @@ export const DateSlider = memo(
     const sliderContainerRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
 
-    const dimensions = useDimesions(sliderContainerRef, trackContainerRef);
+    const dimensions = useSliderDimesions(sliderContainerRef, trackContainerRef);
     const { sliderContainerWidth, trackContainerWidth } = dimensions;
 
     const { scales: allScales, numberOfScales } = useMemo(
@@ -210,7 +210,7 @@ export const DateSlider = memo(
       );
     }, [allTimeLabels, behavior.scrollable, trackWidth, sliderContainerWidth, sliderPosition.x]);
 
-    useHandleVisible({
+    useHandleAutoScrollToVisible({
       pointHandleRef,
       isHandleDragging,
       sliderContainerRef,

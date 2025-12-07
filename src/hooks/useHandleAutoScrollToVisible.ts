@@ -23,7 +23,7 @@ type UseHandleVisible = {
 /**
  * auto scroll slider to keep point handle in view when position changes via buttons or keyboard
  */
-export const useHandleVisible = ({
+export const useHandleAutoScrollToVisible = ({
   pointHandleRef,
   isHandleDragging,
   sliderContainerRef,

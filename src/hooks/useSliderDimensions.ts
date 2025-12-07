@@ -9,7 +9,7 @@ import { useResizeObserver } from './useResizeObserver';
  * @param trackContainerRef
  * @returns
  */
-export function useDimesions(
+export function useSliderDimesions(
   sliderContainerRef: RefObject<HTMLDivElement | null>,
   trackContainerRef: RefObject<HTMLDivElement | null>
 ) {
