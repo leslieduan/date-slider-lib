@@ -11,7 +11,8 @@ A powerful, fully customizable React date slider component with range, point, an
 ## Features
 
 - **3 Selection Modes**: Point, Range, and Combined
-- **Fully Customizable**: Style with Tailwind CSS classes
+- **4 Time Units**: Hour, Day, Month, and Year granularity
+- **Fully Customizable**: Style with Tailwind CSS classes and custom scale type resolvers
 - **TypeScript**: Complete type safety
 - **Accessible**: WCAG compliant with keyboard navigation
 - **Mobile-Optimized**: Auto-adapts with persistent labels on mobile
@@ -306,6 +307,104 @@ import 'dayjs/locale/es';  // Spanish
 
 **Note**: Import locales at your app's entry point or before using the component. The default locale is `'en'` (English).
 
+### Time Units
+
+DateSlider supports four time unit granularities for different use cases:
+
+#### Hour
+Perfect for detailed timeline views, event scheduling, or time tracking applications:
+
+```tsx
+<DateSlider
+  mode="point"
+  value={{ point: new Date('2024-12-07T12:00:00Z') }}
+  min={new Date('2024-12-07T00:00:00Z')}
+  max={new Date('2024-12-08T23:59:59Z')}
+  initialTimeUnit="hour"
+  dateFormat={{
+    scale: (date) => {
+      const hour = date.getUTCHours();
+      if (hour === 0) return 'DD HH:mm';  // Midnight: show date
+      return 'HH:mm';                      // Other hours: show time
+    },
+    label: () => 'DD MMM YYYY HH:mm'
+  }}
+/>
+```
+
+#### Day
+Standard daily granularity for most date selection use cases:
+
+```tsx
+<DateSlider
+  mode="range"
+  initialTimeUnit="day"
+  // ... other props
+/>
+```
+
+#### Month
+Monthly granularity for longer-term planning:
+
+```tsx
+<DateSlider
+  mode="range"
+  initialTimeUnit="month"
+  // ... other props
+/>
+```
+
+#### Year
+Yearly granularity for historical or long-term date ranges:
+
+```tsx
+<DateSlider
+  mode="range"
+  initialTimeUnit="year"
+  // ... other props
+/>
+```
+
+### Custom Scale Type Resolver
+
+Control the visual hierarchy of scale marks (short/medium/long) with a custom resolver function. This allows you to customize which dates get emphasized with different tick mark heights.
+
+**Default behavior** (when no custom resolver provided):
+- **Hour**: long=year start, medium=month start, short=each hour
+- **Day**: long=month start, medium=Monday, short=each day
+- **Month**: long=year start, medium=quarter start, short=each month
+- **Year**: long=decade start, medium=5-year mark, short=each year
+
+**Partial resolver example** - Only customize hour timeUnit, use defaults for others:
+
+```tsx
+<DateSlider
+  mode="point"
+  initialTimeUnit="hour"
+  scaleTypeResolver={(date, timeUnit) => {
+    // Only handle hour timeUnit
+    if (timeUnit === 'hour') {
+      const hour = date.getUTCHours();
+      if (hour % 6 === 0) return 'long';    // Every 6 hours
+      if (hour % 3 === 0) return 'medium';  // Every 3 hours
+      return 'short';                        // Other hours
+    }
+    // Return undefined to use default logic for day/month/year
+    return undefined;
+  }}
+/>
+```
+
+**The resolver function:**
+- **Receives**: `(date: Date, timeUnit: TimeUnit)`
+- **Returns**: `'long' | 'medium' | 'short' | undefined`
+  - `'long'`: Tallest tick marks (major divisions)
+  - `'medium'`: Medium tick marks (intermediate divisions)
+  - `'short'`: Shortest tick marks (minor divisions)
+  - `undefined`: Fall back to default logic for this timeUnit
+
+**Tip**: Return `undefined` for timeUnits you don't want to customize. This allows partial customization while using sensible defaults for the rest!
+
 ### Label Behavior
 
 ```tsx
@@ -393,7 +492,8 @@ function App() {
 | `onChange` | `(value) => void` | Yes | Selection change callback |
 | `min` | `Date` | No | Minimum date (UTC) |
 | `max` | `Date` | No | Maximum date (UTC) |
-| `initialTimeUnit` | `'day' \| 'month' \| 'year'` | No | Initial time unit |
+| `initialTimeUnit` | `'hour' \| 'day' \| 'month' \| 'year'` | No | Initial time unit |
+| `scaleTypeResolver` | `function` | No | Custom function to determine scale types |
 | `icons` | `object` | No | Custom icons (optional, defaults provided) |
 | `classNames` | `object` | No | Tailwind classes for styling |
 | `behavior` | `object` | No | Interaction behavior options |

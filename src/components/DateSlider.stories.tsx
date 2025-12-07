@@ -51,10 +51,10 @@ const meta: Meta<typeof DateSlider> = {
     },
     initialTimeUnit: {
       control: 'select',
-      options: ['day', 'month', 'year'],
+      options: ['hour', 'day', 'month', 'year'],
       description: 'Initial time unit for navigation',
       table: {
-        type: { summary: "'day' | 'month' | 'year'" },
+        type: { summary: "'hour' | 'day' | 'month' | 'year'" },
         defaultValue: { summary: 'day' },
       },
     },
@@ -511,6 +511,73 @@ export const LargeDateRange: Story = {
       handle: 'bg-emerald-600 border-2 border-white shadow-lg',
       scaleMarkMajor: 'bg-emerald-400',
       scaleLabel: 'text-emerald-700 font-medium',
+    },
+  },
+};
+
+/**
+ * ## Hourly Granularity with Partial Custom Resolver
+ *
+ * Demonstrates hourly time unit with a partial custom scale type resolver.
+ *
+ * **Key Features:**
+ * - Hour-based timeline (perfect for event scheduling, time tracking)
+ * - Partial custom resolver: Only handles 'hour', returns undefined for other units
+ * - When undefined is returned, falls back to default logic for day/month/year
+ * - Custom emphasis: Every 6 hours gets 'long' scale, every 3 hours gets 'medium'
+ *
+ * **Try this:** Use the initialTimeUnit control to switch between hour/day/month/year.
+ * The resolver gracefully falls back to defaults for non-hour units!
+ */
+export const HourlyWithCustomResolver: Story = {
+  render: Template,
+  args: {
+    mode: 'range',
+    value: {
+      start: toUTCDate('2024-12-07T08:00:00Z'),
+      end: toUTCDate('2024-12-07T16:00:00Z'),
+    },
+    min: toUTCDate('2024-12-07T00:00:00Z'),
+    max: toUTCDate('2024-12-08T23:59:59Z'),
+    initialTimeUnit: 'hour' as TimeUnit,
+    scaleTypeResolver: (date, timeUnit) => {
+      // Only customize hour timeUnit, return undefined for others to use defaults
+      if (timeUnit === 'hour') {
+        const hour = date.getUTCHours();
+        if (hour % 6 === 0) return 'long'; // Every 6 hours
+        if (hour % 3 === 0) return 'medium'; // Every 3 hours
+        return 'short'; // Other hours
+      }
+    },
+    layout: {
+      width: 800,
+      height: 120,
+      dateLabelEnabled: true,
+    },
+    behavior: {
+      scrollable: true,
+      handleLabelPersistent: true,
+    },
+    dateFormat: {
+      scale: (date) => {
+        const hour = date.getUTCHours();
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+        if (month === 0 && day === 1 && hour === 0) return 'YYYY';
+        if (hour === 0) return 'MMM DD';
+        if (hour % 6 === 0) return 'HH:mm';
+        return '';
+      },
+      label: () => 'DD MMM YYYY HH:mm',
+    },
+    classNames: {
+      trackActive: 'bg-purple-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-purple-600 border-2 border-white shadow-lg',
+      scaleMarkMajor: 'bg-purple-600',
+      scaleMarkMedium: 'bg-purple-400',
+      scaleMarkMinor: 'bg-purple-200',
+      scaleLabel: 'text-purple-700 font-semibold text-xs',
     },
   },
 };

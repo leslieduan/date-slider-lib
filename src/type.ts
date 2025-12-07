@@ -10,11 +10,12 @@ export type ViewMode = 'range' | 'point' | 'combined';
 
 /**
  * Time unit granularity for date navigation and display
+ * - `'hour'`: Hourly granularity
  * - `'day'`: Daily granularity
  * - `'month'`: Monthly granularity
  * - `'year'`: Yearly granularity
  */
-export type TimeUnit = 'day' | 'month' | 'year';
+export type TimeUnit = 'hour' | 'day' | 'month' | 'year';
 
 /**
  * Handle type identifier for drag operations
@@ -557,6 +558,30 @@ type CommonSliderProps = {
    */
   locale?: string;
 
+  /**
+   * Custom function to determine scale type (short/medium/long) for each date.
+   * Allows full control over visual hierarchy of scale marks.
+   * If not provided, uses sensible defaults based on timeUnit.
+   *
+   * @example
+   * ```tsx
+   * <DateSlider
+   *   initialTimeUnit="hour"
+   *   scaleTypeResolver={(date, timeUnit) => {
+   *     if (timeUnit === 'hour') {
+   *       const hour = date.getUTCHours();
+   *       const day = date.getUTCDate();
+   *       if (day === 1 && hour === 0) return 'long';   // Month start
+   *       if (hour === 0) return 'medium';               // Day start
+   *       return 'short';                                // Each hour
+   *     }
+   *     // ... handle other units
+   *   }}
+   * />
+   * ```
+   */
+  scaleTypeResolver?: ScaleTypeResolver;
+
   /** Imperative API reference for external control */
   imperativeRef?: React.Ref<SliderExposedMethod>;
 };
@@ -642,6 +667,29 @@ export type SliderProps = (PointModeSliderProps | RangeModeSliderProps | Combine
 export type ScaleType = 'short' | 'medium' | 'long';
 export type Scale = { position: number; type: ScaleType; date: Date };
 export type NumOfScales = { short: number; medium: number; long: number };
+
+/**
+ * Function type for determining scale type (short/medium/long) for a given date and time unit.
+ * Allows customization of how scale marks are visually categorized.
+ *
+ * @param date - The date to evaluate
+ * @param timeUnit - The current time unit context
+ * @returns The scale type for this date
+ *
+ * @example
+ * // Custom resolver for hour timeUnit
+ * const customResolver: ScaleTypeResolver = (date, timeUnit) => {
+ *   if (timeUnit === 'hour') {
+ *     const hour = date.getUTCHours();
+ *     const day = date.getUTCDate();
+ *     if (day === 1 && hour === 0) return 'long';   // Month boundaries
+ *     if (hour === 0) return 'medium';               // Day boundaries
+ *     return 'short';                                // Each hour
+ *   }
+ *   // ... handle other timeUnits
+ * };
+ */
+export type ScaleTypeResolver = (date: Date, timeUnit: TimeUnit) => ScaleType | undefined;
 
 type BaseSliderTrackProps = {
   onTrackClick: (e: React.MouseEvent) => void;

@@ -73,6 +73,7 @@ export const DateSlider = memo(
     layout,
     dateFormat,
     locale = 'en',
+    scaleTypeResolver,
     imperativeRef: imperativeHandleRef,
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
@@ -196,8 +197,9 @@ export const DateSlider = memo(
     const trackRef = useRef<HTMLDivElement>(null);
 
     const { scales: allScales, numberOfScales } = useMemo(
-      () => generateScalesWithInfo(startDate, endDate, timeUnit, totalScaleUnits),
-      [endDate, startDate, timeUnit, totalScaleUnits]
+      () =>
+        generateScalesWithInfo(startDate, endDate, timeUnit, totalScaleUnits, scaleTypeResolver),
+      [endDate, startDate, timeUnit, totalScaleUnits, scaleTypeResolver]
     );
 
     const trackWidth = useMemo(() => {
