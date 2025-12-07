@@ -150,7 +150,7 @@ export const PointMode: Story = {
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'DD';
+        return day === 1 ? 'MMM YYYY' : '';
       },
       label: () => 'DD-MMM-YYYY',
     },

@@ -542,7 +542,7 @@ export function formatDate(
   variant: 'scale' | 'label' = 'scale'
 ): string {
   const pattern = variant === 'scale' ? format.scale(date) : format.label(date);
-  return dayjs.utc(date).locale(locale).format(pattern);
+  return pattern ? dayjs.utc(date).locale(locale).format(pattern) : '';
 }
 
 /**
