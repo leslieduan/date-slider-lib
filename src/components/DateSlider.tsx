@@ -34,6 +34,7 @@ import {
   getPercentFromDate,
   getTotalScales,
   labelDateFormatFn,
+  getTrackVisibleRange,
 } from '@/utils';
 import {
   LAYOUT,
@@ -262,55 +263,35 @@ export const DateSlider = memo(
     //TODO: 5. improve performance, avoid too many re-renders when dragging.
     //TODO: snap to unit can be configured, along with steps.
 
-    // Virtualization: Only render scales that are visible in the viewport
-    // This improves performance dramatically for large date ranges
+    // Only render scales that are visible in the viewport
     const scales = useMemo(() => {
-      // If track is not scrollable or track fits in viewport, render all scales
       if (!scrollable || trackWidth <= dimensions.sliderContainerWidth) {
         return allScales;
       }
 
-      // Calculate visible range in pixels
-      const scrollLeft = Math.abs(sliderPosition.x);
-      const viewportWidth = dimensions.sliderContainerWidth;
+      const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
+        sliderPositionX: sliderPosition.x,
+        trackWidth,
+        sliderContainerWidth: dimensions.sliderContainerWidth,
+      });
 
-      // Convert pixel positions to percentages
-      // Scale positions are in percentage (0-100), we need to map pixel scroll to percentage
-      const visibleStartPercent = (scrollLeft / trackWidth) * 100;
-      const visibleEndPercent = ((scrollLeft + viewportWidth) / trackWidth) * 100;
-
-      // Add buffer zone (render 50% extra on each side to prevent pop-in during scroll)
-      const bufferPercent = ((viewportWidth * 0.5) / trackWidth) * 100;
-      const startWithBuffer = Math.max(0, visibleStartPercent - bufferPercent);
-      const endWithBuffer = Math.min(100, visibleEndPercent + bufferPercent);
-
-      // Filter scales within visible range
       return allScales.filter(
         (scale) => scale.position >= startWithBuffer && scale.position <= endWithBuffer
       );
     }, [allScales, scrollable, trackWidth, dimensions.sliderContainerWidth, sliderPosition.x]);
 
-    // Virtualization for time labels (same logic as scales)
+    // Only render time labels that are visible in the viewport
     const timeLabels = useMemo(() => {
-      // If track is not scrollable or track fits in viewport, render all labels
       if (!scrollable || trackWidth <= dimensions.sliderContainerWidth) {
         return allTimeLabels;
       }
 
-      // Calculate visible range in pixels
-      const scrollLeft = Math.abs(sliderPosition.x);
-      const viewportWidth = dimensions.sliderContainerWidth;
+      const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
+        sliderPositionX: sliderPosition.x,
+        trackWidth,
+        sliderContainerWidth: dimensions.sliderContainerWidth,
+      });
 
-      // Convert pixel positions to percentages
-      const visibleStartPercent = (scrollLeft / trackWidth) * 100;
-      const visibleEndPercent = ((scrollLeft + viewportWidth) / trackWidth) * 100;
-
-      // Add buffer zone (render 50% extra on each side)
-      const bufferPercent = ((viewportWidth * 0.5) / trackWidth) * 100;
-      const startWithBuffer = Math.max(0, visibleStartPercent - bufferPercent);
-      const endWithBuffer = Math.min(100, visibleEndPercent + bufferPercent);
-
-      // Filter time labels within visible range
       return allTimeLabels.filter(
         (label) => label.position >= startWithBuffer && label.position <= endWithBuffer
       );

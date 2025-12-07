@@ -622,3 +622,34 @@ export const handleOutsideVisibleArea = ({
     rightOut: distanceFromRightEdge < 0,
   };
 };
+
+/**
+ * Calculate the current start and end position of visible track with additional buffer in percentage,
+ * the result can be used to filter out invisible scales and time labels.
+ *
+ * @param sliderPositionX - the horizontal position track scrolled
+ * @param sliderContainerWidth - the width of visible track
+ * @param trackWidth - the width of full track
+ * @returns the current start and end position of visible track in percentage
+ */
+export const getTrackVisibleRange = ({
+  sliderPositionX,
+  sliderContainerWidth,
+  trackWidth,
+}: {
+  sliderPositionX: number;
+  sliderContainerWidth: number;
+  trackWidth: number;
+}) => {
+  const scrollLeft = Math.abs(sliderPositionX);
+  const viewportWidth = sliderContainerWidth;
+
+  const visibleStartPercent = (scrollLeft / trackWidth) * 100;
+  const visibleEndPercent = ((scrollLeft + viewportWidth) / trackWidth) * 100;
+
+  const bufferPercent = ((viewportWidth * 0.5) / trackWidth) * 100;
+  const startWithBuffer = Math.max(0, visibleStartPercent - bufferPercent);
+  const endWithBuffer = Math.min(100, visibleEndPercent + bufferPercent);
+
+  return { start: startWithBuffer, end: endWithBuffer };
+};

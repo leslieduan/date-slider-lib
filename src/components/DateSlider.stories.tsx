@@ -133,7 +133,7 @@ export const PointMode: Story = {
     mode: 'point',
     value: { point: toUTCDate('2024-06-15') },
     min: toUTCDate('2024-01-01'),
-    max: toUTCDate('2034-12-31'),
+    max: toUTCDate('2054-12-31'),
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 700,
