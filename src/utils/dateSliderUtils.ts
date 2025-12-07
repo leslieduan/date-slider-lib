@@ -10,6 +10,7 @@ import type {
   NumOfScales,
   Scale,
   ScaleType,
+  ScaleTypeResolver,
   ScaleUnitConfig,
   SelectionResult,
   TimeLabel,
@@ -54,6 +55,9 @@ export const generateNewDateByAddingScaleUnit = (
 ): Date => {
   const newDate = new Date(date);
   switch (unit) {
+    case 'hour':
+      newDate.setUTCHours(newDate.getUTCHours() + amount);
+      break;
     case 'day':
       newDate.setUTCDate(newDate.getUTCDate() + amount);
       break;
@@ -68,12 +72,16 @@ export const generateNewDateByAddingScaleUnit = (
 };
 
 /**
- * Calculate total number of scales for different combination of start date, end date and unit as 'day'|'month'|'year'.
+ * Calculate total number of scales for different combination of start date, end date and unit as 'hour'|'day'|'month'|'year'.
  *
  * @param start - Start date
  * @param end - End date
- * @param unit - Time unit ('day', 'month', or 'year')
+ * @param unit - Time unit ('hour', 'day', 'month', or 'year')
  * @returns Total number of scale units
+ *
+ * @example
+ * // For hours: 25 hours between start and end returns 25
+ * getTotalScales(new Date('2024-01-01T00:00:00Z'), new Date('2024-01-02T01:00:00Z'), 'hour') // 25
  *
  * @example
  * // For days: if there are 49 hours between start and end, returns Math.ceil(49/24) = 3
@@ -91,6 +99,8 @@ export const getTotalScales = (start: Date, end: Date, unit: TimeUnit): number =
   const msDiff = end.getTime() - start.getTime();
 
   switch (unit) {
+    case 'hour':
+      return Math.ceil(msDiff / (1000 * 60 * 60));
     case 'day':
       return Math.ceil(msDiff / (1000 * 60 * 60 * 24));
     case 'month': {
@@ -111,6 +121,7 @@ export const getTotalScales = (start: Date, end: Date, unit: TimeUnit): number =
  *
  * This function returns the most appropriate date to use for labels
  * at different zoom levels:
+ * - hour: returns the date normalized to the hour (minutes/seconds set to 0)
  * - day: returns the date normalized to midnight
  * - month: returns January 1st of the year
  * - year: returns January 1st of the decade
@@ -130,6 +141,10 @@ export const getTotalScales = (start: Date, end: Date, unit: TimeUnit): number =
  */
 export const getRepresentativeDate = (date: Date, unit: TimeUnit): Date => {
   switch (unit) {
+    case 'hour':
+      return new Date(
+        Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours())
+      );
     case 'day':
       return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
     case 'month':
@@ -169,22 +184,21 @@ export const generateTrackWidth = (
  *
  * Creates an array of scale objects representing tick marks on the slider.
  * Each scale tick points to the corresponding unit.
- * Scale types (short/medium/long) are determined by date significance:
- * - Day mode: long=1st of month, medium=Monday, short=other days
- * - Month mode: long=January, medium=quarter start, short=other months
- * - Year mode: long=decade start, medium=5-year mark, short=other years
+ * Scale types (short/medium/long) are determined by the scaleTypeResolver function.
  *
  * @param start - Start date of the range
  * @param end - End date of the range
  * @param unit - Time unit for scales
  * @param totalUnits - Total number of scale units
+ * @param scaleTypeResolver - Function to determine scale type for each date (defaults to defaultScaleTypeResolver)
  * @returns Object containing scales array and count by type
  */
 export const generateScalesWithInfo = (
   start: Date,
   end: Date,
   unit: TimeUnit,
-  totalUnits: number
+  totalUnits: number,
+  scaleTypeResolver?: ScaleTypeResolver
 ): { scales: Scale[]; numberOfScales: NumOfScales } => {
   const scales: Scale[] = [];
   const scaleCounts = { short: 0, medium: 0, long: 0 };
@@ -193,37 +207,23 @@ export const generateScalesWithInfo = (
   const endTime = end.getTime();
   const totalTimeSpan = endTime - startTime;
 
+  const resolverWithDefaultFallback = (...args: Parameters<ScaleTypeResolver>) => {
+    let type;
+    if (scaleTypeResolver) type = scaleTypeResolver(...args);
+    if (type) return type as ScaleType;
+    type = defaultScaleTypeResolver(...args);
+    return type as ScaleType;
+  };
+
   for (let i = 0; i < totalUnits; i++) {
-    //i <= totalUnits to i < totalUnits
     const current = generateNewDateByAddingScaleUnit(start, i, unit);
     if (current > end) break;
 
-    // Calculate position based on actual time elapsed
     const currentTime = current.getTime();
     const position = totalTimeSpan === 0 ? 0 : ((currentTime - startTime) / totalTimeSpan) * 100;
 
-    let type: ScaleType = 'short';
-    switch (unit) {
-      case 'day':
-        type = current.getUTCDate() === 1 ? 'long' : current.getUTCDay() === 1 ? 'medium' : 'short';
-        break;
-      case 'month':
-        type =
-          current.getUTCMonth() === 0
-            ? 'long'
-            : current.getUTCMonth() % 3 === 0
-              ? 'medium'
-              : 'short';
-        break;
-      case 'year':
-        type =
-          current.getUTCFullYear() % 10 === 0
-            ? 'long'
-            : current.getUTCFullYear() % 5 === 0
-              ? 'medium'
-              : 'short';
-        break;
-    }
+    // Use the resolver to determine scale type
+    const type = resolverWithDefaultFallback(current, unit);
 
     scaleCounts[type]++;
     scales.push({ date: current, position, type });
@@ -266,6 +266,17 @@ export const generateTimeLabelsWithPositions = (
   while (current <= end) {
     let labelDate: Date | undefined;
     switch (unit) {
+      case 'hour':
+        labelDate = new Date(
+          Date.UTC(
+            current.getUTCFullYear(),
+            current.getUTCMonth(),
+            current.getUTCDate(),
+            current.getUTCHours()
+          )
+        );
+        current.setUTCHours(current.getUTCHours() + 1);
+        break;
       case 'day':
         labelDate = new Date(
           Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), current.getUTCDate())
@@ -535,6 +546,64 @@ export const labelDateFormatFn: DateFormatFn = () => {
   return 'DD-MMM-YYYY';
 };
 
+/**
+ * Default scale type resolver function.
+ * Determines whether a date should be rendered as short/medium/long scale mark.
+ *
+ * Default logic:
+ * - hour: long=year start, medium=month start, short=each hour
+ * - day: long=month start, medium=Monday, short=each day
+ * - month: long=year start, medium=quarter start, short=each month
+ * - year: long=decade start, medium=5-year mark, short=each year
+ *
+ * @param date - The date to evaluate
+ * @param timeUnit - Current time unit context
+ * @returns Scale type for this date
+ */
+export const defaultScaleTypeResolver: ScaleTypeResolver = (
+  date: Date,
+  timeUnit: TimeUnit
+): ScaleType => {
+  switch (timeUnit) {
+    case 'hour': {
+      const hour = date.getUTCHours();
+      const day = date.getUTCDate();
+      const month = date.getUTCMonth();
+
+      // Year boundary: January 1st at 00:00
+      if (month === 0 && day === 1 && hour === 0) return 'long';
+      // Month boundary: 1st of month at 00:00
+      if (day === 1 && hour === 0) return 'medium';
+      // Each hour
+      return 'short';
+    }
+
+    case 'day':
+      // First day of month
+      if (date.getUTCDate() === 1) return 'long';
+      // Monday (week start)
+      if (date.getUTCDay() === 1) return 'medium';
+      // Each day
+      return 'short';
+
+    case 'month':
+      // January (year start)
+      if (date.getUTCMonth() === 0) return 'long';
+      // Quarter starts (Apr, Jul, Oct)
+      if (date.getUTCMonth() % 3 === 0) return 'medium';
+      // Each month
+      return 'short';
+
+    case 'year':
+      // Decade start (2020, 2030, etc.)
+      if (date.getUTCFullYear() % 10 === 0) return 'long';
+      // 5-year mark (2025, 2035, etc.)
+      if (date.getUTCFullYear() % 5 === 0) return 'medium';
+      // Each year
+      return 'short';
+  }
+};
+
 export function formatDate(
   date: Date,
   format: Required<DateFormat>,
@@ -542,7 +611,7 @@ export function formatDate(
   variant: 'scale' | 'label' = 'scale'
 ): string {
   const pattern = variant === 'scale' ? format.scale(date) : format.label(date);
-  return dayjs.utc(date).locale(locale).format(pattern);
+  return pattern ? dayjs.utc(date).locale(locale).format(pattern) : '';
 }
 
 /**
