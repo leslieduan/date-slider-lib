@@ -137,7 +137,7 @@ export const PointMode: Story = {
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 700,
-      height: 100,
+      height: 60,
       dateLabelEnabled: true,
     },
     classNames: {
@@ -176,7 +176,7 @@ export const RangeMode: Story = {
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 800,
-      height: 110,
+      height: 80,
       dateLabelEnabled: true,
       scaleUnitConfig: {
         gap: 80,
@@ -219,7 +219,7 @@ export const CombinedMode: Story = {
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 900,
-      height: 130,
+      height: 90,
       dateLabelEnabled: true,
       dateLabelDistanceOverHandle: 40,
     },
@@ -258,7 +258,7 @@ export const WithUIComponents: Story = {
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 850,
-      height: 130,
+      height: 80,
       dateLabelEnabled: true,
       selectionPanelEnabled: true,
       timeUnitSelectionEnabled: true,
@@ -303,7 +303,6 @@ export const CustomIcons: Story = {
     },
     layout: {
       width: 800,
-      height: 100,
       dateLabelEnabled: true,
     },
     behavior: {
@@ -334,7 +333,7 @@ export const TimelineStyle: Story = {
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 600,
-      height: 80,
+      height: 60,
       scaleUnitConfig: {
         gap: 150,
         width: { short: 0, medium: 0, long: 2 },
@@ -350,14 +349,14 @@ export const TimelineStyle: Story = {
       trackActive: 'bg-gradient-to-r from-blue-500 to-purple-500',
       track: 'bg-gray-200',
       trackInner: 'h-1 top-1/2 bg-red-400',
-      handle: 'shadow-xl top-1/2 -translate-y-1/2 bg-gradient-to-br from-blue-600 to-purple-600',
-      handlePoint: 'hover:scale-125 transition-transform border-2 border-white',
-      scaleLabel: 'text-gray-700 font-semibold -bottom-4',
+      handle: 'shadow-xl top-1/2 -translate-y-1/2 ',
+      handlePoint: 'hover:scale-125 transition-transform ',
+      scaleLabel: '-bottom-4',
     },
     dateFormat: {
       scale: (date) => {
         const day = date.getUTCDate();
-        return day === 1 ? 'MMM' : 'DD';
+        return day === 1 ? 'MMM YYYY' : 'DD MMM';
       },
       label: () => 'DD-MMM-YYYY',
     },
@@ -384,7 +383,6 @@ export const FlexibleFormats: Story = {
     initialTimeUnit: 'month' as TimeUnit,
     layout: {
       width: 700,
-      height: 90,
       dateLabelEnabled: true,
     },
     behavior: {
@@ -396,7 +394,7 @@ export const FlexibleFormats: Story = {
         const month = date.getUTCMonth();
 
         if (day === 1 && month === 0) {
-          return 'YYYY';
+          return 'MMM YY';
         }
         if (day === 1) {
           return 'MMM';
@@ -435,7 +433,7 @@ export const LocaleSupport: Story = {
     locale: 'fr', // French locale
     layout: {
       width: 700,
-      height: 90,
+      height: 60,
       dateLabelEnabled: true,
     },
     behavior: {
@@ -488,7 +486,7 @@ export const LargeDateRange: Story = {
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 800,
-      height: 100,
+      height: 80,
       dateLabelEnabled: true,
     },
     behavior: {
@@ -501,7 +499,7 @@ export const LargeDateRange: Story = {
         const month = date.getUTCMonth();
         if (day === 1 && month === 0) return 'YYYY';
         if (day === 1) return 'MMM';
-        return 'DD';
+        return '';
       },
       label: () => 'DD MMM YYYY',
     },
@@ -551,7 +549,7 @@ export const HourlyWithCustomResolver: Story = {
     },
     layout: {
       width: 800,
-      height: 120,
+      height: 60,
       dateLabelEnabled: true,
     },
     behavior: {
@@ -564,7 +562,7 @@ export const HourlyWithCustomResolver: Story = {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
         if (month === 0 && day === 1 && hour === 0) return 'YYYY';
-        if (hour === 0) return 'MMM DD';
+        if (hour === 0) return 'MMM DD HH:mm';
         if (hour % 6 === 0) return 'HH:mm';
         return '';
       },
