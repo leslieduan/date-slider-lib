@@ -9,17 +9,15 @@ import {
 } from 'react';
 import {
   useDrag,
-  useElementSize,
   useEventHandlers,
   useFocusManagement,
   useHandleDragState,
   useHandleVisible,
   useInitialAutoScrollPosition,
   usePositionState,
-  useRAFDFn,
-  useResizeObserver,
   useViewportSize,
   useSliderConfig,
+  useDimesions,
 } from '@/hooks';
 import {
   checkDateDuration,
@@ -36,7 +34,7 @@ import {
   getTrackVisibleRange,
 } from '@/utils';
 import { LAYOUT, PERCENTAGE, TIMING, ACCESSIBILITY } from '@/constants';
-import type { SliderProps, TimeUnit, DragHandle, SelectionResult, Dimension } from '@/type';
+import type { SliderProps, TimeUnit, DragHandle, SelectionResult } from '@/type';
 import { RenderSliderHandle } from './SliderHandle';
 import { SliderTrack } from './SliderTrack';
 import { SelectionPanel } from './SelectionPanel';
@@ -64,10 +62,6 @@ export const DateSlider = memo(
     const { locale, scaleTypeResolver, initialValues, icons, layout, behavior, dateFormat } =
       useSliderConfig(restProps as SliderProps, isSmallScreen);
 
-    const [dimensions, setDimensions] = useState<Dimension>({
-      sliderContainerWidth: 0,
-      trackContainerWidth: 0,
-    });
     const [timeUnit, setTimeUnit] = useState<TimeUnit>(initialTimeUnit);
 
     // all prop dates are expected to be UTC Date objects
@@ -119,13 +113,12 @@ export const DateSlider = memo(
       handleDragComplete,
     } = useHandleDragState();
 
-    const {
-      ref: sliderContainerRef,
-      size: { width: sliderContainerWidth },
-    } = useElementSize<HTMLDivElement>();
-
     const trackContainerRef = useRef<HTMLDivElement>(null);
+    const sliderContainerRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
+
+    const dimensions = useDimesions(sliderContainerRef, trackContainerRef);
+    const { sliderContainerWidth, trackContainerWidth } = dimensions;
 
     const { scales: allScales, numberOfScales } = useMemo(
       () =>
@@ -152,24 +145,12 @@ export const DateSlider = memo(
       [startDate, endDate, timeUnit]
     );
 
-    const updateDimensions = useCallback(() => {
-      if (sliderContainerRef?.current && trackContainerRef.current) {
-        const sliderContainerWidth = sliderContainerRef.current.getBoundingClientRect().width;
-        const trackContainerWidth = trackContainerRef.current.getBoundingClientRect().width;
-        setDimensions({ sliderContainerWidth, trackContainerWidth });
-      }
-    }, [sliderContainerRef]);
-
-    const scheduleUpdateDimensions = useRAFDFn(updateDimensions);
-
-    useResizeObserver(trackContainerRef || { current: null }, scheduleUpdateDimensions);
-
     const dragBounds = useMemo(
       () => ({
-        left: Math.min(0, dimensions.sliderContainerWidth - dimensions.trackContainerWidth),
+        left: Math.min(0, sliderContainerWidth - trackContainerWidth),
         right: 0,
       }),
-      [dimensions.sliderContainerWidth, dimensions.trackContainerWidth]
+      [sliderContainerWidth, trackContainerWidth]
     );
 
     const autoScrollToVisibleAreaRef = useRef(false);
@@ -197,49 +178,37 @@ export const DateSlider = memo(
 
     // Only render scales that are visible in the viewport
     const scales = useMemo(() => {
-      if (!behavior.scrollable || trackWidth <= dimensions.sliderContainerWidth) {
+      if (!behavior.scrollable || trackWidth <= sliderContainerWidth) {
         return allScales;
       }
 
       const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
         sliderPositionX: sliderPosition.x,
         trackWidth,
-        sliderContainerWidth: dimensions.sliderContainerWidth,
+        sliderContainerWidth: sliderContainerWidth,
       });
 
       return allScales.filter(
         (scale) => scale.position >= startWithBuffer && scale.position <= endWithBuffer
       );
-    }, [
-      allScales,
-      behavior.scrollable,
-      trackWidth,
-      dimensions.sliderContainerWidth,
-      sliderPosition.x,
-    ]);
+    }, [allScales, behavior.scrollable, trackWidth, sliderContainerWidth, sliderPosition.x]);
 
     // Only render time labels that are visible in the viewport
     const timeLabels = useMemo(() => {
-      if (!behavior.scrollable || trackWidth <= dimensions.sliderContainerWidth) {
+      if (!behavior.scrollable || trackWidth <= sliderContainerWidth) {
         return allTimeLabels;
       }
 
       const { start: startWithBuffer, end: endWithBuffer } = getTrackVisibleRange({
         sliderPositionX: sliderPosition.x,
         trackWidth,
-        sliderContainerWidth: dimensions.sliderContainerWidth,
+        sliderContainerWidth: sliderContainerWidth,
       });
 
       return allTimeLabels.filter(
         (label) => label.position >= startWithBuffer && label.position <= endWithBuffer
       );
-    }, [
-      allTimeLabels,
-      behavior.scrollable,
-      trackWidth,
-      dimensions.sliderContainerWidth,
-      sliderPosition.x,
-    ]);
+    }, [allTimeLabels, behavior.scrollable, trackWidth, sliderContainerWidth, sliderPosition.x]);
 
     useHandleVisible({
       pointHandleRef,

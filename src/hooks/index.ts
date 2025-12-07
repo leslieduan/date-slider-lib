@@ -1,5 +1,4 @@
 export * from './useDrag';
-export * from './useElementSize';
 export * from './useRAFDFn';
 export * from './useResizeObserver';
 export * from './useDragState';
@@ -12,3 +11,4 @@ export * from './useHandleVisible';
 export * from './useViewPortSize';
 export * from './useIsScrolling';
 export * from './useSliderConfig';
+export * from './useDimensions';
