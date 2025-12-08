@@ -266,6 +266,10 @@ export const WithUIComponents: Story = {
       handleLabelPersistent: true,
       scrollable: true,
       sliderAutoScrollToPointHandleVisibleEnabled: true,
+      step: {
+        amount: 14,
+        unit: 'day',
+      },
     },
     classNames: {
       trackActive: 'bg-indigo-400/30',

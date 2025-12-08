@@ -161,6 +161,10 @@ export type ScaleUnitConfig = {
  * // Set a specific date
  * sliderRef.current?.setDateTime(new Date('2024-06-15'), 'point');
  *
+ * // Move by configured step
+ * sliderRef.current?.moveByStep('forward', 'point');
+ * sliderRef.current?.moveByStep('backward'); // Uses default target based on viewMode
+ *
  * // Focus a handle
  * sliderRef.current?.focusHandle('point');
  * ```
@@ -172,6 +176,13 @@ export type SliderExposedMethod = {
    * @param target - Which handle to update ('start', 'end', 'point'). Defaults to the current active handle.
    */
   setDateTime: (date: Date, target?: DragHandle) => void;
+
+  /**
+   * Move the handle by the configured step amount
+   * @param direction - 'forward' or 'backward'
+   * @param target - Which handle to move ('start', 'end', 'point'). Defaults based on viewMode.
+   */
+  moveByStep: (direction: 'forward' | 'backward', target?: DragHandle) => void;
 
   /**
    * Programmatically focus a specific handle
@@ -246,6 +257,11 @@ export type IconsConfig = {
   rangeEnd?: ReactNode;
 };
 
+export type Step = {
+  amount: number;
+  unit: TimeUnit;
+};
+
 /**
  * Behavior configuration for slider interactions
  */
@@ -256,6 +272,8 @@ export type BehaviorConfig = {
   freeSelectionOnTrackClick?: boolean;
   /**Keep point handle always visible, slider will auto scroll into point handle visible area */
   sliderAutoScrollToPointHandleVisibleEnabled?: boolean;
+
+  step?: Step;
 
   /** Keep handle date label visible persistently (applies to all handles if specific ones not set) */
   handleLabelPersistent?: boolean;
@@ -807,10 +825,9 @@ export type SelectionPanelProps = {
   position: number;
   startDate: Date;
   endDate: Date;
-  setDateTime: (date: Date, target?: DragHandle) => void;
+  moveByStep: (direction: 'forward' | 'backward', target?: DragHandle) => void;
   renderSelectionPanel: (props: SelectionPanelRenderProps) => ReactNode;
   dateFormat: Required<DateFormat>;
-  timeUnit: TimeUnit;
   locale: string;
 };
 

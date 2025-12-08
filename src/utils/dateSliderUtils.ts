@@ -439,7 +439,7 @@ export function addTime(
   amount: number,
   unit: 'day' | 'month' | 'year' | 'hour' | 'minute'
 ): Date {
-  const result = new Date(date);
+  const result = new Date(date.getTime());
 
   switch (unit) {
     case 'minute':

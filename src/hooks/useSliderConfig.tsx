@@ -64,6 +64,7 @@ export function useSliderConfig(props: SliderProps, isSmallScreen: boolean) {
     const trackHoverCursorLineDisabled = behavior?.trackHoverCursorLineDisabled ?? false;
 
     return {
+      ...behavior,
       scrollable,
       freeSelectionOnTrackClick,
       sliderAutoScrollToPointHandleVisibleEnabled,
