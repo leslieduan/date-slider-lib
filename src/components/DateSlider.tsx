@@ -29,6 +29,10 @@ import {
   customTimeUnitSelectionRenderer,
 } from './defaultRender';
 
+//TODO: 2. testing.
+//TODO: 3. beautify stories.
+//TODO: 4. snap to unit.
+
 export const DateSlider = memo(
   ({
     mode: viewMode,
@@ -38,7 +42,7 @@ export const DateSlider = memo(
     onChange,
     renderProps,
     classNames,
-    imperativeRef: imperativeHandleRef,
+    imperativeRef,
     ...restProps
   }: SliderProps) => {
     const { isSmallScreen } = useViewportSize();
@@ -69,7 +73,7 @@ export const DateSlider = memo(
       pointPosition,
       setRangeStartPosition,
       setRangeEndPosition,
-      setPointPosition,
+      setPointPosition, //this is the one that actually select date time.
       rangeStartRef,
       rangeEndRef,
       pointPositionRef,
@@ -190,7 +194,7 @@ export const DateSlider = memo(
       [resetPosition]
     );
 
-    const { setDateTime, updateHandlePosition } = useHandlePosition({
+    const { setDateTime, moveByStep, updateHandlePosition } = useHandlePosition({
       minGapPercent,
       startDate,
       endDate,
@@ -200,16 +204,20 @@ export const DateSlider = memo(
       setPointPosition,
       rangeStartRef,
       rangeEndRef,
+      pointPositionRef,
       autoScrollToVisibleAreaRef,
+      step: behavior.step,
+      timeUnit,
     });
 
     useImperativeHandle(
-      imperativeHandleRef,
+      imperativeRef,
       () => ({
         setDateTime,
+        moveByStep,
         focusHandle: (handleType: DragHandle) => requestHandleFocus(handleType, 'keyboard'),
       }),
-      [setDateTime, requestHandleFocus]
+      [setDateTime, moveByStep, requestHandleFocus]
     );
 
     const {
@@ -223,7 +231,12 @@ export const DateSlider = memo(
       timeUnit,
       viewMode,
       positions: { rangeStartRef, rangeEndRef, pointPositionRef },
-      handlers: { updateHandlePosition, requestHandleFocus, handleDragComplete },
+      handlers: {
+        updateHandlePosition,
+        moveByStep: moveByStep,
+        requestHandleFocus,
+        handleDragComplete,
+      },
       dragState: {
         isDragging: isHandleDragging,
         handleDragStarted,
@@ -235,7 +248,10 @@ export const DateSlider = memo(
         setLastInteractionType,
       },
       refs: { trackRef, sliderRef: trackContainerRef, autoScrollToVisibleAreaRef },
-      config: { totalScaleUnits, freeSelectionOnTrackClick: behavior.freeSelectionOnTrackClick },
+      config: {
+        totalScaleUnits,
+        freeSelectionOnTrackClick: behavior.freeSelectionOnTrackClick,
+      },
     });
 
     useOnChangeNotifier({
@@ -255,11 +271,11 @@ export const DateSlider = memo(
             startDate={startDate}
             endDate={endDate}
             position={pointPosition}
-            setDateTime={setDateTime}
+            moveByStep={moveByStep}
             renderSelectionPanel={renderProps?.renderSelectionPanel || customSelectionPanelRenderer}
             dateFormat={dateFormat}
-            timeUnit={timeUnit}
             locale={locale}
+            timeUnit={timeUnit}
           />
         )}
 
@@ -320,6 +336,7 @@ export const DateSlider = memo(
                   dateLabelDistanceOverHandle={layout.dateLabelDistance}
                   dateFormat={dateFormat}
                   locale={locale}
+                  timeUnit={timeUnit}
                 />
 
                 <RenderSliderHandle

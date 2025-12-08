@@ -89,7 +89,7 @@ type DatePattern = string;
  *
  * @see {@link dateFormatFn} - Built-in format for scale and date labels
  */
-export type DateFormatFn = (date: Date) => DatePattern;
+export type DateFormatFn = ({ date, unit }: { date: Date; unit?: TimeUnit }) => DatePattern;
 
 export type DateFormat = {
   scale?: DateFormatFn;
@@ -161,6 +161,10 @@ export type ScaleUnitConfig = {
  * // Set a specific date
  * sliderRef.current?.setDateTime(new Date('2024-06-15'), 'point');
  *
+ * // Move by configured step
+ * sliderRef.current?.moveByStep('forward', 'point');
+ * sliderRef.current?.moveByStep('backward'); // Uses default target based on viewMode
+ *
  * // Focus a handle
  * sliderRef.current?.focusHandle('point');
  * ```
@@ -172,6 +176,13 @@ export type SliderExposedMethod = {
    * @param target - Which handle to update ('start', 'end', 'point'). Defaults to the current active handle.
    */
   setDateTime: (date: Date, target?: DragHandle) => void;
+
+  /**
+   * Move the handle by the configured step amount
+   * @param direction - 'forward' or 'backward'
+   * @param target - Which handle to move ('start', 'end', 'point'). Defaults based on viewMode.
+   */
+  moveByStep: (direction: 'forward' | 'backward', target?: DragHandle) => void;
 
   /**
    * Programmatically focus a specific handle
@@ -246,6 +257,39 @@ export type IconsConfig = {
   rangeEnd?: ReactNode;
 };
 
+export type Step = {
+  amount: number;
+  unit: TimeUnit;
+};
+
+/**
+ * Context provided to step callback function
+ */
+export type StepFnContext = {
+  /** Current date at the handle position */
+  date: Date;
+  /** Current time unit (zoom level) */
+  unit: TimeUnit;
+  /** Which handle is being moved */
+  handle: DragHandle;
+};
+
+/**
+ * Function type for dynamic step calculation
+ * Allows step amount/unit to vary based on context
+ *
+ * @example
+ * ```tsx
+ * // Adaptive step based on timeUnit
+ * step={({ unit, date, handle }) => {
+ *   if (unit === 'hour') return { amount: 6, unit: 'hour' };
+ *   if (unit === 'day') return { amount: 7, unit: 'day' };
+ *   return { amount: 1, unit };
+ * }}
+ * ```
+ */
+export type StepFn = (context: StepFnContext) => Step;
+
 /**
  * Behavior configuration for slider interactions
  */
@@ -256,6 +300,26 @@ export type BehaviorConfig = {
   freeSelectionOnTrackClick?: boolean;
   /**Keep point handle always visible, slider will auto scroll into point handle visible area */
   sliderAutoScrollToPointHandleVisibleEnabled?: boolean;
+
+  /**
+   * Step configuration for navigation (keyboard arrows, SelectionPanel buttons, moveByStep API)
+   * Can be a static Step object or a function that returns a Step based on context
+   *
+   * @example Static step
+   * ```tsx
+   * step={{ amount: 7, unit: 'day' }}  // Always move 7 days
+   * ```
+   *
+   * @example Dynamic step
+   * ```tsx
+   * step={({ timeUnit }) => {
+   *   if (timeUnit === 'hour') return { amount: 6, unit: 'hour' };
+   *   if (timeUnit === 'day') return { amount: 7, unit: 'day' };
+   *   return { amount: 1, unit: timeUnit };
+   * }}
+   * ```
+   */
+  step?: Step | StepFn;
 
   /** Keep handle date label visible persistently (applies to all handles if specific ones not set) */
   handleLabelPersistent?: boolean;
@@ -713,6 +777,7 @@ type BaseSliderTrackProps = {
   dateLabelDistanceOverHandle: number;
   dateFormat: Required<DateFormat>;
   locale: string;
+  timeUnit: TimeUnit;
 };
 
 type PointModeProps = {
@@ -807,11 +872,11 @@ export type SelectionPanelProps = {
   position: number;
   startDate: Date;
   endDate: Date;
-  setDateTime: (date: Date, target?: DragHandle) => void;
+  moveByStep: (direction: 'forward' | 'backward', target?: DragHandle) => void;
   renderSelectionPanel: (props: SelectionPanelRenderProps) => ReactNode;
   dateFormat: Required<DateFormat>;
-  timeUnit: TimeUnit;
   locale: string;
+  timeUnit: TimeUnit;
 };
 
 export type ScalesUnitLabelsProps = {
@@ -822,6 +887,7 @@ export type ScalesUnitLabelsProps = {
   classNames?: DateSliderClassNames;
   dateFormat: Required<DateFormat>;
   locale: string;
+  timeUnit: TimeUnit;
 };
 
 export type DateLabelProps = {

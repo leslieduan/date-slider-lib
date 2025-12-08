@@ -5,7 +5,6 @@ import {
   getPercentageFromMouseEvent,
   clampToLowerBound,
   getAllScalesPercentage,
-  snapToClosestStep,
 } from '@/utils';
 import { useCallback, useEffect } from 'react';
 
@@ -28,6 +27,7 @@ interface UseEventHandlersParams {
   // Handler callbacks
   handlers: {
     updateHandlePosition: (handle: DragHandle, percentage: number) => void;
+    moveByStep: (direction: 'forward' | 'backward', target?: DragHandle) => void;
     requestHandleFocus: (handleType: DragHandle, interactionType?: 'mouse' | 'keyboard') => void;
     handleDragComplete: () => void;
   };
@@ -86,7 +86,7 @@ export function useEventHandlers({
 }: UseEventHandlersParams) {
   const { startDate, endDate } = dates;
   const { rangeStartRef, rangeEndRef, pointPositionRef } = positions;
-  const { updateHandlePosition, requestHandleFocus, handleDragComplete } = handlers;
+  const { updateHandlePosition, moveByStep, requestHandleFocus, handleDragComplete } = handlers;
   const { isDragging, handleDragStarted, isContainerDragging } = dragState;
   const { setIsDragging, setDragStarted, setLastInteractionType } = setters;
   const { trackRef, sliderRef, autoScrollToVisibleAreaRef } = refs;
@@ -227,67 +227,36 @@ export function useEventHandlers({
 
   const handleHandleKeyDown = useCallback(
     (handle: DragHandle) => (e: React.KeyboardEvent) => {
-      const step = (1 / totalScaleUnits) * 100;
-      let newPercentage: number | undefined;
-
-      const scaleUnitsPercentags = getAllScalesPercentage(
-        startDate,
-        endDate,
-        timeUnit,
-        totalScaleUnits
-      );
-
-      const currentPosition =
-        handle === 'start'
-          ? rangeStartRef.current
-          : handle === 'end'
-            ? rangeEndRef.current
-            : pointPositionRef.current;
-
       switch (e.key) {
         case 'ArrowLeft':
         case 'ArrowDown':
           e.preventDefault();
-          newPercentage = freeSelectionOnTrackClick
-            ? currentPosition - step
-            : snapToClosestStep(currentPosition - step, scaleUnitsPercentags);
+          setLastInteractionType('keyboard');
+          moveByStep('backward', handle);
           break;
         case 'ArrowRight':
         case 'ArrowUp':
           e.preventDefault();
-          newPercentage = freeSelectionOnTrackClick
-            ? currentPosition + step
-            : snapToClosestStep(currentPosition + step, scaleUnitsPercentags);
+          setLastInteractionType('keyboard');
+          moveByStep('forward', handle);
           break;
-        case 'Home':
+        case 'Home': {
           e.preventDefault();
-          newPercentage = 0;
+          setLastInteractionType('keyboard');
+          updateHandlePosition(handle, 0);
+          autoScrollToVisibleAreaRef.current = true;
           break;
-        case 'End':
+        }
+        case 'End': {
           e.preventDefault();
-          newPercentage = PERCENTAGE.MAX;
+          setLastInteractionType('keyboard');
+          updateHandlePosition(handle, PERCENTAGE.MAX);
+          autoScrollToVisibleAreaRef.current = true;
           break;
-      }
-
-      if (newPercentage !== undefined) {
-        setLastInteractionType('keyboard');
-        updateHandlePosition(handle, newPercentage);
-        autoScrollToVisibleAreaRef.current = true;
+        }
       }
     },
-    [
-      totalScaleUnits,
-      startDate,
-      endDate,
-      timeUnit,
-      rangeStartRef,
-      rangeEndRef,
-      pointPositionRef,
-      freeSelectionOnTrackClick,
-      setLastInteractionType,
-      updateHandlePosition,
-      autoScrollToVisibleAreaRef,
-    ]
+    [setLastInteractionType, moveByStep, updateHandlePosition, autoScrollToVisibleAreaRef]
   );
 
   // Set up global event listeners for mouse and touch events
