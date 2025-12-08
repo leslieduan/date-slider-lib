@@ -29,7 +29,6 @@ import {
   customTimeUnitSelectionRenderer,
 } from './defaultRender';
 
-//TODO: 1. step, when to next date in selectionpanel, enable user to config the date range move to. Currently, by one date unit as current time unit.
 //TODO: 2. testing.
 //TODO: 3. beautify stories.
 //TODO: 4. snap to unit.

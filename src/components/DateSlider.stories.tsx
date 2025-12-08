@@ -320,8 +320,6 @@ export const CustomIcons: Story = {
 /**
  * Timeline Style - Minimal scale marks for timeline displays
  *
- * Demonstrates a timeline-style configuration with minimal scale marks,
- * custom positioning, and optimized for clean timeline interfaces.
  */
 export const TimelineStyle: Story = {
   render: Template,
@@ -335,7 +333,7 @@ export const TimelineStyle: Story = {
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 600,
-      height: 60,
+      height: 80,
       scaleUnitConfig: {
         gap: 150,
         width: { short: 0, medium: 0, long: 2 },
@@ -351,9 +349,9 @@ export const TimelineStyle: Story = {
       trackActive: 'bg-gradient-to-r from-blue-500 to-purple-500',
       track: 'bg-gray-200',
       trackInner: 'h-1 top-1/2 bg-red-400',
-      handle: 'top-1/2 -translate-y-1/2 ',
-      handlePoint: 'hover:scale-125 transition-transform ',
-      scaleLabel: '-bottom-4',
+      handle: 'shadow-xl top-1/2 -translate-y-1/2 bg-gradient-to-br from-blue-600 to-purple-600',
+      handlePoint: 'hover:scale-125 transition-transform border-2 border-white',
+      scaleLabel: 'text-gray-700 font-semibold -bottom-4',
     },
     dateFormat: {
       scale: ({ date }) => {
