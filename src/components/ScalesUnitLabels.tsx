@@ -11,6 +11,7 @@ export const ScalesUnitLabels = memo(
     classNames,
     dateFormat,
     locale,
+    timeUnit,
   }: ScalesUnitLabelsProps) => {
     const getVisibleScaleLabels = useCallback((): TimeLabel[] => {
       if (!scales.length || !scales.length) return [];
@@ -49,7 +50,13 @@ export const ScalesUnitLabels = memo(
             style={{ left: `${position}%` }}
             aria-hidden="true"
           >
-            {formatDate(date, dateFormat, locale, 'scale').toUpperCase()}
+            {formatDate({
+              date,
+              format: dateFormat,
+              locale,
+              variant: 'scale',
+              timeUnit,
+            }).toUpperCase()}
           </span>
         ))}
       </>

@@ -147,7 +147,7 @@ export const PointMode: Story = {
       scaleLabel: 'text-green-800 font-medium',
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         return day === 1 ? 'MMM YYYY' : '';
       },
@@ -356,7 +356,7 @@ export const TimelineStyle: Story = {
       scaleLabel: '-bottom-4',
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         return day === 1 ? 'MMM YYYY' : 'DD MMM';
       },
@@ -391,7 +391,7 @@ export const FlexibleFormats: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
 
@@ -442,7 +442,7 @@ export const LocaleSupport: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
 
@@ -496,7 +496,7 @@ export const LargeDateRange: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
         if (day === 1 && month === 0) return 'YYYY';
@@ -559,7 +559,7 @@ export const HourlyWithCustomResolver: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const hour = date.getUTCHours();
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
@@ -604,6 +604,23 @@ export const DynamicStep: Story = {
       dateLabelEnabled: true,
       selectionPanelEnabled: true,
       timeUnitSelectionEnabled: true,
+    },
+    dateFormat: {
+      scale: ({ date, unit }) => {
+        const hour = date.getUTCHours();
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+        if (month === 0 && day === 1 && hour === 0) return 'YYYY';
+        if (day === 1 && hour === 0) return 'MMM ';
+        if (hour === 0 && unit !== 'hour') return 'DD';
+        if (hour === 0 && unit === 'hour') return 'dd';
+        if (hour % 3 === 0) return 'HH:mm';
+        return '';
+      },
+      label: ({ unit }) => {
+        if (unit === 'hour') return 'DD MMM YYYY HH:mm';
+        return 'DD MMM YYYY ';
+      },
     },
     behavior: {
       scrollable: true,

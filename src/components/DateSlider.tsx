@@ -276,6 +276,7 @@ export const DateSlider = memo(
             renderSelectionPanel={renderProps?.renderSelectionPanel || customSelectionPanelRenderer}
             dateFormat={dateFormat}
             locale={locale}
+            timeUnit={timeUnit}
           />
         )}
 
@@ -336,6 +337,7 @@ export const DateSlider = memo(
                   dateLabelDistanceOverHandle={layout.dateLabelDistance}
                   dateFormat={dateFormat}
                   locale={locale}
+                  timeUnit={timeUnit}
                 />
 
                 <RenderSliderHandle

@@ -10,11 +10,12 @@ export const SelectionPanel = ({
   renderSelectionPanel,
   dateFormat,
   locale,
+  timeUnit,
 }: SelectionPanelProps) => {
   const dateLabel = useMemo(() => {
     const date = getDateFromPercent(position, startDate, endDate);
-    return formatDate(date, dateFormat, locale, 'label');
-  }, [position, startDate, endDate, dateFormat, locale]);
+    return formatDate({ date, format: dateFormat, locale, variant: 'label', timeUnit });
+  }, [position, startDate, endDate, dateFormat, locale, timeUnit]);
 
   return renderSelectionPanel({
     dateLabel,

@@ -462,7 +462,7 @@ export function addTime(
   return result;
 }
 
-export const scaleDateFormatFn: DateFormatFn = (date: Date) => {
+export const scaleDateFormatFn: DateFormatFn = ({ date }) => {
   const month = date.getUTCMonth();
   const day = date.getUTCDate();
 
@@ -539,13 +539,23 @@ export const defaultScaleTypeResolver: ScaleTypeResolver = (
   }
 };
 
-export function formatDate(
-  date: Date,
-  format: Required<DateFormat>,
-  locale: string = 'en',
-  variant: 'scale' | 'label' = 'scale'
-): string {
-  const pattern = variant === 'scale' ? format.scale(date) : format.label(date);
+export function formatDate({
+  date,
+  format,
+  locale = 'en',
+  variant = 'scale',
+  timeUnit,
+}: {
+  date: Date;
+  format: Required<DateFormat>;
+  locale: string;
+  variant: 'scale' | 'label';
+  timeUnit: TimeUnit;
+}): string {
+  const pattern =
+    variant === 'scale'
+      ? format.scale({ date, unit: timeUnit })
+      : format.label({ date, unit: timeUnit });
   return pattern ? dayjs.utc(date).locale(locale).format(pattern) : '';
 }
 

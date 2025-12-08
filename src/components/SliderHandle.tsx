@@ -154,6 +154,7 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
     locale,
     sliderPositionX,
     trackWidth,
+    timeUnit,
   }) => {
     const commonProps = {
       onFocus: onHandleFocus,
@@ -164,35 +165,38 @@ export const RenderSliderHandle = memo<RenderSliderHandleProps>(
 
     const startLabel = useMemo(
       () =>
-        formatDate(
-          getDateFromPercent(rangeStartPosition, startDate, endDate),
-          dateFormat,
+        formatDate({
+          date: getDateFromPercent(rangeStartPosition, startDate, endDate),
+          format: dateFormat,
           locale,
-          'label'
-        ),
-      [rangeStartPosition, startDate, endDate, dateFormat, locale]
+          variant: 'label',
+          timeUnit,
+        }),
+      [rangeStartPosition, startDate, endDate, dateFormat, locale, timeUnit]
     );
 
     const endLabel = useMemo(
       () =>
-        formatDate(
-          getDateFromPercent(rangeEndPosition, startDate, endDate),
-          dateFormat,
+        formatDate({
+          date: getDateFromPercent(rangeEndPosition, startDate, endDate),
+          format: dateFormat,
           locale,
-          'label'
-        ),
-      [rangeEndPosition, startDate, endDate, dateFormat, locale]
+          variant: 'label',
+          timeUnit,
+        }),
+      [rangeEndPosition, startDate, endDate, dateFormat, locale, timeUnit]
     );
 
     const pointLabel = useMemo(
       () =>
-        formatDate(
-          getDateFromPercent(pointPosition, startDate, endDate),
-          dateFormat,
+        formatDate({
+          date: getDateFromPercent(pointPosition, startDate, endDate),
+          format: dateFormat,
           locale,
-          'label'
-        ),
-      [pointPosition, startDate, endDate, dateFormat, locale]
+          variant: 'label',
+          timeUnit,
+        }),
+      [pointPosition, startDate, endDate, dateFormat, locale, timeUnit]
     );
 
     return (

@@ -89,7 +89,7 @@ type DatePattern = string;
  *
  * @see {@link dateFormatFn} - Built-in format for scale and date labels
  */
-export type DateFormatFn = (date: Date) => DatePattern;
+export type DateFormatFn = ({ date, unit }: { date: Date; unit?: TimeUnit }) => DatePattern;
 
 export type DateFormat = {
   scale?: DateFormatFn;
@@ -777,6 +777,7 @@ type BaseSliderTrackProps = {
   dateLabelDistanceOverHandle: number;
   dateFormat: Required<DateFormat>;
   locale: string;
+  timeUnit: TimeUnit;
 };
 
 type PointModeProps = {
@@ -875,6 +876,7 @@ export type SelectionPanelProps = {
   renderSelectionPanel: (props: SelectionPanelRenderProps) => ReactNode;
   dateFormat: Required<DateFormat>;
   locale: string;
+  timeUnit: TimeUnit;
 };
 
 export type ScalesUnitLabelsProps = {
@@ -885,6 +887,7 @@ export type ScalesUnitLabelsProps = {
   classNames?: DateSliderClassNames;
   dateFormat: Required<DateFormat>;
   locale: string;
+  timeUnit: TimeUnit;
 };
 
 export type DateLabelProps = {
