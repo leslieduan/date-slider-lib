@@ -1,12 +1,4 @@
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import {
   useDrag,
   useEventHandlers,
@@ -20,23 +12,17 @@ import {
   useSliderDimesions,
   useScales,
   useSliderVirtualization,
+  useHandlePosition,
+  useOnChangeNotifier,
 } from '@/hooks';
-import {
-  checkDateDuration,
-  clamp,
-  clampPercent,
-  cn,
-  createSelectionResult,
-  debounce,
-  generateTrackWidth,
-  getPercentFromDate,
-} from '@/utils';
-import { LAYOUT, PERCENTAGE, TIMING, ACCESSIBILITY } from '@/constants';
-import type { SliderProps, TimeUnit, DragHandle, SelectionResult } from '@/type';
+import { checkDateDuration, cn, generateTrackWidth } from '@/utils';
+import { ACCESSIBILITY } from '@/constants';
+import type { SliderProps, TimeUnit, DragHandle } from '@/type';
 import { RenderSliderHandle } from './SliderHandle';
 import { SliderTrack } from './SliderTrack';
 import { SelectionPanel } from './SelectionPanel';
 import { TimeUnitSelection } from './TimeUnitSelection';
+import { DateSliderWrapper } from './DateSliderWrapper';
 import {
   customSelectionPanelRenderer,
   customDateLabelRenderer,
@@ -62,7 +48,6 @@ export const DateSlider = memo(
 
     const [timeUnit, setTimeUnit] = useState<TimeUnit>(initialTimeUnit);
 
-    // all prop dates are expected to be UTC Date objects
     const startDate = propStartDate;
     const endDate = propEndDate;
 
@@ -117,8 +102,10 @@ export const DateSlider = memo(
     const sliderContainerRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
 
-    const dimensions = useSliderDimesions(sliderContainerRef, trackContainerRef);
-    const { sliderContainerWidth, trackContainerWidth } = dimensions;
+    const { sliderContainerWidth, trackContainerWidth } = useSliderDimesions(
+      sliderContainerRef,
+      trackContainerRef
+    );
 
     const trackWidth = useMemo(() => {
       const safeGap =
@@ -186,7 +173,8 @@ export const DateSlider = memo(
 
     useInitialAutoScrollPosition({
       scrollable: behavior.scrollable,
-      dimensions,
+      sliderContainerWidth,
+      trackContainerWidth,
       viewMode,
       pointPosition,
       rangeStartPosition,
@@ -202,69 +190,18 @@ export const DateSlider = memo(
       [resetPosition]
     );
 
-    /**
-     * Sets the date time for the specified target handle
-     *
-     * Accepts UTC Date objects only. Consumers should use toUTCDate()
-     * to convert their data before passing to this function.
-     *
-     * @param date - UTC Date object
-     * @param target - The target handle ('point', 'rangeStart', 'rangeEnd')
-     */
-    const setDateTime = useCallback(
-      (date: Date, target?: DragHandle) => {
-        // Date is expected to be UTC, no conversion needed
-        const percentage = getPercentFromDate(date, startDate, endDate);
-
-        let actualTarget = target;
-        if (!actualTarget) {
-          switch (viewMode) {
-            case 'point':
-              actualTarget = 'point';
-              break;
-            case 'range': {
-              const distanceToStart = Math.abs(percentage - rangeStartRef.current);
-              const distanceToEnd = Math.abs(percentage - rangeEndRef.current);
-              actualTarget = distanceToStart < distanceToEnd ? 'start' : 'end';
-              break;
-            }
-            case 'combined':
-              actualTarget = 'point';
-              break;
-          }
-        }
-        const clampPercentage = clampPercent(percentage, PERCENTAGE.MAX);
-
-        switch (actualTarget) {
-          case 'start': {
-            const newStart = clamp(clampPercentage, 0, rangeEndRef.current - minGapPercent);
-            setRangeStartPosition(newStart);
-            break;
-          }
-          case 'end': {
-            const newEnd = clamp(clampPercentage, 100, rangeStartRef.current + minGapPercent);
-            setRangeEndPosition(newEnd);
-            break;
-          }
-          case 'point': {
-            setPointPosition(clampPercentage);
-            break;
-          }
-        }
-        autoScrollToVisibleAreaRef.current = true;
-      },
-      [
-        startDate,
-        endDate,
-        viewMode,
-        rangeStartRef,
-        rangeEndRef,
-        minGapPercent,
-        setRangeStartPosition,
-        setRangeEndPosition,
-        setPointPosition,
-      ]
-    );
+    const { setDateTime, updateHandlePosition } = useHandlePosition({
+      minGapPercent,
+      startDate,
+      endDate,
+      viewMode,
+      setRangeStartPosition,
+      setRangeEndPosition,
+      setPointPosition,
+      rangeStartRef,
+      rangeEndRef,
+      autoScrollToVisibleAreaRef,
+    });
 
     useImperativeHandle(
       imperativeHandleRef,
@@ -275,145 +212,43 @@ export const DateSlider = memo(
       [setDateTime, requestHandleFocus]
     );
 
-    const updateHandlePosition = useCallback(
-      (handle: DragHandle, percentage: number) => {
-        const clampedPercentage = clampPercent(percentage, PERCENTAGE.MAX);
-
-        switch (handle) {
-          case 'start': {
-            const newStart = Math.max(
-              0,
-              Math.min(clampedPercentage, rangeEndRef.current - minGapPercent)
-            );
-            setRangeStartPosition(newStart);
-            break;
-          }
-          case 'end': {
-            const newEnd = Math.min(
-              clampedPercentage,
-              Math.max(percentage, rangeStartRef.current + minGapPercent) // Use original percentage here
-            );
-            setRangeEndPosition(newEnd);
-            break;
-          }
-          case 'point': {
-            setPointPosition(clampedPercentage);
-            break;
-          }
-        }
-      },
-      [
-        rangeEndRef,
-        minGapPercent,
-        setRangeStartPosition,
-        rangeStartRef,
-        setRangeEndPosition,
-        setPointPosition,
-      ]
-    );
-
     const {
       handleMouseDown,
       handleTouchStart,
       handleTrackClick,
       handleTrackTouch,
       handleHandleKeyDown,
-    } = useEventHandlers(
-      startDate,
-      endDate,
+    } = useEventHandlers({
+      dates: { startDate, endDate },
       timeUnit,
-      rangeStartRef,
-      rangeEndRef,
-      pointPositionRef,
       viewMode,
-      updateHandlePosition,
-      requestHandleFocus,
-      setIsHandleDragging,
-      setHandleDragStarted,
-      setLastInteractionType,
-      isHandleDragging,
-      trackRef,
-      handleDragComplete,
-      trackContainerRef,
-      handleDragStarted,
-      isSliderDragging,
-      totalScaleUnits,
-      behavior.freeSelectionOnTrackClick,
-      autoScrollToVisibleAreaRef
-    );
+      positions: { rangeStartRef, rangeEndRef, pointPositionRef },
+      handlers: { updateHandlePosition, requestHandleFocus, handleDragComplete },
+      dragState: {
+        isDragging: isHandleDragging,
+        handleDragStarted,
+        isContainerDragging: isSliderDragging,
+      },
+      setters: {
+        setIsDragging: setIsHandleDragging,
+        setDragStarted: setHandleDragStarted,
+        setLastInteractionType,
+      },
+      refs: { trackRef, sliderRef: trackContainerRef, autoScrollToVisibleAreaRef },
+      config: { totalScaleUnits, freeSelectionOnTrackClick: behavior.freeSelectionOnTrackClick },
+    });
 
-    const onChangeRef = useRef(onChange);
-    useEffect(() => {
-      onChangeRef.current = onChange;
-    }, [onChange]);
-
-    const debouncedOnChange = useMemo(
-      () =>
-        debounce(
-          (selection: SelectionResult) => onChangeRef.current(selection),
-          TIMING.DEBOUNCE_DELAY
-        ),
-      []
-    );
-
-    useEffect(() => {
-      const selection = createSelectionResult(
-        rangeStartPosition,
-        startDate,
-        endDate,
-        rangeEndPosition,
-        pointPosition,
-        viewMode
-      );
-      debouncedOnChange(selection);
-    }, [
-      debouncedOnChange,
-      endDate,
-      pointPosition,
-      rangeEndPosition,
+    useOnChangeNotifier({
+      onChange,
       rangeStartPosition,
+      rangeEndPosition,
+      pointPosition,
       startDate,
+      endDate,
       viewMode,
-    ]);
+    });
     return (
-      // Date Slider wrapper
-      <div
-        className={cn('flex', classNames?.wrapper)}
-        style={
-          layout.sliderWidth === 'fill'
-            ? {
-                height: layout.sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
-                width: '100%',
-                minWidth: LAYOUT.MIN_SLIDER_WIDTH,
-              }
-            : {
-                height: layout.sliderHeight ?? LAYOUT.DEFAULT_SLIDER_HEIGHT,
-                width: layout.sliderWidth,
-                minWidth: LAYOUT.MIN_SLIDER_WIDTH,
-              }
-        }
-        role="group"
-        aria-label={ACCESSIBILITY.SLIDER_ARIA_LABEL}
-      >
-        {/*
-          Layout Architecture:
-          - DateSlider wrapper width = SelectionPanel + SliderContainer + TimeUnitSelection (flex layout)
-          - SliderContainer is the scrollable viewport (flex-1)
-          - Track is the actual slider with scales, contained in SliderContainer
-
-          Width Modes:
-          1. 'fill' mode: Sets width: 100%, fills parent container. DateSlider wrapper width same as parent, SliderContainer width is flex-1, fill remaining width besides
-          TimeUnitSelection and SelectionPanel. 
-          2. Specified width: Sets explicit width in pixels. DateSlider wrapper width is specified width, SliderContainer width is flex-1, fill remaining width besides
-          TimeUnitSelection and SelectionPanel. 
-          3. Undefined: Uses flex sizing without width constraint. DateSlider wrapper width will fit content, largest to fill its parent div or screen. SliderContainer 
-          width is flex-1, fill remaining width besides TimeUnitSelection and SelectionPanel. 
-
-          Track Behavior:
-          - Scrollable (default): Track width = calculated from scales, enables horizontal scroll if needed
-          - Fixed: Track width = 100% of SliderContainer, no scrolling
-        */}
-
+      <DateSliderWrapper classNames={classNames} layout={layout}>
         {/* Time display and date selection operation */}
         {layout.selectionPanelEnabled && (
           <SelectionPanel
@@ -540,7 +375,7 @@ export const DateSlider = memo(
             }
           />
         )}
-      </div>
+      </DateSliderWrapper>
     );
   }
 );

@@ -9,6 +9,57 @@ import {
 } from '@/utils';
 import { useCallback, useEffect } from 'react';
 
+interface UseEventHandlersParams {
+  // Date range and time settings
+  dates: {
+    startDate: Date;
+    endDate: Date;
+  };
+  timeUnit: TimeUnit;
+  viewMode: ViewMode;
+
+  // Position refs
+  positions: {
+    rangeStartRef: React.RefObject<number>;
+    rangeEndRef: React.RefObject<number>;
+    pointPositionRef: React.RefObject<number>;
+  };
+
+  // Handler callbacks
+  handlers: {
+    updateHandlePosition: (handle: DragHandle, percentage: number) => void;
+    requestHandleFocus: (handleType: DragHandle, interactionType?: 'mouse' | 'keyboard') => void;
+    handleDragComplete: () => void;
+  };
+
+  // Drag state
+  dragState: {
+    isDragging: DragHandle;
+    handleDragStarted: boolean;
+    isContainerDragging: boolean;
+  };
+
+  // State setters
+  setters: {
+    setIsDragging: React.Dispatch<React.SetStateAction<DragHandle>>;
+    setDragStarted: React.Dispatch<React.SetStateAction<boolean>>;
+    setLastInteractionType: React.Dispatch<React.SetStateAction<'mouse' | 'keyboard' | null>>;
+  };
+
+  // Element refs
+  refs: {
+    trackRef: React.RefObject<HTMLDivElement | null>;
+    sliderRef: React.RefObject<HTMLDivElement | null>;
+    autoScrollToVisibleAreaRef: React.MutableRefObject<boolean>;
+  };
+
+  // Configuration
+  config: {
+    totalScaleUnits: number;
+    freeSelectionOnTrackClick: boolean;
+  };
+}
+
 /**
  * Custom hook to manage all user interaction event handlers for the slider.
  *
@@ -20,52 +71,26 @@ import { useCallback, useEffect } from 'react';
  *
  * Sets up global event listeners for drag operations and cleans them up properly.
  *
- * @param startDate - Start date of the slider range
- * @param endDate - End date of the slider range
- * @param timeUnit - Current time unit
- * @param rangeStartRef - Ref to current range start percentage
- * @param rangeEndRef - Ref to current range end percentage
- * @param pointPositionRef - Ref to current point percentage
- * @param viewMode - Current view mode (point/range/combined)
- * @param updateHandlePosition - Function to update handle positions
- * @param requestHandleFocus - Function to request focus on a handle
- * @param setIsDragging - Function to set drag state
- * @param setDragStarted - Function to set drag started state
- * @param setLastInteractionType - Function to set last interaction type
- * @param isDragging - Current dragging handle (if any)
- * @param trackRef - Reference to the track element
- * @param handleDragComplete - Function to call when drag completes
- * @param sliderRef - Reference to the slider container
- * @param handleDragStarted - Whether a drag has started
- * @param isContainerDragging - Whether the container is being dragged
- * @param totalScaleUnits - Total number of scale units
- * @param freeSelectionOnTrackClick - Whether to allow free selection or snap to scales
- * @param autoScrollToVisibleAreaEnabled - Ref to enable auto-scroll to bring handle into view
  * @returns Event handler functions for mouse, touch, and keyboard events
  */
-export function useEventHandlers(
-  startDate: Date,
-  endDate: Date,
-  timeUnit: TimeUnit,
-  rangeStartRef: React.RefObject<number>,
-  rangeEndRef: React.RefObject<number>,
-  pointPositionRef: React.RefObject<number>,
-  viewMode: ViewMode,
-  updateHandlePosition: (handle: DragHandle, percentage: number) => void,
-  requestHandleFocus: (handleType: DragHandle, interactionType?: 'mouse' | 'keyboard') => void,
-  setIsDragging: React.Dispatch<React.SetStateAction<DragHandle>>,
-  setDragStarted: React.Dispatch<React.SetStateAction<boolean>>,
-  setLastInteractionType: React.Dispatch<React.SetStateAction<'mouse' | 'keyboard' | null>>,
-  isDragging: DragHandle,
-  trackRef: React.RefObject<HTMLDivElement | null>,
-  handleDragComplete: () => void,
-  sliderRef: React.RefObject<HTMLDivElement | null>,
-  handleDragStarted: boolean,
-  isContainerDragging: boolean,
-  totalScaleUnits: number,
-  freeSelectionOnTrackClick: boolean,
-  autoScrollToVisibleAreaEnabled: React.MutableRefObject<boolean>
-) {
+export function useEventHandlers({
+  dates,
+  timeUnit,
+  viewMode,
+  positions,
+  handlers,
+  dragState,
+  setters,
+  refs,
+  config,
+}: UseEventHandlersParams) {
+  const { startDate, endDate } = dates;
+  const { rangeStartRef, rangeEndRef, pointPositionRef } = positions;
+  const { updateHandlePosition, requestHandleFocus, handleDragComplete } = handlers;
+  const { isDragging, handleDragStarted, isContainerDragging } = dragState;
+  const { setIsDragging, setDragStarted, setLastInteractionType } = setters;
+  const { trackRef, sliderRef, autoScrollToVisibleAreaRef } = refs;
+  const { totalScaleUnits, freeSelectionOnTrackClick } = config;
   const findClosestHandle = useCallback(
     (percentage: number): DragHandle => {
       const distances = [
@@ -247,7 +272,7 @@ export function useEventHandlers(
       if (newPercentage !== undefined) {
         setLastInteractionType('keyboard');
         updateHandlePosition(handle, newPercentage);
-        autoScrollToVisibleAreaEnabled.current = true;
+        autoScrollToVisibleAreaRef.current = true;
       }
     },
     [
@@ -261,7 +286,7 @@ export function useEventHandlers(
       freeSelectionOnTrackClick,
       setLastInteractionType,
       updateHandlePosition,
-      autoScrollToVisibleAreaEnabled,
+      autoScrollToVisibleAreaRef,
     ]
   );
 

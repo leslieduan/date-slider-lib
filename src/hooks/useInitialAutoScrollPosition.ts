@@ -1,10 +1,10 @@
-import type { Dimension } from '@/type';
 import { useLayoutEffect, useRef } from 'react';
 
 //if the slider is scrollable, auto scroll to center the selected date/range on initial render
 export const useInitialAutoScrollPosition = ({
   scrollable,
-  dimensions,
+  trackContainerWidth,
+  sliderContainerWidth,
   viewMode,
   pointPosition,
   rangeStartPosition,
@@ -12,7 +12,8 @@ export const useInitialAutoScrollPosition = ({
   resetPosition,
 }: {
   scrollable: boolean;
-  dimensions: Dimension;
+  sliderContainerWidth: number;
+  trackContainerWidth: number;
   viewMode: 'point' | 'range' | 'combined';
   pointPosition: number;
   rangeStartPosition: number;
@@ -24,8 +25,8 @@ export const useInitialAutoScrollPosition = ({
   useLayoutEffect(() => {
     if (
       !scrollable ||
-      dimensions.sliderContainerWidth === 0 ||
-      dimensions.trackContainerWidth === 0 ||
+      sliderContainerWidth === 0 ||
+      trackContainerWidth === 0 ||
       hasAutoScrolledRef.current
     ) {
       return;
@@ -44,23 +45,24 @@ export const useInitialAutoScrollPosition = ({
     }
 
     // Calculate the scroll offset to center the target
-    const targetPixel = (targetPercent / 100) * dimensions.trackContainerWidth;
-    const centerOffset = dimensions.sliderContainerWidth / 2;
+    const targetPixel = (targetPercent / 100) * trackContainerWidth;
+    const centerOffset = sliderContainerWidth / 2;
     const scrollOffset = -(targetPixel - centerOffset);
 
     // Clamp to valid scroll bounds
-    const maxScroll = Math.min(0, dimensions.sliderContainerWidth - dimensions.trackContainerWidth);
+    const maxScroll = Math.min(0, sliderContainerWidth - trackContainerWidth);
     const clampedOffset = Math.max(maxScroll, Math.min(0, scrollOffset));
 
     resetPosition({ x: clampedOffset, y: 0 });
     hasAutoScrolledRef.current = true;
   }, [
     scrollable,
-    dimensions,
     viewMode,
     pointPosition,
     rangeStartPosition,
     rangeEndPosition,
     resetPosition,
+    sliderContainerWidth,
+    trackContainerWidth,
   ]);
 };

@@ -14,3 +14,5 @@ export * from './useSliderConfig';
 export * from './useSliderDimensions';
 export * from './useScales';
 export * from './useSliderVirtualization';
+export * from './useHandlePosition';
+export * from './useOnChangeNotifier';
