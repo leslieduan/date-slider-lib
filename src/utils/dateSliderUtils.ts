@@ -219,11 +219,7 @@ export const generateScales = (
   const totalTimeSpan = endTime - startTime;
 
   const resolverWithDefaultFallback = (...args: Parameters<ScaleTypeResolver>) => {
-    let type;
-    if (scaleTypeResolver) type = scaleTypeResolver(...args);
-    if (type) return type as ScaleType;
-    type = defaultScaleTypeResolver(...args);
-    return type as ScaleType;
+    return (scaleTypeResolver?.(...args) || defaultScaleTypeResolver(...args)) as ScaleType;
   };
 
   // Generate both scales and time labels in a single loop
