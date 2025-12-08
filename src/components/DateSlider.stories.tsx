@@ -142,7 +142,6 @@ export const PointMode: Story = {
     classNames: {
       trackActive: 'bg-green-500/30',
       track: 'bg-gray-300',
-      handle: 'bg-green-600',
       scaleMarkMajor: 'bg-green-600',
       scaleLabel: 'text-green-800 font-medium',
     },
@@ -190,7 +189,6 @@ export const RangeMode: Story = {
     classNames: {
       trackActive: 'bg-blue-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-blue-600',
       scaleMarkMajor: 'bg-blue-600',
       scaleLabel: 'text-blue-900 font-semibold',
     },
@@ -274,7 +272,6 @@ export const WithUIComponents: Story = {
     classNames: {
       trackActive: 'bg-indigo-400/30',
       track: 'bg-gray-200',
-      handle: 'bg-indigo-600',
       scaleMarkMajor: 'bg-indigo-500',
       scaleLabel: 'text-indigo-900 font-medium',
     },
@@ -349,8 +346,8 @@ export const TimelineStyle: Story = {
       trackActive: 'bg-gradient-to-r from-blue-500 to-purple-500',
       track: 'bg-gray-200',
       trackInner: 'h-1 top-1/2 bg-red-400',
-      handle: 'shadow-xl top-1/2 -translate-y-1/2 bg-gradient-to-br from-blue-600 to-purple-600',
-      handlePoint: 'hover:scale-125 transition-transform border-2 border-white',
+      handle: 'top-1/2 -translate-y-1/2',
+      handlePoint: 'hover:scale-125 transition-transform',
       scaleLabel: 'text-gray-700 font-semibold -bottom-4',
     },
     dateFormat: {
@@ -406,7 +403,6 @@ export const FlexibleFormats: Story = {
     classNames: {
       trackActive: 'bg-indigo-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-indigo-600',
       scaleMarkMajor: 'bg-indigo-400',
       scaleLabel: 'text-indigo-700 font-medium',
     },
@@ -457,7 +453,6 @@ export const LocaleSupport: Story = {
     classNames: {
       trackActive: 'bg-rose-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-rose-600',
       scaleMarkMajor: 'bg-rose-400',
       scaleLabel: 'text-rose-700 font-medium',
     },
@@ -506,7 +501,6 @@ export const LargeDateRange: Story = {
     classNames: {
       trackActive: 'bg-emerald-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-emerald-600',
       scaleMarkMajor: 'bg-emerald-400',
       scaleLabel: 'text-emerald-700 font-medium',
     },
@@ -571,7 +565,6 @@ export const HourlyWithCustomResolver: Story = {
     classNames: {
       trackActive: 'bg-purple-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-purple-600',
       scaleMarkMajor: 'bg-purple-600',
       scaleMarkMedium: 'bg-purple-400',
       scaleMarkMinor: 'bg-purple-200',
@@ -636,7 +629,6 @@ export const DynamicStep: Story = {
     classNames: {
       trackActive: 'bg-emerald-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-emerald-600',
       scaleMarkMajor: 'bg-emerald-600',
       scaleLabel: 'text-emerald-700 font-medium',
     },

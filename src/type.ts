@@ -267,7 +267,7 @@ export type Step = {
  */
 export type StepFnContext = {
   /** Current date at the handle position */
-  currentDate: Date;
+  date: Date;
   /** Current time unit (zoom level) */
   unit: TimeUnit;
   /** Which handle is being moved */
@@ -281,7 +281,7 @@ export type StepFnContext = {
  * @example
  * ```tsx
  * // Adaptive step based on timeUnit
- * step={({ unit }) => {
+ * step={({ unit, date, handle }) => {
  *   if (unit === 'hour') return { amount: 6, unit: 'hour' };
  *   if (unit === 'day') return { amount: 7, unit: 'day' };
  *   return { amount: 1, unit };

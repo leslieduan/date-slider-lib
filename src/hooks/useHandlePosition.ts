@@ -158,14 +158,14 @@ export function useHandlePosition({
             ? rangeEndRef.current
             : pointPositionRef.current;
 
-      const currentDate = getDateFromPercent(currentPosition, startDate, endDate);
+      const date = getDateFromPercent(currentPosition, startDate, endDate);
 
       // Resolve step - either use static Step or call StepFn with context
       let resolvedStep: Step;
       if (typeof step === 'function') {
         // It's a StepFn - call it with context
         resolvedStep = step({
-          currentDate,
+          date,
           unit: timeUnit,
           handle: actualTarget,
         });
@@ -176,7 +176,7 @@ export function useHandlePosition({
 
       const { amount, unit } = resolvedStep;
       const deltaAmount = direction === 'forward' ? amount : -amount;
-      const newDate = addTime(currentDate, deltaAmount, unit);
+      const newDate = addTime(date, deltaAmount, unit);
 
       setDateTime(newDate, actualTarget);
     },
