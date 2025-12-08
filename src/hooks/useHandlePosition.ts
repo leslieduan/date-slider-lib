@@ -1,7 +1,7 @@
 import { useCallback, type MutableRefObject } from 'react';
 import { clampPercent, getPercentFromDate, getDateFromPercent, addTime } from '@/utils';
 import { PERCENTAGE } from '@/constants';
-import type { DragHandle, ViewMode, Step, TimeUnit } from '@/type';
+import type { DragHandle, ViewMode, Step, StepFn, TimeUnit } from '@/type';
 
 interface UseHandlePositionParams {
   minGapPercent: number;
@@ -15,7 +15,7 @@ interface UseHandlePositionParams {
   rangeEndRef: MutableRefObject<number>;
   pointPositionRef: MutableRefObject<number>;
   autoScrollToVisibleAreaRef: MutableRefObject<boolean>;
-  step?: Step;
+  step?: Step | StepFn;
   timeUnit: TimeUnit;
 }
 
@@ -134,6 +134,7 @@ export function useHandlePosition({
    */
   const moveByStep = useCallback(
     (direction: 'forward' | 'backward', target?: DragHandle) => {
+      // Resolve target handle if not provided
       let actualTarget = target;
       if (!actualTarget) {
         switch (viewMode) {
@@ -149,6 +150,7 @@ export function useHandlePosition({
         }
       }
 
+      // Get current position for the target handle
       const currentPosition =
         actualTarget === 'start'
           ? rangeStartRef.current
@@ -156,9 +158,23 @@ export function useHandlePosition({
             ? rangeEndRef.current
             : pointPositionRef.current;
 
-      const { amount, unit } = step || { amount: 1, unit: timeUnit };
-
       const currentDate = getDateFromPercent(currentPosition, startDate, endDate);
+
+      // Resolve step - either use static Step or call StepFn with context
+      let resolvedStep: Step;
+      if (typeof step === 'function') {
+        // It's a StepFn - call it with context
+        resolvedStep = step({
+          currentDate,
+          unit: timeUnit,
+          handle: actualTarget,
+        });
+      } else {
+        // It's a static Step or undefined
+        resolvedStep = step || { amount: 1, unit: timeUnit };
+      }
+
+      const { amount, unit } = resolvedStep;
       const deltaAmount = direction === 'forward' ? amount : -amount;
       const newDate = addTime(currentDate, deltaAmount, unit);
 
@@ -169,10 +185,10 @@ export function useHandlePosition({
       rangeStartRef,
       rangeEndRef,
       pointPositionRef,
-      step,
-      timeUnit,
       startDate,
       endDate,
+      step,
+      timeUnit,
       setDateTime,
     ]
   );

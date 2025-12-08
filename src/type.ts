@@ -263,6 +263,34 @@ export type Step = {
 };
 
 /**
+ * Context provided to step callback function
+ */
+export type StepFnContext = {
+  /** Current date at the handle position */
+  currentDate: Date;
+  /** Current time unit (zoom level) */
+  unit: TimeUnit;
+  /** Which handle is being moved */
+  handle: DragHandle;
+};
+
+/**
+ * Function type for dynamic step calculation
+ * Allows step amount/unit to vary based on context
+ *
+ * @example
+ * ```tsx
+ * // Adaptive step based on timeUnit
+ * step={({ unit }) => {
+ *   if (unit === 'hour') return { amount: 6, unit: 'hour' };
+ *   if (unit === 'day') return { amount: 7, unit: 'day' };
+ *   return { amount: 1, unit };
+ * }}
+ * ```
+ */
+export type StepFn = (context: StepFnContext) => Step;
+
+/**
  * Behavior configuration for slider interactions
  */
 export type BehaviorConfig = {
@@ -273,7 +301,25 @@ export type BehaviorConfig = {
   /**Keep point handle always visible, slider will auto scroll into point handle visible area */
   sliderAutoScrollToPointHandleVisibleEnabled?: boolean;
 
-  step?: Step;
+  /**
+   * Step configuration for navigation (keyboard arrows, SelectionPanel buttons, moveByStep API)
+   * Can be a static Step object or a function that returns a Step based on context
+   *
+   * @example Static step
+   * ```tsx
+   * step={{ amount: 7, unit: 'day' }}  // Always move 7 days
+   * ```
+   *
+   * @example Dynamic step
+   * ```tsx
+   * step={({ timeUnit }) => {
+   *   if (timeUnit === 'hour') return { amount: 6, unit: 'hour' };
+   *   if (timeUnit === 'day') return { amount: 7, unit: 'day' };
+   *   return { amount: 1, unit: timeUnit };
+   * }}
+   * ```
+   */
+  step?: Step | StepFn;
 
   /** Keep handle date label visible persistently (applies to all handles if specific ones not set) */
   handleLabelPersistent?: boolean;

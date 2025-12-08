@@ -581,3 +581,49 @@ export const HourlyWithCustomResolver: Story = {
     },
   },
 };
+
+/**
+ * Dynamic Step Configuration - Context-aware navigation
+ *
+ * Demonstrates using a callback function for the step configuration.
+ * The step amount adapts based on the current timeUnit zoom level.
+ */
+export const DynamicStep: Story = {
+  render: Template,
+  args: {
+    mode: 'point',
+    value: {
+      point: toUTCDate('2024-06-15'),
+    },
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'day',
+    layout: {
+      width: 900,
+      height: 80,
+      dateLabelEnabled: true,
+      selectionPanelEnabled: true,
+      timeUnitSelectionEnabled: true,
+    },
+    behavior: {
+      scrollable: true,
+      handleLabelPersistent: true,
+      sliderAutoScrollToPointHandleVisibleEnabled: true,
+      // Dynamic step that adapts to current unit
+      step: ({ unit }) => {
+        if (unit === 'hour') return { amount: 6, unit: 'hour' };
+        if (unit === 'day') return { amount: 7, unit: 'day' };
+        if (unit === 'month') return { amount: 3, unit: 'month' };
+        if (unit === 'year') return { amount: 1, unit: 'year' };
+        return { amount: 1, unit: unit };
+      },
+    },
+    classNames: {
+      trackActive: 'bg-emerald-500/30',
+      track: 'bg-gray-200',
+      handle: 'bg-emerald-600',
+      scaleMarkMajor: 'bg-emerald-600',
+      scaleLabel: 'text-emerald-700 font-medium',
+    },
+  },
+};
