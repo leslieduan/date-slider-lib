@@ -1,5 +1,5 @@
 import type { ScaleTypeResolver, TimeUnit } from '@/type';
-import { getTotalScales, generateScalesWithInfo, generateTimeLabelsWithPositions } from '@/utils';
+import { getTotalScales, generateScales } from '@/utils';
 import { useMemo } from 'react';
 
 export function useScales({
@@ -17,15 +17,11 @@ export function useScales({
     () => getTotalScales(startDate, endDate, timeUnit),
     [startDate, endDate, timeUnit]
   );
+
   const { scales: allScales, numberOfScales } = useMemo(
-    () => generateScalesWithInfo(startDate, endDate, timeUnit, totalScaleUnits, scaleTypeResolver),
+    () => generateScales(startDate, endDate, timeUnit, totalScaleUnits, scaleTypeResolver),
     [endDate, startDate, timeUnit, totalScaleUnits, scaleTypeResolver]
   );
 
-  const allTimeLabels = useMemo(
-    () => generateTimeLabelsWithPositions(startDate, endDate, timeUnit),
-    [startDate, endDate, timeUnit]
-  );
-
-  return { allScales, allTimeLabels, numberOfScales, totalScaleUnits };
+  return { allScales, numberOfScales, totalScaleUnits };
 }

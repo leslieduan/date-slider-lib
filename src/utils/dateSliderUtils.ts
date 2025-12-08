@@ -13,7 +13,6 @@ import type {
   ScaleTypeResolver,
   ScaleUnitConfig,
   SelectionResult,
-  TimeLabel,
   TimeUnit,
   ViewMode,
 } from '@/type';
@@ -193,7 +192,19 @@ export const generateTrackWidth = (
  * @param scaleTypeResolver - Function to determine scale type for each date (defaults to defaultScaleTypeResolver)
  * @returns Object containing scales array and count by type
  */
-export const generateScalesWithInfo = (
+/**
+ * Generate both scales and time labels in a single pass.
+ * This combines the logic of generateScalesWithInfo and generateTimeLabelsWithPositions
+ * to avoid duplicate iteration and position calculations.
+ *
+ * @param start - Start date
+ * @param end - End date
+ * @param unit - Time unit
+ * @param totalUnits - Total number of units
+ * @param scaleTypeResolver - Optional custom resolver for scale types
+ * @returns Object containing scales, timeLabels, and numberOfScales
+ */
+export const generateScales = (
   start: Date,
   end: Date,
   unit: TimeUnit,
@@ -215,6 +226,7 @@ export const generateScalesWithInfo = (
     return type as ScaleType;
   };
 
+  // Generate both scales and time labels in a single loop
   for (let i = 0; i < totalUnits; i++) {
     const current = generateNewDateByAddingScaleUnit(start, i, unit);
     if (current > end) break;
@@ -222,100 +234,27 @@ export const generateScalesWithInfo = (
     const currentTime = current.getTime();
     const position = totalTimeSpan === 0 ? 0 : ((currentTime - startTime) / totalTimeSpan) * 100;
 
-    // Use the resolver to determine scale type
+    // Add scale with type
     const type = resolverWithDefaultFallback(current, unit);
-
     scaleCounts[type]++;
     scales.push({ date: current, position, type });
   }
 
-  // Add an end scale if we don't have one exactly at the end date
-  // Check both date and position to avoid duplicates
   const lastScale = scales[scales.length - 1];
-  if (
-    scales.length > 0 &&
-    lastScale &&
-    (lastScale.date.getTime() !== endTime || lastScale.position !== 100)
-  ) {
-    const type: ScaleType = 'short';
-    scaleCounts[type]++;
-    scales.push({ date: end, position: 100, type });
-  }
-  return { scales, numberOfScales: scaleCounts };
-};
-
-/**
- * Each time label point to each sacle tick
- * @param start - Start date of the range
- * @param end - End date of the range
- * @param unit - Time unit for scales
- * @returns
- */
-export const generateTimeLabelsWithPositions = (
-  start: Date,
-  end: Date,
-  unit: TimeUnit
-): TimeLabel[] => {
-  const labels: TimeLabel[] = [];
-  const current = new Date(start);
-
-  const startTime = start.getTime();
-  const endTime = end.getTime();
-  const totalTimeSpan = endTime - startTime;
-
-  while (current <= end) {
-    let labelDate: Date | undefined;
-    switch (unit) {
-      case 'hour':
-        labelDate = new Date(
-          Date.UTC(
-            current.getUTCFullYear(),
-            current.getUTCMonth(),
-            current.getUTCDate(),
-            current.getUTCHours()
-          )
-        );
-        current.setUTCHours(current.getUTCHours() + 1);
-        break;
-      case 'day':
-        labelDate = new Date(
-          Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), current.getUTCDate())
-        );
-        current.setUTCDate(current.getUTCDate() + 1);
-        break;
-      case 'month':
-        labelDate = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 1));
-        current.setUTCMonth(current.getUTCMonth() + 1);
-        break;
-      case 'year': {
-        labelDate = new Date(Date.UTC(current.getUTCFullYear(), 0, 1));
-        current.setUTCFullYear(current.getUTCFullYear() + 1);
-        break;
-      }
-    }
-
-    if (
-      labelDate &&
-      labelDate.getTime() <= end.getTime() &&
-      (labels.length === 0 || labels[labels.length - 1].date.getTime() !== labelDate.getTime())
-    ) {
-      // Calculate position using the same method as scales
-      const labelTime = labelDate.getTime();
-      const percentage = totalTimeSpan === 0 ? 0 : ((labelTime - startTime) / totalTimeSpan) * 100;
-
-      labels.push({ date: labelDate, position: percentage });
-    }
-  }
-
-  // Add end label if needed
   const endLabel = getRepresentativeDate(end, unit);
-  if (labels.length === 0 || labels[labels.length - 1].date.getTime() !== endLabel.getTime()) {
-    const labelTime = endLabel.getTime();
-    const percentage = totalTimeSpan === 0 ? 0 : ((labelTime - startTime) / totalTimeSpan) * 100;
-    labels.push({ date: endLabel, position: percentage });
+  const needsEndEntry = scales.length === 0 || lastScale.date.getTime() !== endLabel.getTime();
+
+  if (needsEndEntry) {
+    const endTime = endLabel.getTime();
+    const endPosition = totalTimeSpan === 0 ? 100 : ((endTime - startTime) / totalTimeSpan) * 100;
+
+    // Add end scale
+    const endScaleType: ScaleType = 'short';
+    scaleCounts[endScaleType]++;
+    scales.push({ date: endLabel, position: endPosition, type: endScaleType });
   }
 
-  return labels;
+  return { scales, numberOfScales: scaleCounts };
 };
 
 /**

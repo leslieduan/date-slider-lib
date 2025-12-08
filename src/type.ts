@@ -707,7 +707,6 @@ type BaseSliderTrackProps = {
   trackHoverCursorLineDisabled?: boolean;
   classNames?: DateSliderClassNames;
   renderDateLabel?: (props: DateLabelRenderProps) => ReactNode;
-  timeLabels: TimeLabel[];
   trackWidth: number;
   minDistance?: number;
   withEndLabel?: boolean;
@@ -816,7 +815,6 @@ export type SelectionPanelProps = {
 };
 
 export type ScalesUnitLabelsProps = {
-  timeLabels: TimeLabel[];
   scales: Scale[];
   trackWidth: number;
   minDistance?: number;

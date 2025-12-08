@@ -4,7 +4,6 @@ import { memo, useCallback, useMemo } from 'react';
 
 export const ScalesUnitLabels = memo(
   ({
-    timeLabels,
     scales,
     trackWidth,
     minDistance = 40,
@@ -13,15 +12,15 @@ export const ScalesUnitLabels = memo(
     dateFormat,
     locale,
   }: ScalesUnitLabelsProps) => {
-    const getVisibleLabels = useCallback((): TimeLabel[] => {
-      if (!timeLabels.length || !scales.length) return [];
+    const getVisibleScaleLabels = useCallback((): TimeLabel[] => {
+      if (!scales.length || !scales.length) return [];
       const visible: TimeLabel[] = [];
-      const firstHidden = timeLabels[0].date.getTime() < scales[0].date.getTime();
+      const firstHidden = scales[0].date.getTime() < scales[0].date.getTime();
 
       let lastPos = -Infinity;
 
-      for (let i = 0; i < timeLabels.length; i++) {
-        const label = timeLabels[i];
+      for (let i = 0; i < scales.length; i++) {
+        const label = scales[i];
         const pos = i === 0 && firstHidden ? 0 : label.position;
 
         if ((pos - lastPos) * trackWidth >= minDistance) {
@@ -34,13 +33,13 @@ export const ScalesUnitLabels = memo(
       }
 
       return withEndLabel ? visible : visible.slice(0, -1);
-    }, [timeLabels, scales, trackWidth, minDistance, withEndLabel]);
+    }, [scales, trackWidth, minDistance, withEndLabel]);
 
-    const visibleLabels = useMemo(() => getVisibleLabels(), [getVisibleLabels]);
+    const visibleScaleLabels = useMemo(() => getVisibleScaleLabels(), [getVisibleScaleLabels]);
 
     return (
       <>
-        {visibleLabels.map(({ date, position }, index) => (
+        {visibleScaleLabels.map(({ date, position }, index) => (
           <span
             key={`${date.getTime()}-${index}`}
             className={cn(

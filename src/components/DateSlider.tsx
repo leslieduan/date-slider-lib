@@ -66,7 +66,7 @@ export const DateSlider = memo(
     const startDate = propStartDate;
     const endDate = propEndDate;
 
-    const { allScales, allTimeLabels, numberOfScales, totalScaleUnits } = useScales({
+    const { allScales, numberOfScales, totalScaleUnits } = useScales({
       startDate,
       endDate,
       timeUnit,
@@ -162,13 +162,12 @@ export const DateSlider = memo(
       },
     });
 
-    const { scales, timeLabels } = useSliderVirtualization({
+    const { scales } = useSliderVirtualization({
       behavior,
       trackWidth,
       sliderContainerWidth,
       sliderPositionX: sliderPosition.x,
       allScales,
-      allTimeLabels,
     });
 
     useHandleAutoScrollToVisible({
@@ -482,7 +481,6 @@ export const DateSlider = memo(
                       : undefined
                   }
                   trackWidth={trackWidth}
-                  timeLabels={timeLabels}
                   withEndLabel={layout.withEndLabel}
                   dateLabelDistanceOverHandle={layout.dateLabelDistance}
                   dateFormat={dateFormat}

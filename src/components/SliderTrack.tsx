@@ -1,4 +1,4 @@
-import type { ScaleType, SliderTrackProps } from '@/type';
+import type { Scale, ScaleType, SliderTrackProps } from '@/type';
 import {
   cn,
   getPercentageFromMouseEvent,
@@ -50,7 +50,7 @@ const Scales = memo(
     scaleMarkMediumClassName,
     scaleMarkMinorClassName,
   }: {
-    scales?: Array<{ position: number; type: ScaleType }>;
+    scales?: Scale[];
     scaleUnitConfig: {
       width: Record<ScaleType, number>;
       height: Record<ScaleType, number>;
@@ -124,7 +124,6 @@ export const SliderTrack = memo(
     trackHoverCursorLineDisabled,
     classNames,
     renderDateLabel,
-    timeLabels,
     trackWidth,
     withEndLabel,
     dateLabelDistanceOverHandle,
@@ -272,7 +271,6 @@ export const SliderTrack = memo(
             scaleMarkMinorClassName={classNames?.scaleMarkMinor}
           />
           <ScalesUnitLabels
-            timeLabels={timeLabels}
             scales={scales}
             trackWidth={trackWidth}
             withEndLabel={withEndLabel}
@@ -299,7 +297,6 @@ export const SliderTrack = memo(
         scales,
         scaleUnitConfig,
         classNames,
-        timeLabels,
         trackWidth,
         withEndLabel,
         dateFormat,
