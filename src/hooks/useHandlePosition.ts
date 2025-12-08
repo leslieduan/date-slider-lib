@@ -1,7 +1,7 @@
 import { useCallback, type MutableRefObject } from 'react';
-import { clamp, clampPercent, getPercentFromDate } from '@/utils';
+import { clampPercent, getPercentFromDate, getDateFromPercent, addTime } from '@/utils';
 import { PERCENTAGE } from '@/constants';
-import type { DragHandle, ViewMode } from '@/type';
+import type { DragHandle, ViewMode, Step, StepFn, TimeUnit } from '@/type';
 
 interface UseHandlePositionParams {
   minGapPercent: number;
@@ -13,7 +13,10 @@ interface UseHandlePositionParams {
   setPointPosition: (position: number) => void;
   rangeStartRef: MutableRefObject<number>;
   rangeEndRef: MutableRefObject<number>;
+  pointPositionRef: MutableRefObject<number>;
   autoScrollToVisibleAreaRef: MutableRefObject<boolean>;
+  step?: Step | StepFn;
+  timeUnit: TimeUnit;
 }
 
 /**
@@ -30,7 +33,10 @@ export function useHandlePosition({
   setPointPosition,
   rangeStartRef,
   rangeEndRef,
+  pointPositionRef,
   autoScrollToVisibleAreaRef,
+  step,
+  timeUnit,
 }: UseHandlePositionParams) {
   /**
    * Update handle position by percentage with gap constraints
@@ -86,6 +92,7 @@ export function useHandlePosition({
       // Date is expected to be UTC, no conversion needed
       const percentage = getPercentFromDate(date, startDate, endDate);
 
+      // Resolve target handle if not provided
       let actualTarget = target;
       if (!actualTarget) {
         switch (viewMode) {
@@ -103,24 +110,9 @@ export function useHandlePosition({
             break;
         }
       }
-      const clampPercentage = clampPercent(percentage, PERCENTAGE.MAX);
 
-      switch (actualTarget) {
-        case 'start': {
-          const newStart = clamp(clampPercentage, 0, rangeEndRef.current - minGapPercent);
-          setRangeStartPosition(newStart);
-          break;
-        }
-        case 'end': {
-          const newEnd = clamp(clampPercentage, 100, rangeStartRef.current + minGapPercent);
-          setRangeEndPosition(newEnd);
-          break;
-        }
-        case 'point': {
-          setPointPosition(clampPercentage);
-          break;
-        }
-      }
+      updateHandlePosition(actualTarget, percentage);
+
       autoScrollToVisibleAreaRef.current = true;
     },
     [
@@ -129,13 +121,77 @@ export function useHandlePosition({
       viewMode,
       rangeStartRef,
       rangeEndRef,
-      minGapPercent,
-      setRangeStartPosition,
-      setRangeEndPosition,
-      setPointPosition,
+      updateHandlePosition,
       autoScrollToVisibleAreaRef,
     ]
   );
 
-  return { setDateTime, updateHandlePosition };
+  /**
+   * Move the handle by the configured step amount
+   *
+   * @param direction - 'forward' or 'backward'
+   * @param target - Which handle to move ('start', 'end', 'point'). Defaults based on viewMode.
+   */
+  const moveByStep = useCallback(
+    (direction: 'forward' | 'backward', target?: DragHandle) => {
+      // Resolve target handle if not provided
+      let actualTarget = target;
+      if (!actualTarget) {
+        switch (viewMode) {
+          case 'point':
+            actualTarget = 'point';
+            break;
+          case 'range':
+            actualTarget = 'start';
+            break;
+          case 'combined':
+            actualTarget = 'point';
+            break;
+        }
+      }
+
+      // Get current position for the target handle
+      const currentPosition =
+        actualTarget === 'start'
+          ? rangeStartRef.current
+          : actualTarget === 'end'
+            ? rangeEndRef.current
+            : pointPositionRef.current;
+
+      const date = getDateFromPercent(currentPosition, startDate, endDate);
+
+      // Resolve step - either use static Step or call StepFn with context
+      let resolvedStep: Step;
+      if (typeof step === 'function') {
+        // It's a StepFn - call it with context
+        resolvedStep = step({
+          date,
+          unit: timeUnit,
+          handle: actualTarget,
+        });
+      } else {
+        // It's a static Step or undefined
+        resolvedStep = step || { amount: 1, unit: timeUnit };
+      }
+
+      const { amount, unit } = resolvedStep;
+      const deltaAmount = direction === 'forward' ? amount : -amount;
+      const newDate = addTime(date, deltaAmount, unit);
+
+      setDateTime(newDate, actualTarget);
+    },
+    [
+      viewMode,
+      rangeStartRef,
+      rangeEndRef,
+      pointPositionRef,
+      startDate,
+      endDate,
+      step,
+      timeUnit,
+      setDateTime,
+    ]
+  );
+
+  return { setDateTime, moveByStep, updateHandlePosition };
 }

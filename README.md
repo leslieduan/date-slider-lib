@@ -12,13 +12,14 @@ A powerful, fully customizable React date slider component with range, point, an
 
 - **3 Selection Modes**: Point, Range, and Combined
 - **4 Time Units**: Hour, Day, Month, and Year granularity
+- **Step Navigation**: Configurable step amounts for keyboard and button navigation (static or dynamic)
 - **Fully Customizable**: Style with Tailwind CSS classes and custom scale type resolvers
 - **TypeScript**: Complete type safety
 - **Accessible**: WCAG compliant with keyboard navigation
 - **Mobile-Optimized**: Auto-adapts with persistent labels on mobile
 - **Optional UI Components**: Time display, unit selector, and date labels with defaults
-- **Default Icons**: Built-in icons, customization optional
 - **High Performance**: Automatic virtualization for large date ranges
+- **Imperative API**: Programmatic control with `setDateTime`, `moveByStep`, and `focusHandle`
 
 ## Performance
 
@@ -242,14 +243,22 @@ Customize date formats using standard [dayjs format tokens](https://day.js.org/d
   mode="point"
   value={{ point: new Date() }}
   dateFormat={{
-    scale: (date) => {
+    scale: ({ date, unit }) => {
       const day = date.getUTCDate();
       if (day === 1) return 'MMM';      // "Jun" on first day
       return 'DD';                       // "15" on other days
     },
-    label: (date) => 'DD-MMM-YYYY',      // "15-Jun-2024"
+    label: ({ date, unit }) => 'DD-MMM-YYYY',  // "15-Jun-2024"
   }}
 />
+```
+
+**Format function signature**:
+```typescript
+type DateFormatFn = (params: {
+  date: Date;        // The date to format
+  unit?: TimeUnit;   // Current time unit (hour/day/month/year)
+}) => string;
 ```
 
 **Common format tokens**: `YYYY`, `MM`, `DD`, `MMM`, `MMMM`, `HH`, `mm`, `ddd`, `dddd`
@@ -257,28 +266,17 @@ Customize date formats using standard [dayjs format tokens](https://day.js.org/d
 **Full token list**: [dayjs format documentation](https://day.js.org/docs/en/display/format)
 
 **Separator examples**:
-```tsx
-dateFormat={{
-  scale: (date) => 'YYYY-MM-DD',   // "2024-06-15" (hyphens)
-  label: (date) => 'DD/MM/YYYY'    // "15/06/2024" (slashes)
-}}
-
-dateFormat={{
-  scale: (date) => 'MMM DD, YYYY', // "Jun 15, 2024" (comma + space)
-  label: (date) => 'YYYY.MM.DD'    // "2024.06.15" (dots)
-}}
-```
 
 You can specify `scale` only, `label` only, or both:
 
 ```tsx
 // Same format for both scale and labels
-dateFormat={{ scale: (date) => 'YYYY-MM-DD' }}
+dateFormat={{ scale: ({ date }) => 'YYYY-MM-DD' }}
 
 // Different formats
 dateFormat={{
-  scale: (date) => 'DD',
-  label: (date) => 'DD-MMM-YYYY'
+  scale: ({ date }) => 'DD',
+  label: ({ date }) => 'DD-MMM-YYYY'
 }}
 ```
 
@@ -297,8 +295,8 @@ import 'dayjs/locale/es';  // Spanish
   value={{ point: new Date() }}
   locale="fr"  // French locale
   dateFormat={{
-    scale: (date) => 'DD MMM',
-    label: (date) => 'dddd, DD MMMM YYYY'  // "lundi, 15 juin 2024"
+    scale: ({ date }) => 'DD MMM',
+    label: ({ date }) => 'dddd, DD MMMM YYYY'  // "lundi, 15 juin 2024"
   }}
 />
 ```
@@ -322,12 +320,12 @@ Perfect for detailed timeline views, event scheduling, or time tracking applicat
   max={new Date('2024-12-08T23:59:59Z')}
   initialTimeUnit="hour"
   dateFormat={{
-    scale: (date) => {
+    scale: ({ date }) => {
       const hour = date.getUTCHours();
       if (hour === 0) return 'DD HH:mm';  // Midnight: show date
       return 'HH:mm';                      // Other hours: show time
     },
-    label: () => 'DD MMM YYYY HH:mm'
+    label: ({ date }) => 'DD MMM YYYY HH:mm'
   }}
 />
 ```
@@ -414,7 +412,7 @@ Control the visual hierarchy of scale marks (short/medium/long) with a custom re
   behavior={{
     handleLabelPersistent: true,           // All handles: always visible
     pointHandleLabelPersistent: true,      // Point only: always visible
-    rangeHandleLabelPersistent: false,     // Range only: hover to show
+    rangeHandleLabelPersistent: false,     // Range only: always visible
     trackHoverDateLabelDisabled: false,    // Enable/disable track hover label
     trackHoverCursorLineDisabled: false,   // Enable/disable cursor line
   }}
@@ -422,6 +420,63 @@ Control the visual hierarchy of scale marks (short/medium/long) with a custom re
 ```
 
 **Note**: On mobile, labels are automatically persistent for better usability.
+
+### Step Navigation
+
+Configure how the slider navigates when using keyboard arrow keys or SelectionPanel buttons. You can use a static step amount or a dynamic callback function that adapts to context.
+
+#### Static Step
+
+Navigate by a fixed amount:
+
+```tsx
+<DateSlider
+  mode="point"
+  value={{ point: new Date() }}
+  behavior={{
+    step: { amount: 7, unit: 'day' }  // Move 7 days at a time
+  }}
+/>
+```
+
+#### Dynamic Step (Callback)
+
+Adapt step amount based on current zoom level, date, or handle:
+
+```tsx
+<DateSlider
+  mode="point"
+  value={{ point: new Date() }}
+  layout={{
+    timeUnitSelectionEnabled: true,  // Allow switching between hour/day/month/year
+  }}
+  behavior={{
+    // Step adapts to current timeUnit
+    step: ({ unit }) => {
+      if (unit === 'hour') return { amount: 6, unit: 'hour' };
+      if (unit === 'day') return { amount: 7, unit: 'day' };
+      if (unit === 'month') return { amount: 3, unit: 'month' };
+      return { amount: 1, unit };
+    }
+  }}
+/>
+```
+
+**Step function context**:
+```typescript
+type StepFn = (context: {
+  date: Date;     // Current date at handle position
+  unit: TimeUnit;        // Current zoom level (hour/day/month/year)
+  handle: DragHandle;    // Which handle is being moved ('start'/'end'/'point')
+}) => Step;
+```
+
+**Use cases**:
+- **Adaptive navigation**: Different steps for different zoom levels
+- **Date-aware stepping**: Jump to first of month, quarters, etc.
+- **Handle-specific steps**: Different steps for range start vs end
+
+**Default behavior**: If no step is configured, the slider moves by 1 unit of the current `timeUnit`.
 
 ### Layout & Behavior
 
@@ -452,6 +507,8 @@ Control the visual hierarchy of scale marks (short/medium/long) with a custom re
 
 ### Imperative API
 
+Control the slider programmatically using a ref. Three methods are available:
+
 ```tsx
 import { useRef } from 'react';
 import type { SliderExposedMethod } from 'date-slider-lib';
@@ -460,10 +517,22 @@ function App() {
   const sliderRef = useRef<SliderExposedMethod>(null);
 
   const setToToday = () => {
+    // Absolute positioning: set to a specific date
     sliderRef.current?.setDateTime(new Date(), 'point');
   };
 
+  const moveForward = () => {
+    // Relative positioning: move by configured step
+    sliderRef.current?.moveByStep('forward', 'point');
+  };
+
+  const moveBackward = () => {
+    // Relative positioning: move by configured step
+    sliderRef.current?.moveByStep('backward', 'point');
+  };
+
   const focusHandle = () => {
+    // Focus management: set keyboard focus to handle
     sliderRef.current?.focusHandle('point');
   };
 
@@ -473,13 +542,33 @@ function App() {
         mode="point"
         value={{ point: new Date() }}
         imperativeRef={sliderRef}
+        behavior={{
+          step: { amount: 7, unit: 'day' }  // moveByStep will use this
+        }}
       />
       <button onClick={setToToday}>Set to Today</button>
+      <button onClick={moveBackward}>← Previous Week</button>
+      <button onClick={moveForward}>Next Week →</button>
       <button onClick={focusHandle}>Focus Handle</button>
     </>
   );
 }
 ```
+
+**API Methods**:
+
+- **`setDateTime(date: Date, target?: DragHandle)`**: Set handle to a specific date
+  - `date`: UTC Date to set
+  - `target`: Optional - which handle to move ('start', 'end', 'point'). Auto-detects if not provided.
+
+- **`moveByStep(direction: 'forward' | 'backward', target?: DragHandle)`**: Move handle by configured step amount
+  - `direction`: 'forward' or 'backward'
+  - `target`: Optional - which handle to move. Defaults based on mode.
+  - Uses the `step` configuration from `behavior.step`
+
+- **`focusHandle(handleType: DragHandle)`**: Set keyboard focus to a handle
+  - `handleType`: Which handle to focus ('start', 'end', 'point')
+
 
 ## API Reference
 
@@ -515,10 +604,13 @@ type CombinedValue = { point: Date; start: Date; end: Date };
 
 ```typescript
 {
+  // Navigation
   scrollable?: boolean;
   freeSelectionOnTrackClick?: boolean;
   sliderAutoScrollToPointHandleVisibleEnabled?: boolean;
+  step?: Step | StepFn;  // Static step or dynamic callback
 
+  // Label behavior
   handleLabelPersistent?: boolean;
   handleLabelDisabled?: boolean;
   pointHandleLabelPersistent?: boolean;
@@ -526,9 +618,22 @@ type CombinedValue = { point: Date; start: Date; end: Date };
   rangeHandleLabelPersistent?: boolean;
   rangeHandleLabelDisabled?: boolean;
 
+  // Track hover behavior
   trackHoverDateLabelDisabled?: boolean;
   trackHoverCursorLineDisabled?: boolean;
 }
+
+// Step types
+type Step = {
+  amount: number;
+  unit: 'hour' | 'day' | 'month' | 'year';
+};
+
+type StepFn = (context: {
+  date: Date;
+  unit: TimeUnit;
+  handle: DragHandle;
+}) => Step;
 ```
 
 ### LayoutConfig
@@ -561,10 +666,14 @@ Test mobile behavior by resizing your browser to mobile viewport.
 
 ## Accessibility
 
-- ✅ Keyboard navigation (Arrow keys, Home, End, Page Up/Down)
-- ✅ ARIA labels for screen readers
-- ✅ Visible focus indicators
-- ✅ Touch support
+- ✅ **Keyboard navigation**:
+  - Arrow keys: Move by configured `step` amount
+  - Home: Jump to minimum date
+  - End: Jump to maximum date
+  - Tab: Move between handles
+- ✅ **ARIA labels** for screen readers
+- ✅ **Visible focus indicators**
+- ✅ **Touch support** with mobile optimizations
 
 
 ## License

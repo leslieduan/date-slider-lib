@@ -142,12 +142,11 @@ export const PointMode: Story = {
     classNames: {
       trackActive: 'bg-green-500/30',
       track: 'bg-gray-300',
-      handle: 'bg-green-600',
       scaleMarkMajor: 'bg-green-600',
       scaleLabel: 'text-green-800 font-medium',
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         return day === 1 ? 'MMM YYYY' : '';
       },
@@ -190,7 +189,6 @@ export const RangeMode: Story = {
     classNames: {
       trackActive: 'bg-blue-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-blue-600',
       scaleMarkMajor: 'bg-blue-600',
       scaleLabel: 'text-blue-900 font-semibold',
     },
@@ -266,11 +264,14 @@ export const WithUIComponents: Story = {
       handleLabelPersistent: true,
       scrollable: true,
       sliderAutoScrollToPointHandleVisibleEnabled: true,
+      step: {
+        amount: 14,
+        unit: 'day',
+      },
     },
     classNames: {
       trackActive: 'bg-indigo-400/30',
       track: 'bg-gray-200',
-      handle: 'bg-indigo-600',
       scaleMarkMajor: 'bg-indigo-500',
       scaleLabel: 'text-indigo-900 font-medium',
     },
@@ -316,8 +317,6 @@ export const CustomIcons: Story = {
 /**
  * Timeline Style - Minimal scale marks for timeline displays
  *
- * Demonstrates a timeline-style configuration with minimal scale marks,
- * custom positioning, and optimized for clean timeline interfaces.
  */
 export const TimelineStyle: Story = {
   render: Template,
@@ -331,7 +330,7 @@ export const TimelineStyle: Story = {
     initialTimeUnit: 'day' as TimeUnit,
     layout: {
       width: 600,
-      height: 60,
+      height: 80,
       scaleUnitConfig: {
         gap: 150,
         width: { short: 0, medium: 0, long: 2 },
@@ -347,12 +346,12 @@ export const TimelineStyle: Story = {
       trackActive: 'bg-gradient-to-r from-blue-500 to-purple-500',
       track: 'bg-gray-200',
       trackInner: 'h-1 top-1/2 bg-red-400',
-      handle: 'top-1/2 -translate-y-1/2 ',
-      handlePoint: 'hover:scale-125 transition-transform ',
-      scaleLabel: '-bottom-4',
+      handle: 'top-1/2 -translate-y-1/2',
+      handlePoint: 'hover:scale-125 transition-transform',
+      scaleLabel: 'text-gray-700 font-semibold -bottom-4',
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         return day === 1 ? 'MMM YYYY' : 'DD MMM';
       },
@@ -387,7 +386,7 @@ export const FlexibleFormats: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
 
@@ -404,7 +403,6 @@ export const FlexibleFormats: Story = {
     classNames: {
       trackActive: 'bg-indigo-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-indigo-600',
       scaleMarkMajor: 'bg-indigo-400',
       scaleLabel: 'text-indigo-700 font-medium',
     },
@@ -438,7 +436,7 @@ export const LocaleSupport: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
 
@@ -455,7 +453,6 @@ export const LocaleSupport: Story = {
     classNames: {
       trackActive: 'bg-rose-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-rose-600',
       scaleMarkMajor: 'bg-rose-400',
       scaleLabel: 'text-rose-700 font-medium',
     },
@@ -492,7 +489,7 @@ export const LargeDateRange: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
         if (day === 1 && month === 0) return 'YYYY';
@@ -504,7 +501,6 @@ export const LargeDateRange: Story = {
     classNames: {
       trackActive: 'bg-emerald-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-emerald-600',
       scaleMarkMajor: 'bg-emerald-400',
       scaleLabel: 'text-emerald-700 font-medium',
     },
@@ -555,7 +551,7 @@ export const HourlyWithCustomResolver: Story = {
       handleLabelPersistent: true,
     },
     dateFormat: {
-      scale: (date) => {
+      scale: ({ date }) => {
         const hour = date.getUTCHours();
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
@@ -569,11 +565,72 @@ export const HourlyWithCustomResolver: Story = {
     classNames: {
       trackActive: 'bg-purple-500/30',
       track: 'bg-gray-200',
-      handle: 'bg-purple-600',
       scaleMarkMajor: 'bg-purple-600',
       scaleMarkMedium: 'bg-purple-400',
       scaleMarkMinor: 'bg-purple-200',
       scaleLabel: 'text-purple-700 font-semibold text-xs',
+    },
+  },
+};
+
+/**
+ * Dynamic Step Configuration - Context-aware navigation
+ *
+ * Demonstrates using a callback function for the step configuration.
+ * The step amount adapts based on the current timeUnit zoom level.
+ */
+export const DynamicStep: Story = {
+  render: Template,
+  args: {
+    mode: 'point',
+    value: {
+      point: toUTCDate('2024-06-15'),
+    },
+    min: toUTCDate('2024-01-01'),
+    max: toUTCDate('2024-12-31'),
+    initialTimeUnit: 'day',
+    layout: {
+      width: 900,
+      height: 80,
+      dateLabelEnabled: true,
+      selectionPanelEnabled: true,
+      timeUnitSelectionEnabled: true,
+    },
+    dateFormat: {
+      scale: ({ date, unit }) => {
+        const hour = date.getUTCHours();
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth();
+        if (month === 0 && day === 1 && hour === 0) return 'YYYY';
+        if (day === 1 && hour === 0) return 'MMM ';
+        if (hour === 0 && unit !== 'hour') return 'DD';
+        if (hour === 0 && unit === 'hour') return 'dd';
+        if (hour % 3 === 0) return 'HH:mm';
+        return '';
+      },
+      label: ({ unit }) => {
+        if (unit === 'hour') return 'DD MMM YYYY HH:mm';
+        return 'DD MMM YYYY ';
+      },
+    },
+    behavior: {
+      scrollable: true,
+      handleLabelPersistent: true,
+      sliderAutoScrollToPointHandleVisibleEnabled: true,
+      // Dynamic step that adapts to current unit
+      step: ({ unit }) => {
+        if (unit === 'hour') return { amount: 6, unit: 'hour' };
+        if (unit === 'day') return { amount: 7, unit: 'day' };
+        if (unit === 'month') return { amount: 3, unit: 'month' };
+        if (unit === 'year') return { amount: 1, unit: 'year' };
+        return { amount: 1, unit: unit };
+      },
+    },
+    classNames: {
+      trackActive: 'bg-emerald-500/30',
+      track: 'bg-gray-200',
+      scaleMarkMajor: 'bg-emerald-600',
+      scaleLabel: 'text-emerald-700 font-medium',
     },
   },
 };
