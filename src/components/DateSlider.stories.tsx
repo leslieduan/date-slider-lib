@@ -125,7 +125,6 @@ export const Default: Story = {
  * Point Mode - Single date selection
  *
  * Demonstrates point mode with custom styling and date formatting.
- * Useful for event selection, calendar pickers, etc.
  */
 export const PointMode: Story = {
   render: Template,
@@ -161,7 +160,6 @@ export const PointMode: Story = {
  * Range Mode - Date range selection
  *
  * Shows range selection with scrollable behavior and custom scale configuration.
- * Ideal for booking systems, filters, and analytics dashboards.
  */
 export const RangeMode: Story = {
   render: Template,
@@ -536,7 +534,7 @@ export const HourlyWithCustomResolver: Story = {
       end: toUTCDate('2024-12-07T16:00:00Z'),
     },
     min: toUTCDate('2024-12-07T00:00:00Z'),
-    max: toUTCDate('2024-12-08T23:59:59Z'),
+    max: toUTCDate('2024-12-10T23:59:59Z'),
     initialTimeUnit: 'hour' as TimeUnit,
     scaleTypeResolver: (date, timeUnit) => {
       // Only customize hour timeUnit, return undefined for others to use defaults
@@ -562,8 +560,8 @@ export const HourlyWithCustomResolver: Story = {
         const day = date.getUTCDate();
         const month = date.getUTCMonth();
         if (month === 0 && day === 1 && hour === 0) return 'YYYY';
-        if (hour === 0) return 'MMM DD HH:mm';
-        if (hour % 6 === 0) return 'HH:mm';
+        if (hour === 0) return 'dd';
+        if (hour % 3 === 0) return 'HH:mm';
         return '';
       },
       label: () => 'DD MMM YYYY HH:mm',
