@@ -150,13 +150,14 @@ export function useHandlePosition({
         }
       }
 
+      const positionMap = {
+        start: rangeStartRef.current,
+        end: rangeEndRef.current,
+        point: pointPositionRef.current,
+      } as const;
+
       // Get current position for the target handle
-      const currentPosition =
-        actualTarget === 'start'
-          ? rangeStartRef.current
-          : actualTarget === 'end'
-            ? rangeEndRef.current
-            : pointPositionRef.current;
+      const currentPosition = positionMap[actualTarget];
 
       const date = getDateFromPercent(currentPosition, startDate, endDate);
 
